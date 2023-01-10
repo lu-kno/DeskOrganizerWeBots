@@ -31,6 +31,37 @@ from controller import Supervisor
 from controller import Robot
 
 
+
+class MyGripper:
+    def __init__(self):
+        self.f1 = [supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
+        self.f2 = [supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
+        self.f3 = [supervisor.getDevice(f'finger_middle_joint_{i}') for i in [1,2,3]]
+        self.fingers = [self.f1,self.f2,self.f3]
+        self.enableForceFeedback()
+        
+    def close(self):
+        # inc = 0.5
+        for f in self.fingers:
+            # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
+            f[0].setPosition(f[0].getMaxPosition())
+            
+    def open(self):
+        for f in self.fingers:
+            # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
+            f[0].setPosition(f[0].getMinPosition())
+            
+    def enableForceFeedback(self):
+        for f in self.fingers:
+            for j in f:
+                j.enableForceFeedback()
+            
+    def printForces(self):
+        print(f'forces:')
+        for i,f in enumerate(self.fingers):
+            print(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
+  
+
 if ikpy.__version__[0] < '3':
     sys.exit('The "ikpy" Python module version is too old. '
              'Please upgrade "ikpy" Python module to version "3.0" or newer with this command: "pip install --upgrade ikpy"')
@@ -40,6 +71,10 @@ IKPY_MAX_ITERATIONS = 4
 
 print('Initialize the Webots Supervisor.')
 supervisor = Supervisor()
+keyboard = supervisor.getKeyboard()
+keyboard.enable(50)
+gripper = MyGripper()
+
 timeStep = int(4 * supervisor.getBasicTimeStep())
 
 print('Create the arm chain from the URDF')
@@ -67,9 +102,6 @@ arm = supervisor.getSelf()
 
 
 
-
-def setGripper(distance):
-    pass    
 
 
 print('Loop 1: Draw a circle on the paper sheet.')
@@ -108,8 +140,7 @@ while supervisor.step(timeStep) != -1 and DrawCircle:
 
 # Loop 2: Move the arm hand to the target.
 print('Move the yellow and black sphere to move the arm...')
-counter=0
-inc = 0.05
+
 while supervisor.step(timeStep) != -1:
     # Get the absolute postion of the target and the arm base.
     targetPosition = target.getPosition()
@@ -135,25 +166,18 @@ while supervisor.step(timeStep) != -1:
         motors[i].setPosition(ikResults[i + 1])
         
         
-    fingers = ['finger_1_joint_1', 'finger_2_joint_1', 'finger_middle_joint_1', 'palm_finger_1_joint', 'palm_finger_2_joint']
+    gripper.printForces()
+        
+    key = keyboard.getKey()
+    if (key==ord('A')):
+        gripper.close()
+        print('closing grip')
+    if (key==ord('S')):
+        gripper.open()
+        print('opening grip')        
     
-    fingersJ1 = [supervisor.getDevice(f'finger_{i}_joint_1') for i in [1,2,'middle']]
-    fingersJ2 = [supervisor.getDevice(f'finger_{i}_joint_2') for i in [1,2,'middle']]
-    fingersJ3 = [supervisor.getDevice(f'finger_{i}_joint_3') for i in [1,2,'middle']]
-        
-    for j in [fingersJ1,fingersJ2, fingersJ3]:
-        for f in j:
-            f.enableForceFeedback()
-        
-    print(f'forces:')
-        
-    for i,f in enumerate(fingersJ1):
-        fpos = abs((counter % f.getMaxPosition()*2) - f.getMaxPosition())
-        f.setPosition(max(fpos,f.getMinPosition()))
-        print(f'  Finger {i} FF:  {f.getForceFeedback()}')        
-        
-    counter += inc
     
 
+    
 
 
