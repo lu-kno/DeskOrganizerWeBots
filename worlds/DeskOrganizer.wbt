@@ -1,0 +1,105 @@
+#VRML_SIM R2023a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/VarnishedPine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/neuronics/ipr/protos/IprHd6m180.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/robotiq/protos/Robotiq3fGripper.proto"
+EXTERNPROTO "../protos/Irb4600-40.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.7267829261175218 0.10107851247447724 -0.6793892202706777 2.9531738337888442
+  position 1.707522070228005 -0.12350431667644063 3.011455344614888
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+  floorTileSize 1 1
+}
+DEF TARGET Solid {
+  translation 1.4 0 1.04
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        roughnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        metalnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        emissiveColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        textureTransform TextureTransform {
+          scale 2 1
+        }
+      }
+      geometry Sphere {
+        radius 0.1
+      }
+    }
+  ]
+}
+SolidBox {
+  translation 1.21 0.45 0.79
+  size 0.1 0.1 0.1
+  physics Physics {
+  }
+}
+Table {
+  translation 0.089999 1.3 0
+  rotation 0 0 1 -1.5707953071795862
+  name "table(1)"
+  trayAppearance VarnishedPine {
+    colorOverride 0.541176 0.886275 0.203922
+    textureTransform TextureTransform {
+      scale 10 10
+    }
+  }
+  legAppearance VarnishedPine {
+    colorOverride 0.305882 0.603922 0.0235294
+    textureTransform TextureTransform {
+      scale 4 5
+    }
+  }
+}
+IprHd6m180 {
+  translation 0.85 0.95 0.74
+}
+WoodenBox {
+  translation -0.26 -2.24 0.3
+}
+Table {
+  translation 1.51 -0.1 0
+}
+Irb4600-40 {
+  controller "ArmController"
+  supervisor TRUE
+  handSlot [
+    DEF GRIPPER Robotiq3fGripper {
+      translation 0 0 0
+      rotation 1 0 0 1.5707996938995747
+    }
+  ]
+  staticBase TRUE
+}
