@@ -64,7 +64,6 @@ SolidBox {
   translation 1.21 0.45 0.79
   size 0.1 0.1 0.1
   physics Physics {
-    density 100000
   }
 }
 Table {
