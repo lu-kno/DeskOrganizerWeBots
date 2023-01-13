@@ -14,8 +14,8 @@ EXTERNPROTO "../protos/Irb4600-40.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.5047430454082459 0.004133483833108691 -0.8632597363617807 3.127448329767327
-  position 3.090536036597736 -0.14730691822100633 3.231169004489091
+  orientation -0.3398373666116895 0.14534555381439082 0.9291852529182865 2.3850586646509355
+  position 3.3537065234657737 -2.482507392739343 4.222958022042277
 }
 TexturedBackground {
 }
@@ -26,7 +26,7 @@ RectangleArena {
   floorTileSize 1 1
 }
 DEF TARGET Solid {
-  translation 1.4 0 1.04
+  translation 1.44 0 1.77
   children [
     Shape {
       appearance PBRAppearance {
