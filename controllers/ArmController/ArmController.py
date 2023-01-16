@@ -29,7 +29,7 @@ except ImportError:
 
 import math
 from controller import Supervisor
-from controller import Robot
+from controller import Robot, Camera
 
 
 
@@ -98,9 +98,6 @@ for link in armChain.links:
 print('Get the arm and target nodes.')
 target = supervisor.getFromDef('TARGET')
 arm = supervisor.getSelf()
-
-
-
 
 
 
@@ -286,4 +283,3 @@ def moveTo(pos):
 
 
 followSphereFromAbove()
-

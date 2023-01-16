@@ -14,8 +14,8 @@ EXTERNPROTO "../protos/Irb4600-40.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.3398373666116895 0.14534555381439082 0.9291852529182865 2.3850586646509355
-  position 3.3537065234657737 -2.482507392739343 4.222958022042277
+  orientation 0.26681241522819754 -0.20806620340118306 -0.9410205046024841 4.351593268623721
+  position 3.56786472973282 -9.525750663458354 5.748917153249714
 }
 TexturedBackground {
 }
@@ -24,6 +24,64 @@ TexturedBackgroundLight {
 RectangleArena {
   floorSize 10 10
   floorTileSize 1 1
+}
+DEF robot Robot {
+  translation 1.35843 0.064976 3.16
+  rotation 0 1 0 1.5708
+  children [
+    Transform {
+      rotation 0 0 1 -1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.0820075 0.364731 0.8
+            roughness 1
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.1
+            radius 0.05
+          }
+        }
+      ]
+    }
+    DEF camera Camera {
+      translation 0.02 0 0.065
+      children [
+        Transform {
+          translation -0.015 0 0
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.9 0
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.03
+                radius 0.01
+              }
+            }
+          ]
+        }
+      ]
+      recognitionColors [
+        0.8 0 0
+      ]
+      width 80
+      height 60
+      projection "cylindrical"
+    }
+  ]
+  boundingObject Transform {
+    children [
+      Cylinder {
+        height 0.1
+        radius 0.05
+      }
+    ]
+  }
+  controller "CamRobotController"
 }
 DEF TARGET Solid {
   translation 1.44 0 1.77
