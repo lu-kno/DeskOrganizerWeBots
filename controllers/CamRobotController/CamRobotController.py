@@ -36,11 +36,13 @@ while robot.step(timestep) != -1:
 
     if(firstRun):
         cameraData = camera.getImage()
+        width = camera.getWidth() # Amount of X-Axis Pixel
+        height = camera.getHeight() # Amount of Y-Axis Pixel
         # get the gray component of the pixel (5,10)
-        gray = Camera.imageGetGray(cameraData, camera.getWidth(), 5, 10)
-        red = Camera.imageGetRed(cameraData, camera.getWidth(), 5, 10)
-        green = Camera.imageGetGreen(cameraData, camera.getWidth(), 5, 10)
-        blue = Camera.imageGetBlue(cameraData, camera.getWidth(), 5, 10)
+        gray = Camera.imageGetGray(cameraData, width, 5, 10)
+        red = Camera.imageGetRed(cameraData, width, 5, 10)
+        green = Camera.imageGetGreen(cameraData, width, 5, 10)
+        blue = Camera.imageGetBlue(cameraData, width, 5, 10)
         print('CamRobotController Output:')
         print(f'  RGB fuer Pixel 5,10 :  [{red},{green},{blue}]')   
     firstRun = False
