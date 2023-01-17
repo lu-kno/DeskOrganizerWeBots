@@ -90,7 +90,23 @@ def test():
 
 def test2():
     # Laden das Bild
-    img = cv2.imread('snapshot.jpg')
+    imgRaw = cv2.imread('snapshot.jpg')
+    # Abmessungen des neuen Bildes
+    # Abmessungen des neuen Bildes
+    height, width = imgRaw.shape[:2]
+
+    # Prozentsatz der Verkleinerung oben und unten
+    cutoff_percentage = 0.2
+
+    # Berechnen Sie die Höhe des beschnittenen Bereichs
+    cutoff_height = int(height * cutoff_percentage / 2)
+
+    # Berechnen Sie die Koordinaten des Bereichs, den Sie behalten möchten
+    startRow, startCol = cutoff_height, 0
+    endRow, endCol = height - cutoff_height, width
+
+    # Beschneiden Sie das Bild
+    img = crop_jpg(imgRaw,14,14,1,1)
 
     # Konvertieren das Bild in HSV-Farbraum
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -131,10 +147,27 @@ def test2():
             cv2.circle(img,center,radius,(0,255,0),2)
             mittelpunktX, mittelpunktY = center
             print("Kreis - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
+
     cv2.putText(img, 'Text bei 0,0', (0, 0),
                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
     # Anzeigen Sie das bearbeitete Bild
     cv2.imshow("Detected Shapes", img)
+    cv2.imwrite("snapshot_new.jpg", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+
+def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
+    # Get the image height and width
+    height, width = img.shape[:2]
+
+    # Calculate the number of pixels to crop from the top, bottom, left and right
+    top = int(height * (top_percent / 100))
+    bottom = int(height * (bottom_percent / 100))
+    left = int(width * (left_percent / 100))
+    right = int(width * (right_percent / 100))
+
+    # Crop the image
+    img = img[top:-bottom, left:-right]
+
+    return img
