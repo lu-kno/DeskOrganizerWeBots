@@ -4,6 +4,9 @@ from pprint import pprint
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import ctypes
+from pathlib import Path
+from typing import List, Union, Callable
 
 def detectShapes():
     # reading image
@@ -75,10 +78,10 @@ def test():
     execution_path = os.getcwd()
     
     detector = ObjectDetection()
-    detector.setModelTypeAsRetinaNet()
-    detector.setModelPath( os.path.join(execution_path , "retinanet_resnet50_fpn_coco-eeacb38b.pth"))
+    detector.setModelTypeAsYOLOv3()
+    detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "snapshot1.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=30)
+    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=30)
     
     for eachObject in detections:
         print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", eachObject["box_points"] )
@@ -86,37 +89,52 @@ def test():
 
 
 def test2():
-    # Laden Sie das Bild
+    # Laden das Bild
     img = cv2.imread('snapshot.jpg')
 
-    # Konvertieren Sie das Bild in Graustufen
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Konvertieren das Bild in HSV-Farbraum
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # Verwenden Sie Canny, um Kanten im Bild zu erkennen
-    edges = cv2.Canny(gray, 50, 150)
+    # Define range of blue color in HSV
+    lower_blue = np.array([110,50,50])
+    upper_blue = np.array([130,255,255])
 
-    # Finden Sie die Konturen im Bild
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Mask the image to only select blue colors
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
-    # Iterieren Sie durch die Konturen
+    # Find the contours in the mask
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Iterieren durch die Konturen
     for cnt in contours:
-        # Überprüfen Sie die Anzahl der Ecken der Kontur
+        # Überprüfen die Anzahl der Ecken der Kontur
         if len(cnt) == 4:
             # Rechteck erkannt
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            mittelpunktX = x + w/2
+            mittelpunktY = y + h/2
+            print("Rechteck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
         elif len(cnt) > 4:
             # Polygon erkannt
             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
             cv2.drawContours(img, [polygon], 0, (0, 255, 0), 2)
+            M = cv2.moments(polygon)
+            mittelpunktX = int(M["m10"] / M["m00"])
+            mittelpunktY = int(M["m01"] / M["m00"])
+            print("Polygon - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
         else:
             # Kreis erkannt
-            (x, y), radius = cv2.minEnclosingCircle(cnt)
-            center = (int(x), int(y))
+            (x,y),radius = cv2.minEnclosingCircle(cnt)
+            center = (int(x),int(y))
             radius = int(radius)
-            cv2.circle(img, center, radius, (0, 255, 0), 2)
-
+            cv2.circle(img,center,radius,(0,255,0),2)
+            mittelpunktX, mittelpunktY = center
+            print("Kreis - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
+    cv2.putText(img, 'Text bei 0,0', (0, 0),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
     # Anzeigen Sie das bearbeitete Bild
     cv2.imshow("Detected Shapes", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
