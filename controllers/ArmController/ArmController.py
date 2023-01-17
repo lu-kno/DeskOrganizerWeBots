@@ -170,10 +170,12 @@ class RobotArm():
             key = self.keyboard.getKey()
             self.handleKeystroke(key)
 
-            if(loopCount==15):
+            if(loopCount==15) and False:
                 self.camera.saveImage("snapshot.jpg",100)
                 ImageDetector.detectShapes()
             loopCount+=1 
+            
+            image2worldTest(self.supervisor)
 
     def handleKeystroke(self, key):
         
@@ -305,26 +307,52 @@ class RobotArm():
             ms -= self.timestep
         
         
-def table2world(pos, tableOrigin, tableSize=None, rotation=None):
+def image2worldTest(supervisor):
+    mover = supervisor.getFromDef('Mover').getField('translation')
+    imageRef = supervisor.getFromDef('MoverReference')
+    MainTable = supervisor.getFromDef('MainTable')
+    
+    
+    follower = supervisor.getFromDef('Follower').getField('translation')
+    
+    print(f'mover -> {mover}')
+    print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
+    
+    res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
+    
+    xn,yn,zn = res
+    follower.setSFVec3f([xn,yn,zn])
+    # follower.setSFVec3f(np.array([0,0,0]))
+    
+        
+def image2world(pos, tableOrigin, tableSize=None, rotation=None):
     ''' this function tranforms the coordinates from the table to world coordinates.
     if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
     
     
     
-    Sx, Sy, Sz = 1,1,1
+    Sx, Sy, Sz = -1,1,-1
     tx,ty,tz = tableOrigin
+    tx+=tableSize[0]/2
+    ty+=tableSize[1]/2
         
     if tableSize is not None:
         tz=tz+tableSize[2]
-        Sx, Sy, Sz = tableSize[0]/2, tableSize[1]/2, 1
+        # Sx, Sy, Sz = tableSize[0]/2, tableSize[1]/2, 1
     
     if rotation is None:
         rotation[0,0,1,0]
     a = rotation[2]*rotation[3]
     
+    # tMat = [
+    #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
+    #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
+    #     [0,               0,              Sz,   tz],
+    #     [0,               0,              0,    1]
+    # ]
     tMat = [
-        [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
-        [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
+        [0, -Sy, 0,    tx],
+        [Sx,  0, 0,    ty],
         [0,               0,              Sz,   tz],
         [0,               0,              0,    1]
     ]
@@ -332,7 +360,10 @@ def table2world(pos, tableOrigin, tableSize=None, rotation=None):
     if len(pos)==3:
         pos = np.array([*pos,1])
     
-    return np.matmul(tMat, pos)
+    res = np.matmul(tMat,pos)[:3]
+    print(f'pos: {pos}')
+    print(f'result: {res}')
+    return res
     
         
         
