@@ -16,14 +16,19 @@ Movement directions make sense when "standing" in front of the robot
 
 # To Do
 
- - Movement routine to grab objects from table
-   - move to XY position and Z+0.3
-   - open gripper
-   - lower to Z
-   - close gripper
-   - move back to Z+0.3
-   - go to destination XY Z+0.3
-   - open gripper to drop
- - helper function to move robot to XY coordinates on the table
- - choose image recognition toolkit
+ - [X] Separate Movement routines to grab objects from table
+   - [X] move to XY position and Z+0.3
+   - [X] open gripper
+   - [X] lower to Z
+   - [X] close gripper
+   - [X] move back to Z+0.3
+   - [X] go to destination XY Z+0.3
+   - [X] open gripper to drop
+ - [ ] Merge pickup and delivery routines to one function moveObject(ItemPosition, DestinationPosition)
+
+
+ - [ ] integrate helper function to move robot to XY coordinates on the 
+ - [ ] make gripper close and stop once force is detected
+
+ - [ ] choose image recognition toolkit
  - 
