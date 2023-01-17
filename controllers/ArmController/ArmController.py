@@ -122,7 +122,7 @@ class RobotArm():
     def goToSphere(self):
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
-        
+
         while self.supervisor.step(self.timestep) != -1:
             # Get the absolute postion of the target and the arm base.
             targetPosition = self.target.getPosition()
@@ -146,7 +146,7 @@ class RobotArm():
             # Actuate the arm motors with the IK results.
             for i,m in enumerate(self.motors):
                 m.setPosition(ikResults[i + 1])
-                
+
             return     
                 
     def followSphereFromAbove(self, safeHeight=None):
@@ -155,8 +155,7 @@ class RobotArm():
             
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
-        firstRun = True
-
+        loopCount=0
         while self.supervisor.step(self.timestep) != -1:
             # Get the absolute postion of the target and the arm base.
             targetPosition = self.target.getPosition()
@@ -168,15 +167,14 @@ class RobotArm():
             z = targetPosition[2] - armPosition[2]
         
             self.moveTo([x,y,z+safeHeight])
- 
-                    
             key = self.keyboard.getKey()
             self.handleKeystroke(key)
-            if(firstRun):
+
+            if(loopCount==15):
                 self.camera.saveImage("snapshot.jpg",100)
-                ImageDetector.test2()
-                firstRun = False
-                           
+                ImageDetector.detectShapes()
+            loopCount+=1 
+
     def handleKeystroke(self, key):
         
         x,y,z = self.target.getPosition()
