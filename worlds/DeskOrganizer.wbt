@@ -14,8 +14,8 @@ EXTERNPROTO "../protos/Irb4600-40.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.11749031598406635 -0.16639684989448159 -0.9790342762105715 4.549974685355237
-  position 1.7550605911168482 -11.187664053516368 4.48390262948354
+  orientation 0.2380990908934432 -0.18818828674876767 -0.9528347137076184 4.150677383910248
+  position 2.978504494544322 -3.4680094006221176 3.6404759699160136
 }
 TexturedBackground {
 }
@@ -26,7 +26,7 @@ RectangleArena {
   floorTileSize 1 1
 }
 DEF TARGET Solid {
-  translation 1.44 0 1.77
+  translation 1.44 0 1.07
   children [
     Shape {
       appearance PBRAppearance {
@@ -35,6 +35,7 @@ DEF TARGET Solid {
             "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
         }
+        transparency 0.5
         roughnessMap ImageTexture {
           url [
             "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/abb/irb/worlds/textures/target.png"
@@ -93,10 +94,6 @@ Table {
   translation 1.51 -0.1 0
 }
 Irb4600-40 {
-  hidden rotation_10 0.706825225060962 0.7073882252402282 3.000129609765238e-06 3.141598000257514
-  hidden rotation_12 0 0 -1 0.5199999995987548
-  hidden rotation_14 0.7068252250609611 0.7073882252402288 3.0001571333574055e-06 3.141598000312605
-  hidden rotation_18 0 0 -1 5.16191365590357e-08
   controller "ArmController"
   supervisor TRUE
   handSlot [

@@ -2,6 +2,7 @@ import sys
 import tempfile
 import numpy as np
 import math
+import time
 from controller import Supervisor, Robot, Camera
 
 try:
@@ -80,6 +81,7 @@ class RobotArm():
 
         self.target = self.supervisor.getFromDef('TARGET')
         self.targetTranslation = self.target.getField('translation')
+        self.safeHeight = 0.3
         
         self.arm = self.supervisor.getSelf()
 
@@ -146,7 +148,10 @@ class RobotArm():
                 
             return     
                 
-    def followSphereFromAbove(self):
+    def followSphereFromAbove(self, safeHeight=None):
+        if safeHeight is None:
+            safeHeight = self.safeHeight
+            
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
                 
@@ -160,7 +165,7 @@ class RobotArm():
             y = targetPosition[1] - armPosition[1]
             z = targetPosition[2] - armPosition[2]
         
-            self.moveTo([x,y,z])
+            self.moveTo([x,y,z+safeHeight])
  
                     
             key = self.keyboard.getKey()
@@ -169,7 +174,7 @@ class RobotArm():
     def handleKeystroke(self, key):
         
         x,y,z = self.target.getPosition()
-        ballSpeed = 0.05
+        ballSpeed = 0.03
         
         # if (key==ord('T')):
             # goToSphere()           
@@ -187,7 +192,14 @@ class RobotArm():
             print('closing grip')
         if (key==ord('E')):
             self.gripper.open()
-            print('opening grip')        
+            print('opening grip')  
+            
+        if (key==ord('1')):
+            print('Picking Up Object')
+            self.pickUpObject([x,y,z])
+        if (key==ord('3')):
+            print('Releasing object')   
+            self.deliverObject([x,y,z])     
     
     
         #reset starting position
@@ -212,8 +224,9 @@ class RobotArm():
                   
     def moveTo(self, pos):
         try:
+            handLength = 0.3 ## To Do: This value needs to be checked. Might need to be .03 larger
             x0,y0,z0 = pos
-            
+            z0 = z0 + handLength
             
             a = 1.095594 # length of first arm
             b = math.sqrt(0.174998**2 + (0.340095+0.929888)**2) # effective length of second arm (corrected)
@@ -250,17 +263,25 @@ class RobotArm():
         except Exception as e:
             print(e)
             
-    def pickUpObject(self, pos,safeHeight=0.3):
+    def pickUpObject(self, pos,safeHeight=None):
+        if safeHeight is None:
+            safeHeight = self.safeHeight
+        
         pos = np.array(pos)
         posSafe = pos + np.array([0,0,safeHeight])
         
         self.moveTo(posSafe)
         self.gripper.open()
         self.moveTo(pos)
+        self.sleep(500)
         self.gripper.close()
+        self.sleep(500)
         self.moveTo(posSafe)
         
-    def deliverObject(self, pos, method='drop', safeHeight=0.3):
+    def deliverObject(self, pos, method='drop', safeHeight=None):
+        if safeHeight is None:
+            safeHeight = self.safeHeight
+            
         pos = np.array(pos)
         posSafe = pos + np.array([0,0,safeHeight])
         
@@ -274,6 +295,10 @@ class RobotArm():
         self.gripper.open()
         self.moveTo(posSafe)
             
+    def sleep(self, ms):
+        while ms>0:
+            self.supervisor.step(self.timestep)
+            ms -= self.timestep
         
         
 def table2world(pos, tableOrigin, tableSize=None, rotation=None):

@@ -10,4 +10,4 @@ orthographicViewHeight: 1.67376
 textFiles: -1
 globalOptionalRendering: CoordinateSystem::JointAxes::ConnectorAxes::ContactPoints
 consoles: Console:All:All
-renderingDevicePerspectives: IRB 4600/40:camera;1;0.526563;0.0840765;0.0426743
+renderingDevicePerspectives: IRB 4600/40:camera;1;0.526563;0.0229886;0.0128023
