@@ -14,8 +14,8 @@ EXTERNPROTO "../protos/Irb4600-40.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.5013789812845416 0.2963709154592831 0.8128858453656955 2.387588476984731
-  position 2.999510748802908 -0.7238371200006586 7.9170875340530955
+  orientation -0.11298991098877299 -0.9927019210977943 0.0421447014878205 4.768085587158374
+  position 1.068735091238047 -1.029551582241177 10.276892532372335
 }
 TexturedBackground {
 }
@@ -103,7 +103,7 @@ Irb4600-40 {
   ]
   camSlot [
     DEF BOTCAM Camera {
-      translation 1.43 0.17 2.24
+      translation 1.51 -0.1 3.22
       rotation 0 1 0 1.5707996938995747
       children [
         Transform {
@@ -122,6 +122,8 @@ Irb4600-40 {
           ]
         }
       ]
+      width 640
+      height 480
     }
   ]
   staticBase TRUE
