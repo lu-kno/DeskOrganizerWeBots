@@ -1,2 +1,2 @@
 **/*.wbt merge=theirs
-**/*.wbproj merge=theirs
+**/*.wbproj merge=ours
