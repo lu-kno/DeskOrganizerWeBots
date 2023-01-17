@@ -14,8 +14,8 @@ EXTERNPROTO "../protos/Irb4600-40.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.26681241522819754 -0.20806620340118306 -0.9410205046024841 4.351593268623721
-  position 3.56786472973282 -9.525750663458354 5.748917153249714
+  orientation -0.5013789812845416 0.2963709154592831 0.8128858453656955 2.387588476984731
+  position 2.999510748802908 -0.7238371200006586 7.9170875340530955
 }
 TexturedBackground {
 }
@@ -24,64 +24,6 @@ TexturedBackgroundLight {
 RectangleArena {
   floorSize 10 10
   floorTileSize 1 1
-}
-DEF robot Robot {
-  translation 1.35843 0.064976 3.16
-  rotation 0 1 0 1.5708
-  children [
-    Transform {
-      rotation 0 0 1 -1.5708
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0.0820075 0.364731 0.8
-            roughness 1
-            metalness 0
-          }
-          geometry Cylinder {
-            height 0.1
-            radius 0.05
-          }
-        }
-      ]
-    }
-    DEF camera Camera {
-      translation 0.02 0 0.065
-      children [
-        Transform {
-          translation -0.015 0 0
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.8 0.9 0
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.03
-                radius 0.01
-              }
-            }
-          ]
-        }
-      ]
-      recognitionColors [
-        0.8 0 0
-      ]
-      width 80
-      height 60
-      projection "cylindrical"
-    }
-  ]
-  boundingObject Transform {
-    children [
-      Cylinder {
-        height 0.1
-        radius 0.05
-      }
-    ]
-  }
-  controller "CamRobotController"
 }
 DEF TARGET Solid {
   translation 1.44 0 1.77
@@ -157,6 +99,29 @@ Irb4600-40 {
     DEF GRIPPER Robotiq3fGripper {
       translation 0 0 0
       rotation 1 0 0 1.5707996938995747
+    }
+  ]
+  camSlot [
+    DEF BOTCAM Camera {
+      translation 1.43 0.17 2.24
+      rotation 0 1 0 1.5707996938995747
+      children [
+        Transform {
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.9 0
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.03
+                radius 0.01
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
   staticBase TRUE

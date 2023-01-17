@@ -28,8 +28,7 @@ except ImportError:
              'To run this sample, please upgrade "pip" and install ikpy with this command: "pip install ikpy"')
 
 import math
-from controller import Supervisor
-from controller import Robot, Camera
+from controller import Supervisor, Robot, Camera
 
 
 
@@ -282,4 +281,9 @@ def moveTo(pos):
     return motor_angles
 
 
+botcam = Camera('camera')
+print(f'botcam -> {botcam}')
+botcam.enable(timeStep)
+
 followSphereFromAbove()
+

@@ -20,6 +20,9 @@ PROTO Irb4600-40 [
   field SFBool     synchronization TRUE                  # Is `Robot.synchronization`.
   field SFColor    color           1 0.45 0              # Is `PBRAppearance.baseColor`.
   field MFNode     handSlot        []                    # Extends the arm with new nodes in the hand slot.
+  field MFNode     camSlot          [Transform{}, Camera{}]                    # Extends the arm with new 
+  field SFVec3f    camTranslation     0 0 0                 # Is `Transform.translation`.
+  field SFRotation camRotation        0 0 1 0               # Is `Transform.rotation`.nodes in the hand slot.
   field SFBool     staticBase      FALSE                 # Defines if the robot base should be pinned to the static environment.
 ]
 {
@@ -28,6 +31,11 @@ PROTO Irb4600-40 [
     rotation IS rotation
     name IS name
     children [
+      Solid {
+        rotation IS camRotation
+        translation IS camTranslation
+        children IS camSlot
+      }
       Shape {
         appearance DEF IRB_APPEARANCE PBRAppearance {
           baseColor IS color
