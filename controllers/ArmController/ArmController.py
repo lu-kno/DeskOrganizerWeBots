@@ -2,6 +2,7 @@ import sys
 import tempfile
 import numpy as np
 import math
+import ImageDetector
 import time
 from controller import Supervisor, Robot, Camera
 
@@ -154,7 +155,8 @@ class RobotArm():
             
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
-                
+        firstRun = True
+
         while self.supervisor.step(self.timestep) != -1:
             # Get the absolute postion of the target and the arm base.
             targetPosition = self.target.getPosition()
@@ -170,6 +172,10 @@ class RobotArm():
                     
             key = self.keyboard.getKey()
             self.handleKeystroke(key)
+            if(firstRun):
+                self.camera.saveImage("snapshot.jpg",100)
+                ImageDetector.test2()
+                firstRun = False
                            
     def handleKeystroke(self, key):
         
@@ -255,7 +261,7 @@ class RobotArm():
                 w0 += math.pi
             motor_angles = (np.array([w0,w1,w2,w3,w4,w5]) + math.pi) % (2*math.pi) - math.pi
             
-            print(f'moving to: {motor_angles}')
+            # print(f'moving to: {motor_angles}')
             
             for m, a in zip(self.motors, motor_angles):
                 m.setPosition(a)
