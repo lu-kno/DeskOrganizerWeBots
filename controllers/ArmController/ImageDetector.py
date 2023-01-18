@@ -94,31 +94,45 @@ def imageAiTest():
 
 
 def openCvTest():
-    findObject("snapshot.jpg","blue")
+    pictureData = findObject("snapshot.jpg","blue")
+    print(pictureData)
 
 def findObject(imageName, targetColor) -> json:
-        # Laden das Bild
+    # Lade das Bild
     img = cv2.imread(imageName)
-
     # Konvertieren das Bild in HSV-Farbraum
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # Define range of blue color in HSV
-    lower_blue = np.array([110,50,50])
-    upper_blue = np.array([130,255,255])
+    if(targetColor == 'red'):
+        low_red = np.array([161, 155, 84])
+        high_red = np.array([179, 255, 255])
+        mask = cv2.inRange(hsv, low_red, high_red)
+        #red = cv2.bitwise_and(img, img, mask=mask)  
+    elif(targetColor == 'green'):
+        low_green = np.array([25, 52, 72])
+        high_green = np.array([102, 255, 255])
+        mask = cv2.inRange(hsv, low_green, high_green)
+        #green = cv2.bitwise_and(img, img, mask=mask)
+    elif(targetColor == 'blue'):
+        low_blue = np.array([110,50,50])
+        high_blue = np.array([130,255,255])
+        mask = cv2.inRange(hsv, low_blue, high_blue)
+        #blue = cv2.bitwise_and(img, img, mask=mask)
+    else:
+        # Every color except white
+        low = np.array([0, 42, 0])
+        high = np.array([179, 255, 255])
+        mask = cv2.inRange(hsv, low, high)
+        allColors = cv2.bitwise_and(img, img, mask=mask)
+        cv2.imshow("allColors", allColors)
 
-    # Red color
-    lower_red = np.array([161, 155, 84])
-    upper_red = np.array([179, 255, 255])
+    # Define range of blue color in HSV
+    #lower_blue = np.array([110,50,50])
+    #upper_blue = np.array([130,255,255])
 
     # Mask the image to only select blue colors
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    # mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
-    low_blue = np.array([94, 80, 2])
-    high_blue = np.array([126, 255, 255])
-    blue_mask = cv2.inRange(hsv, low_blue, high_blue)
-    blue = cv2.bitwise_and(img, img, mask=blue_mask)
-    #cv2.imshow("Blue", blue)
     # Find the contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -130,25 +144,23 @@ def findObject(imageName, targetColor) -> json:
         if len(approx) == 3:
       # Dreieck erkannt
             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-            cv2.drawContours(img, [approx], 0, (0, 255, 0), 2)
+            cv2.drawContours(img, [approx], 0, (255, 255, 255), 2)
             M = cv2.moments(cnt)
             if M['m00'] != 0.0:
                 mittelpunktX = int(M["m10"] / M["m00"])
                 mittelpunktY = int(M["m01"] / M["m00"])
-            cv2.putText(img, "Dreieck", (mittelpunktX - 20, mittelpunktY - 20),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             print("Dreieck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
         elif len(approx) == 4:
             # Rechteck erkannt
             x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.rectangle(img, (x, y), (x+w, y+h), (255, 255, 255), 2)
             mittelpunktX = x + w/2
             mittelpunktY = y + h/2
             print("Rechteck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
         elif len(approx) > 4:
             # Polygon erkannt
             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-            cv2.drawContours(img, [polygon], 0, (0, 255, 0), 2)
+            cv2.drawContours(img, [polygon], 0, (255, 255, 255), 2)
             M = cv2.moments(cnt)
             if M['m00'] != 0.0:
                 mittelpunktX = int(M["m10"] / M["m00"])
@@ -159,14 +171,14 @@ def findObject(imageName, targetColor) -> json:
             (x,y),radius = cv2.minEnclosingCircle(cnt)
             center = (int(x),int(y))
             radius = int(radius)
-            cv2.circle(img,center,radius,(0,255,0),2)
+            cv2.circle(img,center,radius,(255,255,255),2)
             mittelpunktX, mittelpunktY = center
             print("Kreis - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
 
     # 0,0 oben links
     # Anzeigen Sie das bearbeitete Bild
     cv2.imshow("Detected Shapes", img)
-    cv2.imwrite("snapshot_new.jpg", img)
+    #cv2.imwrite("snapshot_new.jpg", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     # do stuff here
@@ -202,3 +214,4 @@ def callWeBotsRecognitionRoutine(camera):
     recObjs = camera.getRecognitionObjects()
     for obj in recObjs:
         print(obj.getModel())
+
