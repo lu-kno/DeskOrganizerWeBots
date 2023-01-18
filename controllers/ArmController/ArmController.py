@@ -281,7 +281,9 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             self.camera.saveImage("snapshot.jpg",100)
-            ImageDetector.test2()
+            ImageDetector.openCvTest()
+        if (key==ord('L')):
+            ImageDetector.callWeBotsRecognitionRoutine(self.camera)
                   
                   
     def moveTo(self, pos):
