@@ -1,2 +1,3 @@
 controllers/ArmController/Modelle/
-__pycache__/
+__pycache__/**
+*.pyc

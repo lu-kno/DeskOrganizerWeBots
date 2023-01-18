@@ -4,10 +4,11 @@ simulationViewPerspectives: 000000ff0000000100000002000001bc000004ab010000000201
 sceneTreePerspectives: 000000ff00000001000000030000001d000000c0000000fa0100000002010000000200
 maximizedDockId: -1
 centralWidgetVisible: 1
-projectionMode: PERSPECTIVE
+projectionMode: ORTHOGRAPHIC
 renderingMode: PLAIN
-orthographicViewHeight: 1.67376
+orthographicViewHeight: 3.43954
 textFiles: -1
 globalOptionalRendering: CoordinateSystem::JointAxes::ConnectorAxes::ContactPoints
 consoles: Console:All:All
-renderingDevicePerspectives: IRB 4600/40:camera;1;0.525;0.00206811;0.00284496
+renderingDevicePerspectives: IRB 4600/40:camera;0;0.5625;0;0.0193877
+
