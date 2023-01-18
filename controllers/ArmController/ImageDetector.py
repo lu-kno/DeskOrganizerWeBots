@@ -93,7 +93,7 @@ def imageAiTest():
         print("--------------------------------")
 
 
-def test2():
+def openCvTest():
     findObject("snapshot.jpg","blue")
 
 def findObject(imageName, targetColor) -> json:
@@ -197,7 +197,7 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
     return img
 
 
-def callRecognitionRoutine(camera):
+def callWeBotsRecognitionRoutine(camera):
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
     for obj in recObjs:
