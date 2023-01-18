@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import ctypes
 from pathlib import Path
 from typing import List, Union, Callable
+import json
 
 def detectShapes():
     # reading image
@@ -74,39 +75,30 @@ def detectShapes():
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def test():
+def imageAiTest():
+    print('test() called')
     execution_path = os.getcwd()
     
     detector = ObjectDetection()
-    detector.setModelTypeAsYOLOv3()
-    detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    detector.setModelTypeAsRetinaNet()
+    #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=30)
-    
+    custom = detector.CustomObjects(apple=True)
+    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
+  
+    #detections = detector.detectCustomObjectsFromImage( custom_objects=custom, input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "image3new-custom.jpg"), minimum_percentage_probability=30)
     for eachObject in detections:
         print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", eachObject["box_points"] )
         print("--------------------------------")
 
 
 def test2():
-    # Laden das Bild
-    imgRaw = cv2.imread('snapshot.jpg')
-    # Abmessungen des neuen Bildes
-    # Abmessungen des neuen Bildes
-    height, width = imgRaw.shape[:2]
+    findObject("snapshot.jpg","blue")
 
-    # Prozentsatz der Verkleinerung oben und unten
-    cutoff_percentage = 0.2
-
-    # Berechnen Sie die Höhe des beschnittenen Bereichs
-    cutoff_height = int(height * cutoff_percentage / 2)
-
-    # Berechnen Sie die Koordinaten des Bereichs, den Sie behalten möchten
-    startRow, startCol = cutoff_height, 0
-    endRow, endCol = height - cutoff_height, width
-
-    # Beschneiden Sie das Bild
-    img = crop_jpg(imgRaw,14,14,1,1)
+def findObject(imageName, targetColor) -> json:
+        # Laden das Bild
+    img = cv2.imread(imageName)
 
     # Konvertieren das Bild in HSV-Farbraum
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -115,29 +107,52 @@ def test2():
     lower_blue = np.array([110,50,50])
     upper_blue = np.array([130,255,255])
 
+    # Red color
+    lower_red = np.array([161, 155, 84])
+    upper_red = np.array([179, 255, 255])
+
     # Mask the image to only select blue colors
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
+    low_blue = np.array([94, 80, 2])
+    high_blue = np.array([126, 255, 255])
+    blue_mask = cv2.inRange(hsv, low_blue, high_blue)
+    blue = cv2.bitwise_and(img, img, mask=blue_mask)
+    #cv2.imshow("Blue", blue)
     # Find the contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Iterieren durch die Konturen
     for cnt in contours:
+      # cv2.approxPloyDP() function to approximate the shape
+        approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
         # Überprüfen die Anzahl der Ecken der Kontur
-        if len(cnt) == 4:
+        if len(approx) == 3:
+      # Dreieck erkannt
+            polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
+            cv2.drawContours(img, [approx], 0, (0, 255, 0), 2)
+            M = cv2.moments(cnt)
+            if M['m00'] != 0.0:
+                mittelpunktX = int(M["m10"] / M["m00"])
+                mittelpunktY = int(M["m01"] / M["m00"])
+            cv2.putText(img, "Dreieck", (mittelpunktX - 20, mittelpunktY - 20),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            print("Dreieck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
+        elif len(approx) == 4:
             # Rechteck erkannt
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
             mittelpunktX = x + w/2
             mittelpunktY = y + h/2
             print("Rechteck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
-        elif len(cnt) > 4:
+        elif len(approx) > 4:
             # Polygon erkannt
             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
             cv2.drawContours(img, [polygon], 0, (0, 255, 0), 2)
-            M = cv2.moments(polygon)
-            mittelpunktX = int(M["m10"] / M["m00"])
-            mittelpunktY = int(M["m01"] / M["m00"])
+            M = cv2.moments(cnt)
+            if M['m00'] != 0.0:
+                mittelpunktX = int(M["m10"] / M["m00"])
+                mittelpunktY = int(M["m01"] / M["m00"])
             print("Polygon - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
         else:
             # Kreis erkannt
@@ -148,14 +163,23 @@ def test2():
             mittelpunktX, mittelpunktY = center
             print("Kreis - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
 
-    cv2.putText(img, 'Text bei 0,0', (0, 0),
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    # 0,0 oben links
     # Anzeigen Sie das bearbeitete Bild
     cv2.imshow("Detected Shapes", img)
     cv2.imwrite("snapshot_new.jpg", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    # do stuff here
 
+    result = dict(position = [mittelpunktX, mittelpunktY],
+                category = 'square', # or circle or triangle or polygon
+                color = 'targetcolor',
+                )
+
+   # result.keys() -> list
+    #result.values() -> list 
+
+    return result
 
 def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
     # Get the image height and width
@@ -171,3 +195,10 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
     img = img[top:-bottom, left:-right]
 
     return img
+
+
+def callRecognitionRoutine(camera):
+    print('callRecognitionRoutine called')
+    recObjs = camera.getRecognitionObjects()
+    for obj in recObjs:
+        print(obj.getModel())

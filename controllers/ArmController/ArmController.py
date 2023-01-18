@@ -156,7 +156,7 @@ class RobotArm():
             
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
-        loopCount = 0
+
 
         while self.supervisor.step(self.timestep) != -1:
             # Get the absolute postion of the target and the arm base.
@@ -175,8 +175,7 @@ class RobotArm():
             self.handleKeystroke(key)
         
 
-                
-            loopCount += 1             
+                          
     def handleKeystroke(self, key):
         
         x,y,z = self.target.getPosition()
@@ -232,6 +231,9 @@ class RobotArm():
         if (key==ord('P')):
             self.camera.saveImage("snapshot.jpg",100)
             ImageDetector.test2()
+        if (key==ord('L')):
+            ImageDetector.callRecognitionRoutine(self.camera)
+
                   
     def moveTo(self, pos):
         try:
@@ -289,7 +291,7 @@ class RobotArm():
         self.sleep(500)
         self.moveTo(posSafe)
         
-    def deliverObject(self, pos, method='drop', safeHeight=None):
+    def deliverObject(self, pos, method='drop', safeHeight=None):   
         if safeHeight is None:
             safeHeight = self.safeHeight
             
