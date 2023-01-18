@@ -73,6 +73,8 @@ class RobotArm():
         self.armChain = Chain.from_urdf_file(self.filename, active_links_mask=[False, True, True, True, True, True, True, False, False, False, False])
 
         self.motors = []
+        self.motorsMax = []
+        self.motorsMin = []
         for link in self.armChain.links:
             if 'motor' in link.name:
                 motor = self.supervisor.getDevice(link.name)
@@ -80,6 +82,8 @@ class RobotArm():
                 position_sensor = motor.getPositionSensor()
                 position_sensor.enable(self.timestep)
                 self.motors.append(motor)
+                self.motorsMax.append(motor.getMaxPosition())
+                self.motorsMin.append(motor.getMinPosition())
 
 
         self.target = self.supervisor.getFromDef('TARGET')
@@ -87,6 +91,10 @@ class RobotArm():
         self.safeHeight = 0.3
         
         self.arm = self.supervisor.getSelf()
+
+    def run(self):
+        pass
+
 
     def drawCircle(self):
         print('Loop 1: Draw a circle on the paper sheet.')
@@ -264,12 +272,35 @@ class RobotArm():
             
             # print(f'moving to: {motor_angles}')
             
-            for m, a in zip(self.motors, motor_angles):
-                m.setPosition(a)
+            self.setPosition(motor_angles)
+            self.awaitPosition(motor_angles)
+                
                 
         except Exception as e:
             print(e)
             
+    def clipAngles(self, angles):
+        return np.clip(np.array(angles), self.motorsMin, self.motorsMax)
+    
+    def setPosition(self, angles):
+        angles = self.clipAngles(angles)
+        for m, a in zip(self.motors, angles):
+                m.setPosition(a)
+        
+    def awaitPosition(self, angles):
+        diff = 10
+        timeout = 30000 # in ms
+        
+        angles = self.clipAngles(angles)
+        while diff>0.05 and timeout>0:
+            self.supervisor.step(self.timestep)
+            timeout-=self.timestep
+            
+            motor_values = np.array([m.getPositionSensor().getValue() for m in self.motors])
+            diff = np.max(abs(motor_values - angles))
+            
+        
+    
     def pickUpObject(self, pos,safeHeight=None):
         if safeHeight is None:
             safeHeight = self.safeHeight
@@ -280,9 +311,9 @@ class RobotArm():
         self.moveTo(posSafe)
         self.gripper.open()
         self.moveTo(pos)
-        self.sleep(500)
+        # self.sleep(500)
         self.gripper.close()
-        self.sleep(500)
+        self.sleep(500)  # To do: add awaitPosition to 
         self.moveTo(posSafe)
         
     def deliverObject(self, pos, method='drop', safeHeight=None):
@@ -307,6 +338,10 @@ class RobotArm():
             self.supervisor.step(self.timestep)
             ms -= self.timestep
         
+        
+        
+        
+
         
 def image2worldTest(supervisor):
     mover = supervisor.getFromDef('Mover').getField('translation')
@@ -370,5 +405,7 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
         
 robot = RobotArm()
 robot.followSphereFromAbove()
+
+
 
 
