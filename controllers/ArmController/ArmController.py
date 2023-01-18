@@ -63,6 +63,8 @@ class RobotArm():
 
         self.camera = Camera('camera')
         self.camera.enable(100)
+        self.camera.recognitionEnable(self.timestep)
+
         
         self.filename = None
         with tempfile.NamedTemporaryFile(suffix='.urdf', delete=False) as file:
@@ -155,7 +157,6 @@ class RobotArm():
             
         print("Loop 2: Move the arm hand to the target.")
         print('Move the yellow and black sphere to move the arm...')
-        loopCount=0
         while self.supervisor.step(self.timestep) != -1:
             # Get the absolute postion of the target and the arm base.
             targetPosition = self.target.getPosition()
@@ -169,11 +170,6 @@ class RobotArm():
             self.moveTo([x,y,z+safeHeight])
             key = self.keyboard.getKey()
             self.handleKeystroke(key)
-
-            if(loopCount==15) and False:
-                self.camera.saveImage("snapshot.jpg",100)
-                ImageDetector.detectShapes()
-            loopCount+=1 
             
             image2worldTest(self.supervisor)
 
@@ -227,6 +223,11 @@ class RobotArm():
             self.targetTranslation.setSFVec3f([x,y,z+ballSpeed])
         if (key==self.keyboard.SHIFT+ord(' ')):
             self.targetTranslation.setSFVec3f([x,y,z-ballSpeed])
+            
+        #trigger Camera and Img interpretation
+        if (key==ord('P')):
+            self.camera.saveImage("snapshot.jpg",100)
+            ImageDetector.test2()
                   
     def moveTo(self, pos):
         try:
@@ -369,3 +370,5 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
         
 robot = RobotArm()
 robot.followSphereFromAbove()
+
+
