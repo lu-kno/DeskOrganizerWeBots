@@ -4,9 +4,9 @@ simulationViewPerspectives: 000000ff0000000100000002000001bc000004ab010000000201
 sceneTreePerspectives: 000000ff000000010000000300000022000000c0000000fa0100000002010000000200
 maximizedDockId: -1
 centralWidgetVisible: 1
-projectionMode: ORTHOGRAPHIC
+projectionMode: PERSPECTIVE
 renderingMode: PLAIN
-orthographicViewHeight: 3.43954
+orthographicViewHeight: 1.67376
 textFiles: -1
 globalOptionalRendering: CoordinateSystem::JointAxes::ConnectorAxes
 consoles: Console:All:All

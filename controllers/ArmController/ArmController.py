@@ -318,8 +318,8 @@ def image2worldTest(supervisor):
     
     follower = supervisor.getFromDef('Follower').getField('translation')
     
-    print(f'mover -> {mover}')
-    print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
+    #print(f'mover -> {mover}')
+    #print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
     
     res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
     
@@ -364,8 +364,8 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
         pos = np.array([*pos,1])
     
     res = np.matmul(tMat,pos)[:3]
-    print(f'pos: {pos}')
-    print(f'result: {res}')
+    #print(f'pos: {pos}')
+    #print(f'result: {res}')
     return res
     
         
