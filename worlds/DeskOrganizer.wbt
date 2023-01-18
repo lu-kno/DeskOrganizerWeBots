@@ -98,8 +98,8 @@ DEF box Solid {
 }
 Table {
   translation 0.089999 1.3 0
-  rotation 0 0 1 -1.5707953071795862
   name "table(1)"
+  size 1.8 1 0.74
   trayAppearance VarnishedPine {
     colorOverride 0.541176 0.886275 0.203922
     textureTransform TextureTransform {
@@ -119,7 +119,7 @@ IprHd6m180 {
 WoodenBox {
   translation -0.26 -2.24 0.3
 }
-Table {
+DEF MainTable Table {
   translation 1.51 -0.1 0
 }
 Solid {
@@ -145,6 +145,27 @@ Solid {
   }
   recognitionColors [
     0.59 0.75 0.28
+  ]
+}
+DEF MoverReference Transform {
+  translation -0.81 1.8 0.73
+  rotation 1 0 0 3.141592653589793
+  children [
+    DEF Mover Solid {
+      translation 0.87 0.42 -0.01
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.8 0 0
+          }
+          geometry Capsule {
+            height 0.1
+            radius 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
   ]
 }
 Irb4600-40 {
@@ -190,6 +211,23 @@ Irb4600-40 {
   ]
   staticBase TRUE
 }
+
 Apple {
   translation 1.29 0 0.81
+}
+
+DEF Follower Solid {
+  translation 1.16 0 0.8
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.45098 0.823529 0.0862745
+      }
+      geometry Capsule {
+        height 0.1
+        radius 0.05
+      }
+    }
+  ]
+  name "solid(2)"
 }

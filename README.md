@@ -29,6 +29,7 @@ Movement directions make sense when "standing" in front of the robot
 
  - [ ] integrate helper function to move robot to XY coordinates on the 
  - [ ] make gripper close and stop once force is detected
+ - [ ] routine to wait for movement to finish
 
  - [ ] choose image recognition toolkit
  - 
