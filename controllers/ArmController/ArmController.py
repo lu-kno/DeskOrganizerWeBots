@@ -18,19 +18,62 @@ if ikpy.__version__[0] < '3':
              'Please upgrade "ikpy" Python module to version "3.0" or newer with this command: "pip install --upgrade ikpy"')
 IKPY_MAX_ITERATIONS = 4
 
+
+    
+def looper(func):
+    def inner(self,*args,**kwargs):
+        while self.supervisor.step(self.timestep) != -1:
+            if func(self, *args,**kwargs)==-1:
+                return
+    return inner    
+
+def looperTimeout(func):
+    def inner(self,*args,**kwargs):
+        timeout = 10000
+        while self.supervisor.step(self.timestep) != -1:
+            if func(self, *args,**kwargs)==-1:
+                return
+
+            timeout-=self.timestep
+            if timeout<0:
+                print(f'TIMED OUT: {func.__name__}')
+                return
+    return inner
+
 class MyGripper:
-    def __init__(self,supervisor):
-        self.f1 = [supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
-        self.f2 = [supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
-        self.f3 = [supervisor.getDevice(f'finger_middle_joint_{i}') for i in [1,2,3]]
+    def __init__(self,master):
+        self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
+        self.f2 = [master.supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
+        self.f3 = [master.supervisor.getDevice(f'finger_middle_joint_{i}') for i in [1,2,3]]
         self.fingers = [self.f1,self.f2,self.f3]
         # self.enableForceFeedback()
         
+        self.master = master
+        self.supervisor = master.supervisor
+        self.timestep = master.timestep
+        
+    @looperTimeout
     def close(self):
+        gripStrength = 1
         # inc = 0.5
-        for f in self.fingers:
+        closed = np.array([0 for f in self.fingers])
+        maxDiff = 0
+        for i, f in enumerate(self.fingers):
+            maxDiff = max(abs(f[0].getPositionSensor().getValue() - f[0].getMaxPosition()),maxDiff)
             # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
-            f[0].setPosition(f[0].getMaxPosition())
+            if f[0].getForceFeedback()<gripStrength:
+                f[0].setPosition(f[0].getMaxPosition())
+            else:
+                f[0].setPosition(f[0].getPositionSensor().getValue())
+                closed[i] = 1
+                
+        if np.all(closed==1):
+            return -1
+            
+        if maxDiff<0.05:
+            print('Gripper Closed Completely')
+            return -1
+            
             
     def open(self):
         for f in self.fingers:
@@ -44,12 +87,14 @@ class MyGripper:
         for f in self.fingers:
             for j in f:
                 j.enableForceFeedback()
+                j.getPositionSensor().enable(self.timestep)
             
     def printForces(self):
         print(f'forces:')
         for i,f in enumerate(self.fingers):
             print(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
-  
+            
+
 class RobotArm():
     def __init__(self):
         self.supervisor = Supervisor()
@@ -58,7 +103,7 @@ class RobotArm():
         self.keyboard = self.supervisor.getKeyboard()
         self.keyboard.enable(50)
         
-        self.gripper = MyGripper(self.supervisor)
+        self.gripper = MyGripper(self)
         self.gripper.enable(self.timestep)
 
         self.camera = Camera('camera')
@@ -72,6 +117,8 @@ class RobotArm():
         self.armChain = Chain.from_urdf_file(self.filename, active_links_mask=[False, True, True, True, True, True, True, False, False, False, False])
 
         self.motors = []
+        self.motorsMax = []
+        self.motorsMin = []
         for link in self.armChain.links:
             if 'motor' in link.name:
                 motor = self.supervisor.getDevice(link.name)
@@ -79,6 +126,8 @@ class RobotArm():
                 position_sensor = motor.getPositionSensor()
                 position_sensor.enable(self.timestep)
                 self.motors.append(motor)
+                self.motorsMax.append(motor.getMaxPosition())
+                self.motorsMin.append(motor.getMinPosition())
 
 
         self.target = self.supervisor.getFromDef('TARGET')
@@ -87,92 +136,97 @@ class RobotArm():
         
         self.arm = self.supervisor.getSelf()
 
+
+    def start(self):
+        # self.drawCircle()
+        self.loop()
+    
+    @looper
+    def loop(self):
+        self.followSphereFromAbove()
+        self.handleKeystroke()
+        image2worldTest(self.supervisor)
+        
+        
+    @looper 
     def drawCircle(self):
-        print('Loop 1: Draw a circle on the paper sheet.')
-        print('Draw a circle on the paper sheet...')
+        # print('Loop 1: Draw a circle on the paper sheet.')
+        # print('Draw a circle on the paper sheet...')
         
-        while self.supervisor.step(self.timestep) != -1:
-            t = self.supervisor.getTime()
-        
-            # Use the circle equation relatively to the arm base as an input of the IK algorithm.
-            x = 0.25 * math.cos(t) + 1.1
-            y = 0.25 * math.sin(t) - 0.95
-            z = 0.05
-        
-            # Call "ikpy" to compute the inverse kinematics of the arm.
-            initial_position = [0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
-            print(f'len(initial_position) -> {len(initial_position)}')
-            ikResults = self.armChain.inverse_kinematics([x, y, z], max_iter=IKPY_MAX_ITERATIONS, initial_position=initial_position)
-        
-            # Actuate the 3 first arm motors with the IK results.
-            for i in range(3):
-                self.motors[i].setPosition(ikResults[i + 1])
-            # Keep the hand orientation down.
-            self.motors[4].setPosition(-ikResults[2] - ikResults[3] + math.pi / 2)
-            # Keep the hand orientation perpendicular.
-            self.motors[5].setPosition(ikResults[1])
-        
-            # Conditions to start/stop drawing and leave this loop.
-            if self.supervisor.getTime() > 2 * math.pi + 1.5:
-                break
-            elif self.supervisor.getTime() > 1.5:
-                # Note: start to draw at 1.5 second to be sure the arm is well located.
-                # supervisor.getFromDef('GRIPPER').close(True)
-                print("TO DO: Close Gripper")
-        
+        t = self.supervisor.getTime()
+    
+        # Use the circle equation relatively to the arm base as an input of the IK algorithm.
+        x = 0.25 * math.cos(t) + 1.1
+        y = 0.25 * math.sin(t) - 0.95
+        z = 0.05
+    
+        # Call "ikpy" to compute the inverse kinematics of the arm.
+        initial_position = [0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
+        print(f'len(initial_position) -> {len(initial_position)}')
+        ikResults = self.armChain.inverse_kinematics([x, y, z], max_iter=IKPY_MAX_ITERATIONS, initial_position=initial_position)
+    
+        # Actuate the 3 first arm motors with the IK results.
+        for i in range(3):
+            self.motors[i].setPosition(ikResults[i + 1])
+        # Keep the hand orientation down.
+        self.motors[4].setPosition(-ikResults[2] - ikResults[3] + math.pi / 2)
+        # Keep the hand orientation perpendicular.
+        self.motors[5].setPosition(ikResults[1])
+    
+        # Conditions to start/stop drawing and leave this loop.
+        if self.supervisor.getTime() > 2 * math.pi + 1.5:
+            return -1
+        elif self.supervisor.getTime() > 1.5:
+            # Note: start to draw at 1.5 second to be sure the arm is well located.
+            # supervisor.getFromDef('GRIPPER').close(True)
+            print("TO DO: Close Gripper")
+        return
+    
+    
     def goToSphere(self):
-        print("Loop 2: Move the arm hand to the target.")
-        print('Move the yellow and black sphere to move the arm...')
+        # Get the absolute postion of the target and the arm base.
+        targetPosition = self.target.getPosition()
+        armPosition = self.arm.getPosition()
+        # Compute the position of the target relatively to the arm.
+        # x and y axis are inverted because the arm is not aligned with the Webots global axes.
+        x = targetPosition[0] - armPosition[0]
+        y = targetPosition[1] - armPosition[1]
+        z = targetPosition[2] - armPosition[2]
+    
+        # Call "ikpy" to compute the inverse kinematics of the arm.
+        initial_position = [0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
+        ikResults = self.armChain.inverse_kinematics([x, y, z], max_iter=IKPY_MAX_ITERATIONS, initial_position=initial_position)
+    
+        # Recalculate the inverse kinematics of the arm if necessary.
+        position = self.armChain.forward_kinematics(ikResults)
+        squared_distance = (position[0, 3] - x)**2 + (position[1, 3] - y)**2 + (position[2, 3] - z)**2
+        if math.sqrt(squared_distance) > 0.03:
+            ikResults = self.armChain.inverse_kinematics([x, y, z])
+    
+        # Actuate the arm motors with the IK results.
+        for i,m in enumerate(self.motors):
+            m.setPosition(ikResults[i + 1])
 
-        while self.supervisor.step(self.timestep) != -1:
-            # Get the absolute postion of the target and the arm base.
-            targetPosition = self.target.getPosition()
-            armPosition = self.arm.getPosition()
-            # Compute the position of the target relatively to the arm.
-            # x and y axis are inverted because the arm is not aligned with the Webots global axes.
-            x = targetPosition[0] - armPosition[0]
-            y = targetPosition[1] - armPosition[1]
-            z = targetPosition[2] - armPosition[2]
-        
-            # Call "ikpy" to compute the inverse kinematics of the arm.
-            initial_position = [0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
-            ikResults = self.armChain.inverse_kinematics([x, y, z], max_iter=IKPY_MAX_ITERATIONS, initial_position=initial_position)
-        
-            # Recalculate the inverse kinematics of the arm if necessary.
-            position = self.armChain.forward_kinematics(ikResults)
-            squared_distance = (position[0, 3] - x)**2 + (position[1, 3] - y)**2 + (position[2, 3] - z)**2
-            if math.sqrt(squared_distance) > 0.03:
-                ikResults = self.armChain.inverse_kinematics([x, y, z])
-        
-            # Actuate the arm motors with the IK results.
-            for i,m in enumerate(self.motors):
-                m.setPosition(ikResults[i + 1])
-
-            return     
+        return     
                 
     def followSphereFromAbove(self, safeHeight=None):
         if safeHeight is None:
             safeHeight = self.safeHeight
             
-        print("Loop 2: Move the arm hand to the target.")
-        print('Move the yellow and black sphere to move the arm...')
-        while self.supervisor.step(self.timestep) != -1:
-            # Get the absolute postion of the target and the arm base.
-            targetPosition = self.target.getPosition()
-            armPosition = self.arm.getPosition()
-            # Compute the position of the target relatively to the arm.
-            # x and y axis are inverted because the arm is not aligned with the Webots global axes.
-            x = targetPosition[0] - armPosition[0]
-            y = targetPosition[1] - armPosition[1]
-            z = targetPosition[2] - armPosition[2]
+        # Get the absolute postion of the target and the arm base.
+        targetPosition = self.target.getPosition()
+        armPosition = self.arm.getPosition()
+        # Compute the position of the target relatively to the arm.
+        # x and y axis are inverted because the arm is not aligned with the Webots global axes.
+        x = targetPosition[0] - armPosition[0]
+        y = targetPosition[1] - armPosition[1]
+        z = targetPosition[2] - armPosition[2]
+    
+        self.moveTo([x,y,z+safeHeight])
         
-            self.moveTo([x,y,z+safeHeight])
-            key = self.keyboard.getKey()
-            self.handleKeystroke(key)
-            
-            image2worldTest(self.supervisor)
 
-    def handleKeystroke(self, key):
+    def handleKeystroke(self):
+        key = self.keyboard.getKey()
         
         x,y,z = self.target.getPosition()
         ballSpeed = 0.03
@@ -229,7 +283,6 @@ class RobotArm():
             ImageDetector.openCvTest()
         if (key==ord('L')):
             ImageDetector.callWeBotsRecognitionRoutine(self.camera)
-
                   
     def moveTo(self, pos):
         try:
@@ -266,12 +319,42 @@ class RobotArm():
             
             # print(f'moving to: {motor_angles}')
             
-            for m, a in zip(self.motors, motor_angles):
-                m.setPosition(a)
+            self.setPosition(motor_angles)
+            self.awaitPosition(motor_angles)
+                
                 
         except Exception as e:
             print(e)
             
+    def clipAngles(self, angles):
+        return np.clip(np.array(angles), self.motorsMin, self.motorsMax)
+    
+    def setPosition(self, angles):
+        angles = self.clipAngles(angles)
+        for m, a in zip(self.motors, angles):
+                m.setPosition(a)
+        
+    # def awaitPosition(self, angles):
+    #     diff = 10
+    #     timeout = 30000 # in ms
+        
+    #     angles = self.clipAngles(angles)
+    #     while diff>0.05 and timeout>0:
+    #         self.supervisor.step(self.timestep)
+    #         timeout-=self.timestep
+            
+    #         motor_values = np.array([m.getPositionSensor().getValue() for m in self.motors])
+    #         diff = np.max(abs(motor_values - angles))
+
+    @looperTimeout            
+    def awaitPosition(self, angles):
+        angles = self.clipAngles(angles)
+        motor_values = np.array([m.getPositionSensor().getValue() for m in self.motors])
+        diff = np.max(abs(motor_values - angles))
+        if diff < 0.05:
+            return -1
+        
+    
     def pickUpObject(self, pos,safeHeight=None):
         if safeHeight is None:
             safeHeight = self.safeHeight
@@ -282,9 +365,9 @@ class RobotArm():
         self.moveTo(posSafe)
         self.gripper.open()
         self.moveTo(pos)
-        self.sleep(500)
+        # self.sleep(500)
         self.gripper.close()
-        self.sleep(500)
+        self.sleep(500)  # To do: add awaitPosition to 
         self.moveTo(posSafe)
         
     def deliverObject(self, pos, method='drop', safeHeight=None):   
@@ -310,6 +393,10 @@ class RobotArm():
             ms -= self.timestep
         
         
+        
+        
+
+        
 def image2worldTest(supervisor):
     mover = supervisor.getFromDef('Mover').getField('translation')
     imageRef = supervisor.getFromDef('MoverReference')
@@ -318,8 +405,7 @@ def image2worldTest(supervisor):
     
     follower = supervisor.getFromDef('Follower').getField('translation')
     
-    print(f'mover -> {mover}')
-    print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
+    # print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
     
     res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
     
@@ -364,13 +450,15 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
         pos = np.array([*pos,1])
     
     res = np.matmul(tMat,pos)[:3]
-    print(f'pos: {pos}')
-    print(f'result: {res}')
+    # print(f'pos: {pos}')
+    # print(f'result: {res}')
     return res
     
         
         
 robot = RobotArm()
-robot.followSphereFromAbove()
+robot.start()
+
+
 
 
