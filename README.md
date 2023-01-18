@@ -27,9 +27,15 @@ Movement directions make sense when "standing" in front of the robot
  - [ ] Merge pickup and delivery routines to one function moveObject(ItemPosition, DestinationPosition)
 
 
- - [ ] integrate helper function to move robot to XY coordinates on the 
- - [ ] make gripper close and stop once force is detected
- - [ ] routine to wait for movement to finish
+ - [ ] integrate helper function to move robot to XY coordinates from table to world
+ - [X] make gripper close and stop once force is detected
+ - [X] routine to wait for movement to finish
+ - [ ] choose gripper force
 
- - [ ] choose image recognition toolkit
- - 
+ - [X] choose image recognition toolkit
+ - [ ] Get position of object in image as ratio to table size (from 0 to 1)
+ - [ ] Detect more than one object on the table
+ - [ ] Detect different shapes
+
+
+
