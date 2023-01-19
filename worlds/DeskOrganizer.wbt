@@ -27,7 +27,7 @@ RectangleArena {
   floorTileSize 1 1
 }
 DEF TARGET Solid {
-  translation 1.44 0 1.07
+  translation 1.44 0 0.74
   children [
     Shape {
       appearance PBRAppearance {
