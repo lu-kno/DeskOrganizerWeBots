@@ -10,21 +10,41 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/robotiq/protos/Robotiq3fGripper.proto"
 EXTERNPROTO "../protos/Irb4600-40.proto"
-IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/fruits/protos/Apple.proto"
+IMPORTABLE EXTERNPROTO "../protos/Apple.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/drinks/protos/Can.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/tools/protos/Hammer.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/utensils/protos/Knife.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/utensils/protos/Fork.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/utensils/protos/WoodenSpoon.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/telephone/protos/Telephone.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/street_furniture/protos/EmergencyPhone.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/computers/protos/ComputerMouse.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/drinks/protos/BeerBottle.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/drinks/protos/WaterBottle.proto"
+IMPORTABLE EXTERNPROTO "../protos/Orange.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.23742801756080403 0.10502413970767022 -0.9657110678436952 2.188586789233816
-  position 6.292740723323477 7.033887081635967 6.308482229095841
+  orientation 0.4151972340842966 0.05648565831487861 -0.9079761159928629 2.8149200061326143
+  position 3.799839706954965 1.0753383902312479 3.2388343390563703
 }
 TexturedBackground {
+  texture "factory"
 }
 TexturedBackgroundLight {
+  texture "factory"
 }
 RectangleArena {
   floorSize 10 10
   floorTileSize 1 1
+}
+ComputerMouse {
+  translation 1.7833 0.292505 0.77
+}
+Can {
+  translation 1.48797 -0.535127 0.94
+  rotation 1 0 0 4.692820414042842e-06
 }
 DEF TARGET Solid {
   translation 1.44 0 1.07
@@ -201,8 +221,9 @@ Irb4600-40 {
       recognitionColors [
         0 0 0
       ]
-      width 640
-      height 355
+      width 2560
+      height 1422
+      antiAliasing TRUE
       recognition Recognition {
         maxRange 500
         segmentation TRUE
@@ -211,11 +232,9 @@ Irb4600-40 {
   ]
   staticBase TRUE
 }
-
 Apple {
-  translation 1.29 0 0.81
+  translation 1.94223 0.720946 0.81
 }
-
 DEF Follower Solid {
   translation 1.16 0 0.8
   children [
@@ -230,4 +249,23 @@ DEF Follower Solid {
     }
   ]
   name "solid(2)"
+}
+Hammer {
+  translation 1.58746 -0.270414 0.774
+}
+Knife {
+  translation 1.31813 0.502401 0.77
+}
+Fork {
+  translation 1.33 0.28 0.75
+}
+WoodenSpoon {
+  translation 1.75223 0.560653 0.74
+}
+BeerBottle {
+  translation 1.28406 -0.482817 0.77
+  rotation 0.6947480600338772 -0.18615701608601462 0.6947450600336179 -2.7734953071795863
+}
+Orange {
+  translation 1.74459 -0.603725 0.85
 }

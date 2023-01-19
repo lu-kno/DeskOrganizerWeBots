@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import List, Union, Callable
 import json
 
+
+
 def detectShapes():
     # reading image
     img = cv2.imread('snapshot.jpg')
@@ -76,7 +78,10 @@ def detectShapes():
     cv2.destroyAllWindows()
 
 def imageAiTest():
-    print('test() called')
+    imageWidth = 2560
+    imageHeight = 1422
+
+    print('imageAiTest() called')
     execution_path = os.getcwd()
     
     detector = ObjectDetection()
@@ -84,18 +89,25 @@ def imageAiTest():
     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
     detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
-    custom = detector.CustomObjects(apple=True)
+    custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
     detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
   
     #detections = detector.detectCustomObjectsFromImage( custom_objects=custom, input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "image3new-custom.jpg"), minimum_percentage_probability=30)
     for eachObject in detections:
-        print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", eachObject["box_points"] )
+        x1 = eachObject["box_points"][0]
+        y1 = eachObject["box_points"][1]
+        x2 = eachObject["box_points"][2]
+        y2 = eachObject["box_points"][3]
+        center = getRectangleCenter(x1,x2,y1,y2)
+        relativeCoords = getRelativeCoords(imageWidth, imageHeight, center[0], center[1])
+        print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", relativeCoords )
         print("--------------------------------")
 
 
 def openCvTest():
-    pictureData = findObject("snapshot.jpg","blue")
-    print(pictureData)
+    pictureData = findObject("snapshot.jpg","all")
+
+
 
 def findObject(imageName, targetColor) -> json:
     # Lade das Bild
@@ -215,3 +227,8 @@ def callWeBotsRecognitionRoutine(camera):
     for obj in recObjs:
         print(obj.getModel())
 
+def getRectangleCenter(x1,x2,y1,y2):
+    return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
+
+def getRelativeCoords(imageWidth, imageHeight, pointX, pointY):
+    return [pointX / imageWidth, pointY / imageHeight]

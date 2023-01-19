@@ -279,10 +279,15 @@ class RobotArm():
 
         #trigger Camera and Img interpretation
         if (key==ord('P')):
+            print("pressed: P")
             self.camera.saveImage("snapshot.jpg",100)
+            #ImageDetector.openCvTest()
             ImageDetector.openCvTest()
         if (key==ord('L')):
-            ImageDetector.callWeBotsRecognitionRoutine(self.camera)
+            print("pressed: L")
+            self.camera.saveImage("snapshot.jpg",100)
+            #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
+            ImageDetector.imageAiTest()
                   
     def moveTo(self, pos):
         try:
