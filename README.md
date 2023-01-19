@@ -42,3 +42,10 @@ Movement directions make sense when "standing" in front of the robot
 
 
 
+# used to avoid tracking of some world files
+
+`git update-index --assume-unchanged worlds/.DeskOrganizer.wbproj `
+`git update-index --assume-unchanged worlds/.DeskOrganizer.jpg `
+
+
+reset with `--no-assume-unchanged` flag
