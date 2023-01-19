@@ -418,6 +418,11 @@ class RobotArm():
         self.moveTo(pos)
         self.gripper.open()
         self.moveTo(posSafe)
+        
+    def pickNplace(self,position, destination, place_method=None):
+        self.pickUpObject(position)
+        self.deliverObject(destination, method=place_method)
+        
             
     def sleep(self, ms):
         while ms>0:

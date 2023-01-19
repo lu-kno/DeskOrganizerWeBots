@@ -24,7 +24,7 @@ Movement directions make sense when "standing" in front of the robot
    - [X] move back to Z+0.3
    - [X] go to destination XY Z+0.3
    - [X] open gripper to drop
- - [ ] Merge pickup and delivery routines to one function moveObject(ItemPosition, DestinationPosition)
+ - [X] Merge pickup and delivery routines to one function pickNplace(ItemPosition, DestinationPosition)
 
 
  - [ ] integrate helper function to move robot to XY coordinates from table to world
@@ -32,7 +32,7 @@ Movement directions make sense when "standing" in front of the robot
  - [X] routine to wait for movement to finish
  - [X] choose gripper force
  - [X] make tip of finger "open" when closing gripper to have a flat grabbing surface
- - [ ] objects seem slippery, check ContactProperties
+ - [X] objects seem slippery, check ContactProperties (seemed to be unnecessary)
  - [X] only one finger seems to be closing properly, check why (solved itself, idk, maybe by restarting webots)
 
  - [X] choose image recognition toolkit
