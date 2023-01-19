@@ -30,10 +30,10 @@ Movement directions make sense when "standing" in front of the robot
  - [ ] integrate helper function to move robot to XY coordinates from table to world
  - [X] make gripper close and stop once force is detected
  - [X] routine to wait for movement to finish
- - [ ] choose gripper force
- - [ ] make tip of finger "open" when closing gripper to have a flat grabbing surface
+ - [X] choose gripper force
+ - [X] make tip of finger "open" when closing gripper to have a flat grabbing surface
  - [ ] objects seem slippery, check ContactProperties
- - [ ] only one finger seems to be closing properly, check why
+ - [X] only one finger seems to be closing properly, check why (solved itself, idk, maybe by restarting webots)
 
  - [X] choose image recognition toolkit
  - [ ] Get position of object in image as ratio to table size (from 0 to 1)
