@@ -41,6 +41,9 @@ def looperTimeout(func):
     return inner
 
 class MyGripper:
+    SPEED = 0.05 # SPEED in DEGREES
+    GRIP_FORCE = 1.5
+    
     def __init__(self,master):
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
         self.f2 = [master.supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
@@ -53,15 +56,14 @@ class MyGripper:
         self.timestep = master.timestep
         
     @looperTimeout
-    def close(self):
-        gripStrength = 1
+    def closeOld(self):
         # inc = 0.5
         closed = np.array([0 for f in self.fingers])
         maxDiff = 0
         for i, f in enumerate(self.fingers):
             maxDiff = max(abs(f[0].getPositionSensor().getValue() - f[0].getMaxPosition()),maxDiff)
             # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
-            if f[0].getForceFeedback()<gripStrength:
+            if f[0].getForceFeedback()<self.GRIP_FORCE:
                 f[0].setPosition(f[0].getMaxPosition())
             else:
                 f[0].setPosition(f[0].getPositionSensor().getValue())
@@ -73,17 +75,45 @@ class MyGripper:
         if maxDiff<0.05:
             print('Gripper Closed Completely')
             return -1
+        
+    @looperTimeout
+    def close(self):
+        inc = self.SPEED * np.pi/180 * self.timestep
+        forces = np.array([f[0].getForceFeedback() for f in self.fingers])
+        maxPositions = np.array([f[0].getMaxPosition() for f in self.fingers])
+        minPositionsTip = np.array([f[2].getMinPosition() for f in self.fingers])
+        
+        positions = np.array([f[0].getPositionSensor().getValue() for f in self.fingers])
+        # currentPositionsTip = np.array([f[2].getPositionSensor().getValue() for f in self.fingers])
+        closedFingers = []
+                
+        print(f'speed -> {inc/self.timestep}')
+        # print(f'meanForce -> {np.mean(forces)}')
+        # print(f'maxForce -> {np.max(forces)}')
+        print(f'Forces:  {"   ".join([f"{f:>7.2f}" for f in forces])}')
+        
+        for finger, force, maxPos, minPosTip, pos in zip(self.fingers,forces,maxPositions, minPositionsTip,positions): #
+            if abs(pos-maxPos)<0.05 or force>self.GRIP_FORCE:
+                closedFingers.append(True)
+                continue
+            else:
+                closedFingers.append(False)
+            finger[0].setPosition(min(pos+inc, maxPos))
+            finger[2].setPosition(max(-pos-inc, minPosTip))
             
+        if np.all(closedFingers):
+            return -1    
             
     def open(self):
         for f in self.fingers:
             # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
             f[0].setPosition(f[0].getMinPosition())
+            f[2].setPosition(f[2].getMaxPosition())
             
     def enable(self,*args):
-        self.enableForceFeedback()        
+        self.enableForceFeedback(*args)        
     
-    def enableForceFeedback(self):
+    def enableForceFeedback(self,*args):
         for f in self.fingers:
             for j in f:
                 j.enableForceFeedback()
@@ -96,6 +126,10 @@ class MyGripper:
             
 
 class RobotArm():
+    HAND_LENGTH = 0.38 ## To Do: This value needs to be checked. Might need to be .03 larger
+    SAFE_HEIGHT = 0.3
+
+    
     def __init__(self):
         self.supervisor = Supervisor()
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
@@ -132,7 +166,6 @@ class RobotArm():
 
         self.target = self.supervisor.getFromDef('TARGET')
         self.targetTranslation = self.target.getField('translation')
-        self.safeHeight = 0.3
         
         self.arm = self.supervisor.getSelf()
 
@@ -211,7 +244,7 @@ class RobotArm():
                 
     def followSphereFromAbove(self, safeHeight=None):
         if safeHeight is None:
-            safeHeight = self.safeHeight
+            safeHeight = self.SAFE_HEIGHT
             
         # Get the absolute postion of the target and the arm base.
         targetPosition = self.target.getPosition()
@@ -286,9 +319,8 @@ class RobotArm():
                   
     def moveTo(self, pos):
         try:
-            handLength = 0.3 ## To Do: This value needs to be checked. Might need to be .03 larger
             x0,y0,z0 = pos
-            z0 = z0 + handLength
+            z0 = z0 + self.HAND_LENGTH
             
             a = 1.095594 # length of first arm
             b = math.sqrt(0.174998**2 + (0.340095+0.929888)**2) # effective length of second arm (corrected)
@@ -357,7 +389,7 @@ class RobotArm():
     
     def pickUpObject(self, pos,safeHeight=None):
         if safeHeight is None:
-            safeHeight = self.safeHeight
+            safeHeight = self.SAFE_HEIGHT
         
         pos = np.array(pos)
         posSafe = pos + np.array([0,0,safeHeight])
@@ -370,9 +402,9 @@ class RobotArm():
         # self.sleep(500)
         self.moveTo(posSafe)
         
-    def deliverObject(self, pos, method='drop', safeHeight=None):   
+    def deliverObject(self, pos, method='place', safeHeight=None):   
         if safeHeight is None:
-            safeHeight = self.safeHeight
+            safeHeight = self.SAFE_HEIGHT
             
         pos = np.array(pos)
         posSafe = pos + np.array([0,0,safeHeight])
