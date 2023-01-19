@@ -101,7 +101,7 @@ class RobotArm():
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
         
         self.keyboard = self.supervisor.getKeyboard()
-        self.keyboard.enable(50)
+        self.keyboard.enable(10)
         
         self.gripper = MyGripper(self)
         self.gripper.enable(self.timestep)
@@ -367,7 +367,7 @@ class RobotArm():
         self.moveTo(pos)
         # self.sleep(500)
         self.gripper.close()
-        self.sleep(500)  # To do: add awaitPosition to 
+        # self.sleep(500)
         self.moveTo(posSafe)
         
     def deliverObject(self, pos, method='drop', safeHeight=None):   
