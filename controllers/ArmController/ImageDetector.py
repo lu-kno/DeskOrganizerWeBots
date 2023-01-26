@@ -12,19 +12,20 @@ import math
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning) 
 
-def imageAiTest():
+def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
     imageHeight = 1422
     print('imageAiTest() called')
-    execution_path = os.getcwd()
+    # execution_path = os.getcwd()
+    execution_path = os.path.dirname(__file__)
     detector = ObjectDetection()
     detector.setModelTypeAsRetinaNet()
     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
     detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
-    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
-    image = cv2.imread("snapshot.jpg")
+    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
+    image = cv2.imread(os.path.join(execution_path , filename))
 
     for detection in detections:
         xmin, ymin, xmax, ymax = detection['box_points']
@@ -34,7 +35,8 @@ def imageAiTest():
         print(detection["name"] , " : ", detection["percentage_probability"], " : ", relativeCoords )
 
         # Crop object from the image
-        objectImage = image[ymin:ymax, xmin:xmax]
+        margin=5
+        objectImage = image[ymin-margin:ymax+margin, xmin-margin:xmax+margin]
         angle = getAngle(objectImage)
         if angle != 999:
             print(f"Object with class ID {detection['name']} has an average rotation angle of {angle} degrees")
@@ -56,12 +58,48 @@ def getAngle(objectImage):
     for lower_color, upper_color in color_ranges:
             # Convert the image to the HSV color space
             hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
-            # Create a mask for the selected color range
-            mask = cv2.inRange(hsv_image, lower_color, upper_color)
-            # Apply Gaussian blur to reduce noise
-            blur = cv2.GaussianBlur(mask, (3, 3), 0)
-            # Apply Canny edge detection
-            edges = cv2.Canny(blur, 50, 150)
+            # # Create a mask for the selected color range
+            # mask = cv2.inRange(hsv_image, lower_color, upper_color)
+            # # Apply Gaussian blur to reduce noise
+            # blur = cv2.GaussianBlur(mask, (3, 3), 0)
+            # # Apply Canny edge detection
+            # edges = cv2.Canny(blur, 50, 150)
+            edges = cv2.Canny(hsv_image, 50, 150)
+            
+            pos = [i for i in zip(*np.where(edges>100))]
+            
+            
+            leftEdgeMask=np.full(np.shape(edges),0)
+            rightEdgeMask=np.full(np.shape(edges),0)
+            topEdgeMask=np.full(np.shape(edges),0)
+            bottomEdgeMask=np.full(np.shape(edges),0)
+            
+            leftEdge=[1000 for i in range(np.shape(edges)[0])]
+            rightEdge=[0 for i in range(np.shape(edges)[0])]
+            topEdge=[1000 for i in range(np.shape(edges)[1])]
+            bottomEdge=[0 for i in range(np.shape(edges)[1])]
+            
+            for y,x in pos:
+                leftEdge[y] = min(leftEdge[y],x)
+                rightEdge[y] = max(rightEdge[y],x)
+                topEdge[x] = min(topEdge[x],y)
+                bottomEdge[x] = max(bottomEdge[x],y)
+                
+            for y,x in enumerate(leftEdge):
+                leftEdgeMask[y,x:] = 255
+                
+            for y,x in enumerate(rightEdge):
+                rightEdgeMask[y,:x] = 255
+                
+            for x,y in enumerate(topEdge):
+                topEdgeMask[y:,x] = 255
+                
+            for x,y in enumerate(bottomEdge):
+                bottomEdgeMask[:y,x] = 255
+                
+            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+            blur = cv2.GaussianBlur(combined_mask, (3,3), 0)
+            
             # Apply HoughLines to detect lines in the edges
             lines = cv2.HoughLines(edges, 1, np.pi/180, 50)
             # Initialize list to store angles
@@ -221,3 +259,12 @@ def edge_detection(img, blur_ksize=5, threshold1=100, threshold2=200):
     img_canny = cv2.Canny(img_gaussian, threshold1, threshold2)
 
     return img_canny
+
+
+import matplotlib
+matplotlib.use('TKAgg')
+
+
+if __name__=="__main__":
+    imageAiTest()
+    print('DONE')
