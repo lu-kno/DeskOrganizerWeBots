@@ -1,3 +1,4 @@
 controllers/ArmController/Modelle/
 __pycache__/**
 *.pyc
+*.code-workspace
