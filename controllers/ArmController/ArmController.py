@@ -5,6 +5,7 @@ import math
 import ImageDetector
 import time
 from controller import Supervisor, Robot, Camera
+import numbers
 
 try:
     import ikpy
@@ -21,6 +22,7 @@ IKPY_MAX_ITERATIONS = 4
 
     
 def looper(func):
+    '''Wrapper to loop function while continuing simulation until '-1' is returned'''
     def inner(self,*args,**kwargs):
         while self.supervisor.step(self.timestep) != -1:
             if func(self, *args,**kwargs)==-1:
@@ -28,6 +30,7 @@ def looper(func):
     return inner    
 
 def looperTimeout(func):
+    '''Wrapper to loop function while continuing simulation until '-1' is returned or timeout is reached'''
     def inner(self,*args,**kwargs):
         timeout = 10000
         while self.supervisor.step(self.timestep) != -1:
@@ -144,12 +147,14 @@ class RobotArm():
         self.camera.enable(100)
         self.camera.recognitionEnable(self.timestep)
 
+        # Get ArmChain Data
         self.filename = None
         with tempfile.NamedTemporaryFile(suffix='.urdf', delete=False) as file:
             self.filename = file.name
             file.write(self.supervisor.getUrdf().encode('utf-8'))
         self.armChain = Chain.from_urdf_file(self.filename, active_links_mask=[False, True, True, True, True, True, True, False, False, False, False])
 
+        # Get Motors and their range
         self.motors = []
         self.motorsMax = []
         self.motorsMin = []
@@ -163,26 +168,36 @@ class RobotArm():
                 self.motorsMax.append(motor.getMaxPosition())
                 self.motorsMin.append(motor.getMinPosition())
 
-
+        # Get Target
         self.target = self.supervisor.getFromDef('TARGET')
         self.targetTranslation = self.target.getField('translation')
         
+        # Get Self
         self.arm = self.supervisor.getSelf()
 
 
     def start(self):
+        '''Robots setup routine'''
         # self.drawCircle()
         self.loop()
     
     @looper
     def loop(self):
+        '''Main loop of the robots controller'''
         self.followSphereFromAbove()
         self.handleKeystroke()
         image2worldTest(self.supervisor)
+    
+    @looper
+    def autoLoop(self):
+        self.handleKeystroke()
+        self.moveTo([])
+        
         
         
     @looper 
     def drawCircle(self):
+        ''' Draws a circle. Unused. Useless. Rests from tutorial'''
         # print('Loop 1: Draw a circle on the paper sheet.')
         # print('Draw a circle on the paper sheet...')
         
@@ -217,6 +232,9 @@ class RobotArm():
     
     
     def goToSphere(self):
+        '''
+        Uses IK to move gripper to targets position. Orientation/direction is not considered.
+        '''
         # Get the absolute postion of the target and the arm base.
         targetPosition = self.target.getPosition()
         armPosition = self.arm.getPosition()
@@ -243,6 +261,7 @@ class RobotArm():
         return     
                 
     def followSphereFromAbove(self, safeHeight=None):
+        ''' moves the arm above the Spheres location '''
         if safeHeight is None:
             safeHeight = self.SAFE_HEIGHT
             
@@ -259,6 +278,7 @@ class RobotArm():
         
 
     def handleKeystroke(self):
+        '''Routine function to handle keystrokes and hold keybindings'''
         key = self.keyboard.getKey()
         
         x,y,z = self.target.getPosition()
@@ -322,7 +342,20 @@ class RobotArm():
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             ImageDetector.imageAiTest()
                   
-    def moveTo(self, pos):
+    def moveTo(self, pos, rotation=None):
+        '''
+        Input:
+            pos (list/iterable of length 3):
+                target position
+            rotation:
+                rotation angle of the gripper (after compensation of robots rotation)
+        
+        Moves the Gripper to given positions (at the tips) with hand pointing down.
+        Motions area awaited until desired position is reached.
+        '''
+        if not isinstance(rotation, numbers.Number):
+            rotation=0
+        
         try:
             x0,y0,z0 = pos
             z0 = z0 + self.HAND_LENGTH
@@ -348,7 +381,7 @@ class RobotArm():
             
             w3 = 0 # forearm rotation (should always point to 0 (down))
             w4 = math.pi/2-w1-w2#math.atan(h/z) + math.acos((b*b+c*c-a*a)/(2*b*c)) - math.pi/2# wrist direction
-            w5 = w0 # wrist rotation
+            w5 = w0 + rotation# wrist rotation
             
             if x<0:
                 w0 += math.pi
@@ -364,50 +397,82 @@ class RobotArm():
             print(e)
             
     def clipAngles(self, angles):
+        '''
+        Input: 
+            angles (list/iterable) with length equal to len(motors).
+            
+        This clips the values to be inside the possible angles of each motor 
+        '''
         return np.clip(np.array(angles), self.motorsMin, self.motorsMax)
     
     def setPosition(self, angles):
+        '''
+        Input: 
+            angles (list/iterable) with length equal to len(motors).
+        
+        This sets the angle of each motor directly.
+        '''
         angles = self.clipAngles(angles)
         for m, a in zip(self.motors, angles):
                 m.setPosition(a)
-        
-    # def awaitPosition(self, angles):
-    #     diff = 10
-    #     timeout = 30000 # in ms
-        
-    #     angles = self.clipAngles(angles)
-    #     while diff>0.05 and timeout>0:
-    #         self.supervisor.step(self.timestep)
-    #         timeout-=self.timestep
-            
-    #         motor_values = np.array([m.getPositionSensor().getValue() for m in self.motors])
-    #         diff = np.max(abs(motor_values - angles))
 
     @looperTimeout            
     def awaitPosition(self, angles):
+        '''
+        Input: 
+            angles (list/iterable) with length equal to len(motors).
+            
+        Clips angles to motors range and calculates difference to actual motor angles
+        Function loops until the max difference is below 0.05 rad or timeout is reached.
+        '''
         angles = self.clipAngles(angles)
         motor_values = np.array([m.getPositionSensor().getValue() for m in self.motors])
         diff = np.max(abs(motor_values - angles))
         if diff < 0.05:
             return -1
         
-    
-    def pickUpObject(self, pos,safeHeight=None):
+    def pickUpObject(self, pos,safeHeight=None, rotation=None):
+        '''
+        Inputs: 
+            pos (List/iterable of length 3):
+                Position of the objet to be picked up
+            safeHeight (Optional):
+                Value to override Robot's SAFE_HEIGHT
+        
+        Moves above the object to be picked up (SAFE_HEIGHT above object), 
+        goes down, grabs the object and goes back up.
+        Movements are awaited to reach desired position before starting next movement.
+        '''
         if safeHeight is None:
             safeHeight = self.SAFE_HEIGHT
         
         pos = np.array(pos)
         posSafe = pos + np.array([0,0,safeHeight])
         
-        self.moveTo(posSafe)
+        self.moveTo(posSafe, rotation=rotation)
         self.gripper.open()
-        self.moveTo(pos)
-        # self.sleep(500)
+        self.moveTo(pos, rotation=rotation)
         self.gripper.close()
-        # self.sleep(500)
         self.moveTo(posSafe)
         
     def deliverObject(self, pos, method='place', safeHeight=None):   
+        '''
+        Inputs: 
+            pos (List/iterable of length 3):
+                Position where the object need to be delivered (destination)
+            method:
+                'drop' lets the object fall. anything else places the object calmly.
+            safeHeight (Optional):
+                Value to override Robot's SAFE_HEIGHT
+        
+        Moves above the objects destination (SAFE_HEIGHT above 'pos'), 
+        if method=='drop':
+            gripper opens
+        else:
+            hand goes down, releases the object and goes back up.
+        Movements are awaited to reach desired position before starting next movement.
+        '''
+        
         if safeHeight is None:
             safeHeight = self.SAFE_HEIGHT
             
@@ -424,15 +489,29 @@ class RobotArm():
         self.gripper.open()
         self.moveTo(posSafe)
         
-    def pickNplace(self,position, destination, place_method=None):
-        self.pickUpObject(position)
+    def pickNplace(self,position, destination, place_method=None, rotation=None):
+        '''
+        Inputs:
+            position (List/Iterable of length 3): 
+                Current position of the object to be moved.
+            destination (List/Iterable of length 3):
+                Location where the Object is to be placed.
+            place_method:
+                if 'drop': gripper letts the object fall from SAFE_HEIGHT above destination.
+                else: object is placed calmly
+            rotation (number)(optional):
+                rotation of the object to be picked up
+                
+        Moves an object from one position to another with the gripper.
+        '''
+        self.pickUpObject(position, rotation=rotation)
         self.deliverObject(destination, method=place_method)
         
             
-    def sleep(self, ms):
-        while ms>0:
-            self.supervisor.step(self.timestep)
-            ms -= self.timestep
+    # def sleep(self, ms):
+    #     while ms>0:
+    #         self.supervisor.step(self.timestep)
+    #         ms -= self.timestep
         
         
         
@@ -461,8 +540,7 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
     ''' this function tranforms the coordinates from the table to world coordinates.
     if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
     
-    
-    
+
     Sx, Sy, Sz = -1,1,-1
     tx,ty,tz = tableOrigin
     tx+=tableSize[0]/2
@@ -483,10 +561,10 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
     #     [0,               0,              0,    1]
     # ]
     tMat = [
-        [0, -Sy, 0,    tx],
-        [Sx,  0, 0,    ty],
-        [0,               0,              Sz,   tz],
-        [0,               0,              0,    1]
+        [0,  -Sy,   0,    tx],
+        [Sx,  0,    0,    ty],
+        [0,   0,    Sz,   tz],
+        [0,   0,    0,    1]
     ]
     
     if len(pos)==3:
