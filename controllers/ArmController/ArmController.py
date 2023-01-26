@@ -312,10 +312,15 @@ class RobotArm():
 
         #trigger Camera and Img interpretation
         if (key==ord('P')):
+            print("pressed: P")
             self.camera.saveImage("snapshot.jpg",100)
+            #ImageDetector.openCvTest()
             ImageDetector.openCvTest()
         if (key==ord('L')):
-            ImageDetector.callWeBotsRecognitionRoutine(self.camera)
+            print("pressed: L")
+            self.camera.saveImage("snapshot.jpg",100)
+            #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
+            ImageDetector.imageAiTest()
                   
     def moveTo(self, pos):
         try:
@@ -442,7 +447,8 @@ def image2worldTest(supervisor):
     
     follower = supervisor.getFromDef('Follower').getField('translation')
     
-    # print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
+    #print(f'mover -> {mover}')
+    #print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
     
     res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
     
@@ -487,8 +493,8 @@ def image2world(pos, tableOrigin, tableSize=None, rotation=None):
         pos = np.array([*pos,1])
     
     res = np.matmul(tMat,pos)[:3]
-    # print(f'pos: {pos}')
-    # print(f'result: {res}')
+    #print(f'pos: {pos}')
+    #print(f'result: {res}')
     return res
     
         
