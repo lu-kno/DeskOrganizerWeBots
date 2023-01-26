@@ -8,82 +8,15 @@ import ctypes
 from pathlib import Path
 from typing import List, Union, Callable
 import json
-
-
-
-def detectShapes():
-    # reading image
-    img = cv2.imread('snapshot.jpg')
-    
-    # converting image into grayscale image
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # setting threshold of gray image
-    _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-    
-    # using a findContours() function
-    contours, _ = cv2.findContours(
-        threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-    i = 0
-    
-    # list for storing names of shapes
-    for contour in contours:
-    
-        # here we are ignoring first counter because 
-        # findcontour function detects whole image as shape
-        if i == 0:
-            i = 1
-            continue
-    
-        # cv2.approxPloyDP() function to approximate the shape
-        approx = cv2.approxPolyDP(
-            contour, 0.01 * cv2.arcLength(contour, True), True)
-        
-        # using drawContours() function
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
-        x=0
-        y=0
-        # finding center point of shape
-        M = cv2.moments(contour)
-        if M['m00'] != 0.0:
-            x = int(M['m10']/M['m00'])
-            y = int(M['m01']/M['m00'])
-    
-        # putting shape name at center of each shape
-        if len(approx) == 3:
-            cv2.putText(img, 'Triangle', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 4:
-            cv2.putText(img, 'Quadrilateral', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 5:
-            cv2.putText(img, 'Pentagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 6:
-            cv2.putText(img, 'Hexagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        else:
-            cv2.putText(img, 'circle', (x, y),
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        # displaying the image after drawing contours
-    cv2.imshow('shapes', img)
-        
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+import math
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning) 
 
 def imageAiTest():
     imageWidth = 2560
     imageHeight = 1422
-
     print('imageAiTest() called')
     execution_path = os.getcwd()
-    
     detector = ObjectDetection()
     detector.setModelTypeAsRetinaNet()
     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
@@ -91,17 +24,66 @@ def imageAiTest():
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
     detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
-  
-    #detections = detector.detectCustomObjectsFromImage( custom_objects=custom, input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "image3new-custom.jpg"), minimum_percentage_probability=30)
-    for eachObject in detections:
-        x1 = eachObject["box_points"][0]
-        y1 = eachObject["box_points"][1]
-        x2 = eachObject["box_points"][2]
-        y2 = eachObject["box_points"][3]
-        center = getRectangleCenter(x1,x2,y1,y2)
+    image = cv2.imread("snapshot.jpg")
+
+    for detection in detections:
+        xmin, ymin, xmax, ymax = detection['box_points']
+
+        center = getRectangleCenter(xmin,xmax,ymin,ymax)
         relativeCoords = getRelativeCoords(imageWidth, imageHeight, center[0], center[1])
-        print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", relativeCoords )
-        print("--------------------------------")
+        print(detection["name"] , " : ", detection["percentage_probability"], " : ", relativeCoords )
+
+        # Crop object from the image
+        objectImage = image[ymin:ymax, xmin:xmax]
+        angle = getAngle(objectImage)
+        if angle != 999:
+            print(f"Object with class ID {detection['name']} has an average rotation angle of {angle} degrees")
+        else:
+            print(f"Object with class ID {detection['name']} does not have a clear rotation angle")
+        
+
+def getAngle(objectImage):
+    color_ranges = [
+            (np.array([35, 50, 50]), np.array([70, 255, 255])), # green
+            (np.array([90, 50, 50]), np.array([120, 255, 255])), # orange
+            (np.array([20, 100, 100]), np.array([30, 255, 255])), # yellow
+            (np.array([100, 50, 50]), np.array([140, 255, 255])), # blue
+            (np.array([0, 0, 200]), np.array([180, 30, 255])), # white
+            (np.array([0, 0, 100]), np.array([180, 255, 150])) # gray
+        ]
+    total_angle = 0
+    counter = 0
+    for lower_color, upper_color in color_ranges:
+            # Convert the image to the HSV color space
+            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+            # Create a mask for the selected color range
+            mask = cv2.inRange(hsv_image, lower_color, upper_color)
+            # Apply Gaussian blur to reduce noise
+            blur = cv2.GaussianBlur(mask, (3, 3), 0)
+            # Apply Canny edge detection
+            edges = cv2.Canny(blur, 50, 150)
+            # Apply HoughLines to detect lines in the edges
+            lines = cv2.HoughLines(edges, 1, np.pi/180, 50)
+            # Initialize list to store angles
+            angles = []
+            if lines is not None:
+                for line in lines:
+                    for rho, theta in line:
+                        # Convert theta from radians to degrees
+                        angle = np.degrees(theta)
+                        angles.append(angle)
+            # Find the average angle
+            if len(angles) > 0:
+                avg_angle = sum(angles) / len(angles)
+                total_angle += avg_angle
+                counter += 1
+            
+    # Calculate the average angle of all color ranges combined
+    if counter > 0:
+        final_angle = total_angle / counter
+        return final_angle
+    else:
+       return -999
 
 
 def openCvTest():
@@ -232,3 +214,10 @@ def getRectangleCenter(x1,x2,y1,y2):
 
 def getRelativeCoords(imageWidth, imageHeight, pointX, pointY):
     return [pointX / imageWidth, pointY / imageHeight]
+
+def edge_detection(img, blur_ksize=5, threshold1=100, threshold2=200):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_gaussian = cv2.GaussianBlur(gray, (blur_ksize, blur_ksize), 0)
+    img_canny = cv2.Canny(img_gaussian, threshold1, threshold2)
+
+    return img_canny
