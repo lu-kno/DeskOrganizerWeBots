@@ -60,3 +60,9 @@ Movement directions make sense when "standing" in front of the robot
 
 
 reset with `--no-assume-unchanged` flag
+
+
+# sources
+
+PCA analysis to detect orientation of objects
+https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/

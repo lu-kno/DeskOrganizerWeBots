@@ -10,7 +10,11 @@ from typing import List, Union, Callable
 import json
 import math
 import warnings
+import random
+from scipy.ndimage import zoom
 warnings.filterwarnings("ignore", category=UserWarning) 
+
+SAVEFIGS=True
 
 def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
@@ -37,91 +41,184 @@ def imageAiTest(filename="snapshot.jpg"):
         # Crop object from the image
         margin=5
         objectImage = image[ymin-margin:ymax+margin, xmin-margin:xmax+margin]
-        angle = getAngle(objectImage)
+        angle = getAngle(objectImage, name=detection['name'], savefig=SAVEFIGS)
         if angle != 999:
             print(f"Object with class ID {detection['name']} has an average rotation angle of {angle} degrees")
         else:
             print(f"Object with class ID {detection['name']} does not have a clear rotation angle")
         
 
-def getAngle(objectImage):
-    color_ranges = [
-            (np.array([35, 50, 50]), np.array([70, 255, 255])), # green
-            (np.array([90, 50, 50]), np.array([120, 255, 255])), # orange
-            (np.array([20, 100, 100]), np.array([30, 255, 255])), # yellow
-            (np.array([100, 50, 50]), np.array([140, 255, 255])), # blue
-            (np.array([0, 0, 200]), np.array([180, 30, 255])), # white
-            (np.array([0, 0, 100]), np.array([180, 255, 150])) # gray
-        ]
-    total_angle = 0
-    counter = 0
-    for lower_color, upper_color in color_ranges:
-            # Convert the image to the HSV color space
-            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
-            # # Create a mask for the selected color range
-            # mask = cv2.inRange(hsv_image, lower_color, upper_color)
-            # # Apply Gaussian blur to reduce noise
-            # blur = cv2.GaussianBlur(mask, (3, 3), 0)
-            # # Apply Canny edge detection
-            # edges = cv2.Canny(blur, 50, 150)
-            edges = cv2.Canny(hsv_image, 50, 150)
+def getAngle(objectImage, name=None, savefig=None):
+    # Convert the image to the HSV color space
+    hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+    # Apply Canny edge detection
+    edges = cv2.Canny(hsv_image, 50, 150)
+    
+    # Get position of true pixels
+    pos = [i for i in zip(*np.where(edges>100))]
+    
+    # Init masks
+    leftEdgeMask=np.full(np.shape(edges),0)
+    rightEdgeMask=np.full(np.shape(edges),0)
+    topEdgeMask=np.full(np.shape(edges),0)
+    bottomEdgeMask=np.full(np.shape(edges),0)
+    
+    # Init Boundary
+    leftEdge=[1000 for i in range(np.shape(edges)[0])]
+    rightEdge=[0 for i in range(np.shape(edges)[0])]
+    topEdge=[1000 for i in range(np.shape(edges)[1])]
+    bottomEdge=[0 for i in range(np.shape(edges)[1])]
+    
+    # Position Boundary
+    for y,x in pos:
+        leftEdge[y] = min(leftEdge[y],x)
+        rightEdge[y] = max(rightEdge[y],x)
+        topEdge[x] = min(topEdge[x],y)
+        bottomEdge[x] = max(bottomEdge[x],y)
+        
+    # Make Masks from Boundary
+    for y,x in enumerate(leftEdge):
+        leftEdgeMask[y,x:] = 255
+        
+    for y,x in enumerate(rightEdge):
+        rightEdgeMask[y,:x] = 255
+        
+    for x,y in enumerate(topEdge):
+        topEdgeMask[y:,x] = 255
+        
+    for x,y in enumerate(bottomEdge):
+        bottomEdgeMask[:y,x] = 255
+        
+    combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+    blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
+    
+    cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+    
+    orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
+    
+    
+    if savefig:
+        if not name:
+            name=random.randrange(999)
             
-            pos = [i for i in zip(*np.where(edges>100))]
+        imagePath=os.path.join(os.getcwd(),'savedImages')
+        pathPrefix=os.path.join(imagePath,name)
+        os.makedirs(imagePath, exist_ok=True)
+        
+        plt.imshow(objectImage)
+        plt.savefig(f'{pathPrefix}_0original.png')
+        plt.imshow(hsv_image)
+        plt.savefig(f'{pathPrefix}_1HSVspace.png')
+        plt.imshow(edges)
+        plt.savefig(f'{pathPrefix}_2roughEdges.png')
+        plt.imshow(combined_mask)
+        plt.savefig(f'{pathPrefix}_3objectArea.png')
+        plt.imshow(blur)
+        plt.savefig(f'{pathPrefix}_4blurredObjectArea.png')
+        plt.imshow(cleanEdges)
+        plt.savefig(f'{pathPrefix}_5cleanEdges.png')
+        plt.imshow(contourNangle)
+        plt.savefig(f'{pathPrefix}_6contourNangle.png')
+    
+    return orientation
+
+    
+    # c, _ = cv2.findContours(cleanEdges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # cleanEdges2x = cv2.GaussianBlur(zoom(cleanEdges,8),(55,55),0)
+    # plt.figure()
+    # plt.imshow(cleanEdges2x)
+    # plt.colorbar()
+
+    # hEdges = np.diff(cleanEdges, axis=0)[:,1:]
+    # vEdges = np.diff(cleanEdges, axis=1)[1:,:]
+    # # hEdges, vEdges = np.gradient(cleanEdges)
+    
+    # # vEdges[vEdges==0]=0.1
+    # # hEdges[hEdges==0]=0.1
+    
+    # plt.figure()
+    # plt.imshow(hEdges)
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(vEdges)
+    # plt.colorbar()
+    
+    # orientation = np.arctan(vEdges/hEdges)
+    # np.nanmean(orientation)
+
+    # # orientation = np.digitize(orientation,[0.1,1,5])-1
+    
+    # plt.figure()
+    # plt.imshow(orientation)
+    # plt.colorbar()
+    
+
+    # # Apply HoughLines to detect lines in the edges
+    # lines = cv2.HoughLines(cleanEdges, 1, np.pi/180, 50)
+    # # Initialize list to store angles
+    # angles = []
+    # if lines is not None:
+    #     for line in lines:
+    #         for rho, theta in line:
+    #             # Convert theta from radians to degrees
+    #             angle = np.degrees(theta)
+    #             angles.append(angle)
+    # # Find the average angle
+    # if len(angles) > 0:
+    #     avg_angle = sum(angles) / len(angles)
+    #     total_angle += avg_angle
+    #     counter += 1
             
-            
-            leftEdgeMask=np.full(np.shape(edges),0)
-            rightEdgeMask=np.full(np.shape(edges),0)
-            topEdgeMask=np.full(np.shape(edges),0)
-            bottomEdgeMask=np.full(np.shape(edges),0)
-            
-            leftEdge=[1000 for i in range(np.shape(edges)[0])]
-            rightEdge=[0 for i in range(np.shape(edges)[0])]
-            topEdge=[1000 for i in range(np.shape(edges)[1])]
-            bottomEdge=[0 for i in range(np.shape(edges)[1])]
-            
-            for y,x in pos:
-                leftEdge[y] = min(leftEdge[y],x)
-                rightEdge[y] = max(rightEdge[y],x)
-                topEdge[x] = min(topEdge[x],y)
-                bottomEdge[x] = max(bottomEdge[x],y)
-                
-            for y,x in enumerate(leftEdge):
-                leftEdgeMask[y,x:] = 255
-                
-            for y,x in enumerate(rightEdge):
-                rightEdgeMask[y,:x] = 255
-                
-            for x,y in enumerate(topEdge):
-                topEdgeMask[y:,x] = 255
-                
-            for x,y in enumerate(bottomEdge):
-                bottomEdgeMask[:y,x] = 255
-                
-            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
-            blur = cv2.GaussianBlur(combined_mask, (3,3), 0)
-            
-            # Apply HoughLines to detect lines in the edges
-            lines = cv2.HoughLines(edges, 1, np.pi/180, 50)
-            # Initialize list to store angles
-            angles = []
-            if lines is not None:
-                for line in lines:
-                    for rho, theta in line:
-                        # Convert theta from radians to degrees
-                        angle = np.degrees(theta)
-                        angles.append(angle)
-            # Find the average angle
-            if len(angles) > 0:
-                avg_angle = sum(angles) / len(angles)
-                total_angle += avg_angle
-                counter += 1
-            
-    # Calculate the average angle of all color ranges combined
-    if counter > 0:
-        final_angle = total_angle / counter
-        return final_angle
-    else:
-       return -999
+    # # Calculate the average angle of all color ranges combined
+    # if counter > 0:
+    #     final_angle = total_angle / counter
+    #     return final_angle
+    # else:
+    #    return -999
+
+def getOrientationPCA(edges, img):
+    '''returns orientation from the contour of an object'''
+    pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
+
+    # Perform PCA analysis
+    mean = np.empty((0))
+    mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+    angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+    
+    cntr = (int(mean[0,0]), int(mean[0,1]))
+    p1 = (cntr[0] + 0.02 * eigenvectors[0,0] * eigenvalues[0,0], cntr[1] + 0.02 * eigenvectors[0,1] * eigenvalues[0,0])
+    p2 = (cntr[0] - 0.02 * eigenvectors[1,0] * eigenvalues[1,0], cntr[1] - 0.02 * eigenvectors[1,1] * eigenvalues[1,0])
+    img = drawAxis(img, cntr, p1, (255, 255, 0), 1)
+    img = drawAxis(img, cntr, p2, (0, 0, 255), 5)
+    img[edges>1]= [225,0,225]
+    
+    return angle, img
+
+def drawAxis(img, p_, q_, color, scale):
+  p = list(p_)
+  q = list(q_)
+ 
+  ## [visualization1]
+  angle = math.atan2(p[1] - q[1], p[0] - q[0]) # angle in radians
+  hypotenuse = math.sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
+ 
+  # Here we lengthen the arrow by a factor of scale
+  q[0] = p[0] - scale * hypotenuse * math.cos(angle)
+  q[1] = p[1] - scale * hypotenuse * math.sin(angle)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+ 
+  # create the arrow hooks
+  p[0] = q[0] + 9 * math.cos(angle + math.pi / 4)
+  p[1] = q[1] + 9 * math.sin(angle + math.pi / 4)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+ 
+  p[0] = q[0] + 9 * math.cos(angle - math.pi / 4)
+  p[1] = q[1] + 9 * math.sin(angle - math.pi / 4)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+  
+  return img
+
 
 
 def openCvTest():
