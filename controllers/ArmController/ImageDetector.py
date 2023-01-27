@@ -374,6 +374,7 @@ def callWeBotsRecognitionRoutine(camera):
 def writeToData(recognizedObjectes, fileName, imageWidth, imageHeight):
     with open(fileName, 'w') as file:
         for obj in recognizedObjectes:
+            pass
             #file.write(f"{categories.index(obj.getModel())} {xPos} {yPos} {width} {height}\n")
 
 def getRectangleCenter(x1,x2,y1,y2):
