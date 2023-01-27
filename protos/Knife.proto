@@ -13,7 +13,7 @@ PROTO Knife [
   Solid {
     translation IS translation
     rotation IS rotation
-    recognitionColors [ 179 179 179 ]
+    recognitionColors [ 0.7 0.7 0.7 ]
     children [
       Shape {
         appearance PBRAppearance {
