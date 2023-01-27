@@ -13,9 +13,10 @@ import warnings
 import random
 from scipy.ndimage import zoom
 warnings.filterwarnings("ignore", category=UserWarning) 
-
+imageWidth = 2560
+imageHeight = 1422
 SAVEFIGS=True
-categories = ['apple', 'orange', 'bottle']
+categories = ['','apple', 'orange', 'bottle','can','computer mouse','knife','fork','hammer','wooden spoon','beer bottle']
 
 def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
@@ -124,60 +125,6 @@ def getAngle(objectImage, name=None, savefig=None):
     
     return orientation
 
-    
-    # c, _ = cv2.findContours(cleanEdges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # cleanEdges2x = cv2.GaussianBlur(zoom(cleanEdges,8),(55,55),0)
-    # plt.figure()
-    # plt.imshow(cleanEdges2x)
-    # plt.colorbar()
-
-    # hEdges = np.diff(cleanEdges, axis=0)[:,1:]
-    # vEdges = np.diff(cleanEdges, axis=1)[1:,:]
-    # # hEdges, vEdges = np.gradient(cleanEdges)
-    
-    # # vEdges[vEdges==0]=0.1
-    # # hEdges[hEdges==0]=0.1
-    
-    # plt.figure()
-    # plt.imshow(hEdges)
-    # plt.colorbar()
-    # plt.figure()
-    # plt.imshow(vEdges)
-    # plt.colorbar()
-    
-    # orientation = np.arctan(vEdges/hEdges)
-    # np.nanmean(orientation)
-
-    # # orientation = np.digitize(orientation,[0.1,1,5])-1
-    
-    # plt.figure()
-    # plt.imshow(orientation)
-    # plt.colorbar()
-    
-
-    # # Apply HoughLines to detect lines in the edges
-    # lines = cv2.HoughLines(cleanEdges, 1, np.pi/180, 50)
-    # # Initialize list to store angles
-    # angles = []
-    # if lines is not None:
-    #     for line in lines:
-    #         for rho, theta in line:
-    #             # Convert theta from radians to degrees
-    #             angle = np.degrees(theta)
-    #             angles.append(angle)
-    # # Find the average angle
-    # if len(angles) > 0:
-    #     avg_angle = sum(angles) / len(angles)
-    #     total_angle += avg_angle
-    #     counter += 1
-            
-    # # Calculate the average angle of all color ranges combined
-    # if counter > 0:
-    #     final_angle = total_angle / counter
-    #     return final_angle
-    # else:
-    #    return -999
 
 def getOrientationPCA(edges, img):
     '''returns orientation from the contour of an object'''
@@ -341,44 +288,34 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
 
 
 def callWeBotsRecognitionRoutine(camera):
-    imageWidth = 2560
-    imageHeight = 1422
+
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
-    for obj in recObjs:
-        id = obj.getId()
-        name = obj.getModel()
-        position = list(obj.getPosition())
-        positionOnImage = list(obj.getPositionOnImage())
-        orientation = list(obj.getOrientation())
-        size = list(obj.getSize())
-        sizeOnImage = list(obj.getSizeOnImage())
-        relativeSize = {sizeOnImage[0]/imageWidth,sizeOnImage[1]/imageHeight}
-        print('-----------------')
-        print(f'ID: {id}')
-        print(f'Name: {name}')
-        print(f'Position: {position}')
-        print(f'PositionOnImage: {positionOnImage}')
-        print(f'Orientation: {orientation}')
-        print(f'sizeOnImage: {sizeOnImage}')
-        print(f'relativeSize: {relativeSize}')
-        print('-----------------')
+    writeTrainingFiles(recObjs,camera)
 
-def writeTrainingFiles(recognizedObjectes, fileName, imageWidth, imageHeight):
+def writeTrainingFiles(recognizedObjectes,camera):
     execution_path = os.path.dirname(__file__)
     annotationPath = os.path.join(execution_path , "DataSet/train/annotations/")
     jsonPath = os.path.join(execution_path , "DataSet/train/raw_data/")
-   
-    i = 1 # get current fileName
+    imagePath = os.path.join(execution_path , "DataSet/train/images/")
+    if not os.path.exists(annotationPath):
+        os.makedirs(annotationPath)
+    if not os.path.exists(jsonPath):
+        os.makedirs(jsonPath)
+    if not os.path.exists(imagePath):
+        os.makedirs(imagePath)
+    # get current fileName
+    i = 1
     while True:
-        filename = f"{i}.json"
-        filepath = os.path.join(path, filename)
+        filename = f"image_{i}.txt"
+        filepath = os.path.join(annotationPath, filename)
         if not os.path.isfile(filepath):
             break
         i += 1
-
+    fileName = f"image_{i}"
+    jsonData = []
+    yoloData = []
     for obj in recognizedObjectes:
-        fileName = "image_"+i
         id = obj.getId()
         name = obj.getModel()
         position = list(obj.getPosition())
@@ -386,14 +323,27 @@ def writeTrainingFiles(recognizedObjectes, fileName, imageWidth, imageHeight):
         orientation = list(obj.getOrientation())
         size = list(obj.getSize())
         sizeOnImage = list(obj.getSizeOnImage())
-        relativeSize = {sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight}
-        relativePosition = {positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight}
-        # Yolo Annotation
-      
-        #with open(annotationPath+fileName, 'w') as file:
-            #file.write(f"{categories.index(name)} {xPos} {yPos} {width} {height}\n")
-        # YSON    
-        i += 1
+        relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
+        relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
+        yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+        jsonData.append({
+            "id": id,
+            "name": name,
+            "position": position,
+            "positionOnImage": positionOnImage,
+            "orientation": orientation,
+            "size": size,
+            "sizeOnImage": sizeOnImage,
+            "relativeSize": relativeSize,
+            "relativePosition": relativePosition
+        })
+
+    camera.saveImage(imagePath+fileName+".jpg",100)
+    with open(jsonPath+fileName+".json", 'w') as file:
+        json.dump(jsonData, file, indent=4)   
+    with open(annotationPath+fileName+".txt", 'w') as file:
+        file.writelines(yoloData)
+    
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
 
