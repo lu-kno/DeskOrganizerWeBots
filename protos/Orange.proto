@@ -13,6 +13,7 @@ PROTO Orange [
   Solid {
     translation IS translation
     rotation IS rotation
+    recognitionColors [ 0.78 1 0.37 ]
     children [
       Shape {
         appearance PBRAppearance {

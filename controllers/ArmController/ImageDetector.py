@@ -8,100 +8,219 @@ import ctypes
 from pathlib import Path
 from typing import List, Union, Callable
 import json
+import math
+import warnings
+import random
+from scipy.ndimage import zoom
+warnings.filterwarnings("ignore", category=UserWarning) 
 
+SAVEFIGS=True
+categories = ['apple', 'orange', 'bottle']
 
-
-def detectShapes():
-    # reading image
-    img = cv2.imread('snapshot.jpg')
-    
-    # converting image into grayscale image
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # setting threshold of gray image
-    _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-    
-    # using a findContours() function
-    contours, _ = cv2.findContours(
-        threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-    i = 0
-    
-    # list for storing names of shapes
-    for contour in contours:
-    
-        # here we are ignoring first counter because 
-        # findcontour function detects whole image as shape
-        if i == 0:
-            i = 1
-            continue
-    
-        # cv2.approxPloyDP() function to approximate the shape
-        approx = cv2.approxPolyDP(
-            contour, 0.01 * cv2.arcLength(contour, True), True)
-        
-        # using drawContours() function
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
-        x=0
-        y=0
-        # finding center point of shape
-        M = cv2.moments(contour)
-        if M['m00'] != 0.0:
-            x = int(M['m10']/M['m00'])
-            y = int(M['m01']/M['m00'])
-    
-        # putting shape name at center of each shape
-        if len(approx) == 3:
-            cv2.putText(img, 'Triangle', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 4:
-            cv2.putText(img, 'Quadrilateral', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 5:
-            cv2.putText(img, 'Pentagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 6:
-            cv2.putText(img, 'Hexagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        else:
-            cv2.putText(img, 'circle', (x, y),
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        # displaying the image after drawing contours
-    cv2.imshow('shapes', img)
-        
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-def imageAiTest():
+def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
     imageHeight = 1422
-
     print('imageAiTest() called')
-    execution_path = os.getcwd()
-    
+    # execution_path = os.getcwd()
+    execution_path = os.path.dirname(__file__)
     detector = ObjectDetection()
-    detector.setModelTypeAsRetinaNet()
+    #detector.setModelTypeAsYOLOv3()
     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    detector.setModelTypeAsRetinaNet()
     detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
-    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
-  
-    #detections = detector.detectCustomObjectsFromImage( custom_objects=custom, input_image=os.path.join(execution_path , "snapshot.jpg"), output_image_path=os.path.join(execution_path , "image3new-custom.jpg"), minimum_percentage_probability=30)
-    for eachObject in detections:
-        x1 = eachObject["box_points"][0]
-        y1 = eachObject["box_points"][1]
-        x2 = eachObject["box_points"][2]
-        y2 = eachObject["box_points"][3]
-        center = getRectangleCenter(x1,x2,y1,y2)
+    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
+    image = cv2.imread(os.path.join(execution_path , filename))
+
+    for detection in detections:
+        xmin, ymin, xmax, ymax = detection['box_points']
+
+        center = getRectangleCenter(xmin,xmax,ymin,ymax)
         relativeCoords = getRelativeCoords(imageWidth, imageHeight, center[0], center[1])
-        print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", relativeCoords )
-        print("--------------------------------")
+        print(detection["name"] , " : ", detection["percentage_probability"], " : ", relativeCoords )
+
+        # Crop object from the image
+        margin=5
+        objectImage = image[ymin-margin:ymax+margin, xmin-margin:xmax+margin]
+        angle = getAngle(objectImage, name=detection['name'], savefig=SAVEFIGS)
+        if angle != 999:
+            print(f"Object with class ID {detection['name']} has an average rotation angle of {angle} degrees")
+        else:
+            print(f"Object with class ID {detection['name']} does not have a clear rotation angle")
+        
+
+def getAngle(objectImage, name=None, savefig=None):
+    # Convert the image to the HSV color space
+    hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+    # Apply Canny edge detection
+    edges = cv2.Canny(hsv_image, 50, 150)
+    
+    # Get position of true pixels
+    pos = [i for i in zip(*np.where(edges>100))]
+    
+    # Init masks
+    leftEdgeMask=np.full(np.shape(edges),0)
+    rightEdgeMask=np.full(np.shape(edges),0)
+    topEdgeMask=np.full(np.shape(edges),0)
+    bottomEdgeMask=np.full(np.shape(edges),0)
+    
+    # Init Boundary
+    leftEdge=[1000 for i in range(np.shape(edges)[0])]
+    rightEdge=[0 for i in range(np.shape(edges)[0])]
+    topEdge=[1000 for i in range(np.shape(edges)[1])]
+    bottomEdge=[0 for i in range(np.shape(edges)[1])]
+    
+    # Position Boundary
+    for y,x in pos:
+        leftEdge[y] = min(leftEdge[y],x)
+        rightEdge[y] = max(rightEdge[y],x)
+        topEdge[x] = min(topEdge[x],y)
+        bottomEdge[x] = max(bottomEdge[x],y)
+        
+    # Make Masks from Boundary
+    for y,x in enumerate(leftEdge):
+        leftEdgeMask[y,x:] = 255
+        
+    for y,x in enumerate(rightEdge):
+        rightEdgeMask[y,:x] = 255
+        
+    for x,y in enumerate(topEdge):
+        topEdgeMask[y:,x] = 255
+        
+    for x,y in enumerate(bottomEdge):
+        bottomEdgeMask[:y,x] = 255
+        
+    combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+    blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
+    
+    cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+    
+    orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
+    
+    
+    if savefig:
+        if not name:
+            name=random.randrange(999)
+            
+        imagePath=os.path.join(os.getcwd(),'savedImages')
+        pathPrefix=os.path.join(imagePath,name)
+        os.makedirs(imagePath, exist_ok=True)
+        
+        plt.imshow(objectImage)
+        plt.savefig(f'{pathPrefix}_0original.png')
+        plt.imshow(hsv_image)
+        plt.savefig(f'{pathPrefix}_1HSVspace.png')
+        plt.imshow(edges)
+        plt.savefig(f'{pathPrefix}_2roughEdges.png')
+        plt.imshow(combined_mask)
+        plt.savefig(f'{pathPrefix}_3objectArea.png')
+        plt.imshow(blur)
+        plt.savefig(f'{pathPrefix}_4blurredObjectArea.png')
+        plt.imshow(cleanEdges)
+        plt.savefig(f'{pathPrefix}_5cleanEdges.png')
+        plt.imshow(contourNangle)
+        plt.savefig(f'{pathPrefix}_6contourNangle.png')
+    
+    return orientation
+
+    
+    # c, _ = cv2.findContours(cleanEdges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # cleanEdges2x = cv2.GaussianBlur(zoom(cleanEdges,8),(55,55),0)
+    # plt.figure()
+    # plt.imshow(cleanEdges2x)
+    # plt.colorbar()
+
+    # hEdges = np.diff(cleanEdges, axis=0)[:,1:]
+    # vEdges = np.diff(cleanEdges, axis=1)[1:,:]
+    # # hEdges, vEdges = np.gradient(cleanEdges)
+    
+    # # vEdges[vEdges==0]=0.1
+    # # hEdges[hEdges==0]=0.1
+    
+    # plt.figure()
+    # plt.imshow(hEdges)
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(vEdges)
+    # plt.colorbar()
+    
+    # orientation = np.arctan(vEdges/hEdges)
+    # np.nanmean(orientation)
+
+    # # orientation = np.digitize(orientation,[0.1,1,5])-1
+    
+    # plt.figure()
+    # plt.imshow(orientation)
+    # plt.colorbar()
+    
+
+    # # Apply HoughLines to detect lines in the edges
+    # lines = cv2.HoughLines(cleanEdges, 1, np.pi/180, 50)
+    # # Initialize list to store angles
+    # angles = []
+    # if lines is not None:
+    #     for line in lines:
+    #         for rho, theta in line:
+    #             # Convert theta from radians to degrees
+    #             angle = np.degrees(theta)
+    #             angles.append(angle)
+    # # Find the average angle
+    # if len(angles) > 0:
+    #     avg_angle = sum(angles) / len(angles)
+    #     total_angle += avg_angle
+    #     counter += 1
+            
+    # # Calculate the average angle of all color ranges combined
+    # if counter > 0:
+    #     final_angle = total_angle / counter
+    #     return final_angle
+    # else:
+    #    return -999
+
+def getOrientationPCA(edges, img):
+    '''returns orientation from the contour of an object'''
+    pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
+
+    # Perform PCA analysis
+    mean = np.empty((0))
+    mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+    angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+    
+    cntr = (int(mean[0,0]), int(mean[0,1]))
+    p1 = (cntr[0] + 0.02 * eigenvectors[0,0] * eigenvalues[0,0], cntr[1] + 0.02 * eigenvectors[0,1] * eigenvalues[0,0])
+    p2 = (cntr[0] - 0.02 * eigenvectors[1,0] * eigenvalues[1,0], cntr[1] - 0.02 * eigenvectors[1,1] * eigenvalues[1,0])
+    # img = drawAxis(img, cntr, p1, (255, 255, 0), 1)
+    # img = drawAxis(img, cntr, p2, (0, 0, 255), 5)
+    # img[edges>1]= [225,0,225]
+    
+    return angle, img
+
+def drawAxis(img, p_, q_, color, scale):
+  p = list(p_)
+  q = list(q_)
+ 
+  ## [visualization1]
+  angle = math.atan2(p[1] - q[1], p[0] - q[0]) # angle in radians
+  hypotenuse = math.sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
+ 
+  # Here we lengthen the arrow by a factor of scale
+  q[0] = p[0] - scale * hypotenuse * math.cos(angle)
+  q[1] = p[1] - scale * hypotenuse * math.sin(angle)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+ 
+  # create the arrow hooks
+  p[0] = q[0] + 9 * math.cos(angle + math.pi / 4)
+  p[1] = q[1] + 9 * math.sin(angle + math.pi / 4)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+ 
+  p[0] = q[0] + 9 * math.cos(angle - math.pi / 4)
+  p[1] = q[1] + 9 * math.sin(angle - math.pi / 4)
+  img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
+  
+  return img
+
 
 
 def openCvTest():
@@ -222,13 +341,77 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
 
 
 def callWeBotsRecognitionRoutine(camera):
+    imageWidth = 2560
+    imageHeight = 1422
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
     for obj in recObjs:
-        print(obj.getModel())
+        id = obj.getId()
+        name = obj.getModel()
+        position = list(obj.getPosition())
+        positionOnImage = list(obj.getPositionOnImage())
+        orientation = list(obj.getOrientation())
+        size = list(obj.getSize())
+        sizeOnImage = list(obj.getSizeOnImage())
+        relativeSize = {sizeOnImage[0]/imageWidth,sizeOnImage[1]/imageHeight}
+        print('-----------------')
+        print(f'ID: {id}')
+        print(f'Name: {name}')
+        print(f'Position: {position}')
+        print(f'PositionOnImage: {positionOnImage}')
+        print(f'Orientation: {orientation}')
+        print(f'sizeOnImage: {sizeOnImage}')
+        print(f'relativeSize: {relativeSize}')
+        print('-----------------')
 
+def writeTrainingFiles(recognizedObjectes, fileName, imageWidth, imageHeight):
+    execution_path = os.path.dirname(__file__)
+    annotationPath = os.path.join(execution_path , "DataSet/train/annotations/")
+    jsonPath = os.path.join(execution_path , "DataSet/train/raw_data/")
+   
+    i = 1 # get current fileName
+    while True:
+        filename = f"{i}.json"
+        filepath = os.path.join(path, filename)
+        if not os.path.isfile(filepath):
+            break
+        i += 1
+
+    for obj in recognizedObjectes:
+        fileName = "image_"+i
+        id = obj.getId()
+        name = obj.getModel()
+        position = list(obj.getPosition())
+        positionOnImage = list(obj.getPositionOnImage())
+        orientation = list(obj.getOrientation())
+        size = list(obj.getSize())
+        sizeOnImage = list(obj.getSizeOnImage())
+        relativeSize = {sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight}
+        relativePosition = {positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight}
+        # Yolo Annotation
+      
+        #with open(annotationPath+fileName, 'w') as file:
+            #file.write(f"{categories.index(name)} {xPos} {yPos} {width} {height}\n")
+        # YSON    
+        i += 1
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
 
 def getRelativeCoords(imageWidth, imageHeight, pointX, pointY):
     return [pointX / imageWidth, pointY / imageHeight]
+
+def edge_detection(img, blur_ksize=5, threshold1=100, threshold2=200):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_gaussian = cv2.GaussianBlur(gray, (blur_ksize, blur_ksize), 0)
+    img_canny = cv2.Canny(img_gaussian, threshold1, threshold2)
+
+    return img_canny
+
+
+import matplotlib
+matplotlib.use('TKAgg')
+
+
+if __name__=="__main__":
+    imageAiTest()
+    print('DONE')
