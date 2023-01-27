@@ -15,7 +15,7 @@ PROTO Hammer [
   Solid {
     translation IS translation
     rotation IS rotation
-    recognitionColors [ 13 13 13 ]
+    recognitionColors [ 0.05 0.05 0.05 ]
     children [
       DEF HAMMER_HANDLE Shape {
         appearance VarnishedPine {

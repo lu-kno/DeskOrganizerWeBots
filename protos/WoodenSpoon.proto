@@ -13,7 +13,7 @@ PROTO WoodenSpoon [
   Solid {
     translation IS translation
     rotation IS rotation
-    recognitionColors [ 153 102 0 ]
+    recognitionColors [ 0.6 0.4 0 ]
     children [
       Shape {
         appearance PBRAppearance {
