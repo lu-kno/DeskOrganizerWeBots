@@ -16,19 +16,27 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 SAVEFIGS=True
 
-def imageAiTest(filename="snapshot.jpg"):
+def imageAiTest(filename="snapshot.jpg", model='retina'):
     imageWidth = 2560
     imageHeight = 1422
     print('imageAiTest() called')
     # execution_path = os.getcwd()
     execution_path = os.path.dirname(__file__)
     detector = ObjectDetection()
-    detector.setModelTypeAsRetinaNet()
-    #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
-    detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
+    
+    if model.lower() == 'retina':
+        detector.setModelTypeAsRetinaNet()
+        detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
+    if model.lower() == 'yolo':
+        detector.setModelTypeAsYOLOv3()
+        detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    if model == 'tinyyolo':
+        detector.setModelTypeAsTinyYOLOv3()
+        detector.setModelPath( os.path.join(execution_path , "Modelle/tiny-yolov3.pt"))
+        
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
-    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
+    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , f"imagenew_{model}.jpg"), minimum_percentage_probability=30)
     image = cv2.imread(os.path.join(execution_path , filename))
 
     for detection in detections:
@@ -363,5 +371,6 @@ matplotlib.use('TKAgg')
 
 
 if __name__=="__main__":
-    imageAiTest()
+    for m in ['retina','yolo','tinyyolo']:
+        imageAiTest(model=m)
     print('DONE')
