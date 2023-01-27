@@ -23,8 +23,9 @@ def imageAiTest(filename="snapshot.jpg"):
     # execution_path = os.getcwd()
     execution_path = os.path.dirname(__file__)
     detector = ObjectDetection()
-    detector.setModelTypeAsRetinaNet()
+    #detector.setModelTypeAsYOLOv3()
     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    detector.setModelTypeAsRetinaNet()
     detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
@@ -339,10 +340,28 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
 
 
 def callWeBotsRecognitionRoutine(camera):
+    imageWidth = 2560
+    imageHeight = 1422
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
     for obj in recObjs:
-        print(obj.getModel())
+        id = obj.getId()
+        name = obj.getModel()
+        position = list(obj.getPosition())
+        positionOnImage = list(obj.getPositionOnImage())
+        orientation = list(obj.getOrientation())
+        size = list(obj.getSize())
+        sizeOnImage = list(obj.getSizeOnImage())
+        relativeSize = {sizeOnImage[0]/imageWidth,sizeOnImage[1]/imageHeight}
+        print('-----------------')
+        print(f'ID: {id}')
+        print(f'Name: {name}')
+        print(f'Position: {position}')
+        print(f'PositionOnImage: {positionOnImage}')
+        print(f'Orientation: {orientation}')
+        print(f'sizeOnImage: {sizeOnImage}')
+        print(f'relativeSize: {relativeSize}')
+        print('-----------------')
 
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
