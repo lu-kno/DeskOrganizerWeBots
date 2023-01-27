@@ -17,27 +17,20 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SAVEFIGS=True
 categories = ['apple', 'orange', 'bottle']
 
-def imageAiTest(filename="snapshot.jpg", model='retina'):
+def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
     imageHeight = 1422
     print('imageAiTest() called')
     # execution_path = os.getcwd()
     execution_path = os.path.dirname(__file__)
     detector = ObjectDetection()
-    
-    if model.lower() == 'retina':
-        detector.setModelTypeAsRetinaNet()
-        detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
-    if model.lower() == 'yolo':
-        detector.setModelTypeAsYOLOv3()
-        detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
-    if model == 'tinyyolo':
-        detector.setModelTypeAsTinyYOLOv3()
-        detector.setModelPath( os.path.join(execution_path , "Modelle/tiny-yolov3.pt"))
-        
+    #detector.setModelTypeAsYOLOv3()
+    #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
+    detector.setModelTypeAsRetinaNet()
+    detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
     detector.loadModel()
     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , f"imagenew_{model}.jpg"), minimum_percentage_probability=30)
+    detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
     image = cv2.imread(os.path.join(execution_path , filename))
 
     for detection in detections:
@@ -371,12 +364,36 @@ def callWeBotsRecognitionRoutine(camera):
         print(f'relativeSize: {relativeSize}')
         print('-----------------')
 
-def writeToData(recognizedObjectes, fileName, imageWidth, imageHeight):
-    with open(fileName, 'w') as file:
-        for obj in recognizedObjectes:
-            pass
-            #file.write(f"{categories.index(obj.getModel())} {xPos} {yPos} {width} {height}\n")
+def writeTrainingFiles(recognizedObjectes, fileName, imageWidth, imageHeight):
+    execution_path = os.path.dirname(__file__)
+    annotationPath = os.path.join(execution_path , "DataSet/train/annotations/")
+    jsonPath = os.path.join(execution_path , "DataSet/train/raw_data/")
+   
+    i = 1 # get current fileName
+    while True:
+        filename = f"{i}.json"
+        filepath = os.path.join(path, filename)
+        if not os.path.isfile(filepath):
+            break
+        i += 1
 
+    for obj in recognizedObjectes:
+        fileName = "image_"+i
+        id = obj.getId()
+        name = obj.getModel()
+        position = list(obj.getPosition())
+        positionOnImage = list(obj.getPositionOnImage())
+        orientation = list(obj.getOrientation())
+        size = list(obj.getSize())
+        sizeOnImage = list(obj.getSizeOnImage())
+        relativeSize = {sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight}
+        relativePosition = {positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight}
+        # Yolo Annotation
+      
+        #with open(annotationPath+fileName, 'w') as file:
+            #file.write(f"{categories.index(name)} {xPos} {yPos} {width} {height}\n")
+        # YSON    
+        i += 1
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
 
@@ -396,6 +413,5 @@ matplotlib.use('TKAgg')
 
 
 if __name__=="__main__":
-    for m in ['retina','yolo','tinyyolo']:
-        imageAiTest(model=m)
+    imageAiTest()
     print('DONE')
