@@ -25,6 +25,7 @@ def looper(func):
     '''Wrapper to loop function while continuing simulation until '-1' is returned'''
     def inner(self,*args,**kwargs):
         while self.supervisor.step(self.timestep) != -1:
+            self.master.stepOperations()
             if func(self, *args,**kwargs)==-1:
                 return
     return inner    
@@ -34,6 +35,7 @@ def looperTimeout(func):
     def inner(self,*args,**kwargs):
         timeout = 10000
         while self.supervisor.step(self.timestep) != -1:
+            self.master.stepOperations()
             if func(self, *args,**kwargs)==-1:
                 return
 
@@ -137,6 +139,8 @@ class RobotArm():
         self.supervisor = Supervisor()
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
         
+        self.master = self
+        
         self.keyboard = self.supervisor.getKeyboard()
         self.keyboard.enable(10)
         
@@ -146,6 +150,11 @@ class RobotArm():
         self.camera = Camera('camera')
         self.camera.enable(100)
         self.camera.recognitionEnable(self.timestep)
+        
+        self.dataCam = Camera('dataCam')
+        self.dataCam.enable(int(1000/24))
+        self.dataCam.recognitionEnable(self.timestep)
+        self.viewPoint = self.supervisor.getFromDef('Viewpoint')
 
         # Get ArmChain Data
         self.filename = None
@@ -175,7 +184,6 @@ class RobotArm():
         # Get Self
         self.arm = self.supervisor.getSelf()
 
-
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
@@ -193,6 +201,14 @@ class RobotArm():
         self.handleKeystroke()
         self.moveTo([])
         
+    def stepOperations(self):
+        vpPos = self.viewPoint.getField('position').getSFVec3f()
+        vpOri = self.viewPoint.getField('orientation').getSFRotation()
+        
+        self.arm.getField('dataCamTrans').setSFVec3f(vpPos)
+        self.arm.getField('dataCamRot').setSFRotation(vpOri)
+        
+        return
         
         
     @looper 

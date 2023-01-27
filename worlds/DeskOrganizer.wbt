@@ -25,7 +25,7 @@ IMPORTABLE EXTERNPROTO "../protos/Orange.proto"
 
 WorldInfo {
 }
-Viewpoint {
+DEF Viewpoint Viewpoint {
   orientation 0.4151972340842966 0.05648565831487861 -0.9079761159928629 2.8149200061326143
   position 3.9048129273166072 0.4136334915442992 3.3696477044874187
 }
@@ -218,6 +218,23 @@ Irb4600-40 {
           ]
         }
       ]
+      recognitionColors [
+        0 0 0
+      ]
+      width 2560
+      height 1422
+      antiAliasing TRUE
+      recognition Recognition {
+        maxRange 500
+        segmentation TRUE
+      }
+    }
+  ]
+  dataCollectionCam [
+    DEF DATACAM Camera {
+      name "dataCam"
+      rotation 0 0 1 0
+      translation 0 0 0 
       recognitionColors [
         0 0 0
       ]

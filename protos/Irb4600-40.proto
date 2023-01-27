@@ -21,6 +21,9 @@ PROTO Irb4600-40 [
   field SFColor    color           1 0.45 0              # Is `PBRAppearance.baseColor`.
   field MFNode     handSlot        []                    # Extends the arm with new nodes in the hand slot.
   field MFNode     camSlot          [Transform{}, Camera{}]                    # Extends the arm with new 
+  field MFNode     dataCollectionCam    [Transform{}, Camera{}]                    # Extends the arm with new 
+  field SFVec3f    dataCamTrans          0 0 0                    # Extends the arm with new 
+  field SFRotation dataCamRot          0 0 1 0                    # Extends the arm with new 
   field SFBool     staticBase      FALSE                 # Defines if the robot base should be pinned to the static environment.
 ]
 {
@@ -33,6 +36,12 @@ PROTO Irb4600-40 [
         rotation 0 0 1 0
         translation 0 0 0
         children IS camSlot
+      }
+      DEF DCAMSolid Solid {
+        rotation IS dataCamRot
+        translation IS dataCamTrans
+        name "dataCamSolid"
+        children IS dataCollectionCam
       }
       Shape {
         appearance DEF IRB_APPEARANCE PBRAppearance {
