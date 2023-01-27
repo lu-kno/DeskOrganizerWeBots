@@ -1,4 +1,5 @@
 from imageai.Detection import ObjectDetection  
+import TrainingsHelper
 import os
 from pprint import pprint
 import cv2
@@ -12,6 +13,7 @@ import math
 import warnings
 import random
 from scipy.ndimage import zoom
+
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
 imageHeight = 1422
@@ -288,61 +290,12 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
 
 
 def callWeBotsRecognitionRoutine(camera):
-
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
-    writeTrainingFiles(recObjs,camera)
-
-def writeTrainingFiles(recognizedObjectes,camera):
-    execution_path = os.path.dirname(__file__)
-    annotationPath = os.path.join(execution_path , "DataSet/train/annotations/")
-    jsonPath = os.path.join(execution_path , "DataSet/train/raw_data/")
-    imagePath = os.path.join(execution_path , "DataSet/train/images/")
-    if not os.path.exists(annotationPath):
-        os.makedirs(annotationPath)
-    if not os.path.exists(jsonPath):
-        os.makedirs(jsonPath)
-    if not os.path.exists(imagePath):
-        os.makedirs(imagePath)
-    # get current fileName
-    i = 1
-    while True:
-        filename = f"image_{i}.txt"
-        filepath = os.path.join(annotationPath, filename)
-        if not os.path.isfile(filepath):
-            break
-        i += 1
-    fileName = f"image_{i}"
-    jsonData = []
-    yoloData = []
     for obj in recognizedObjectes:
-        id = obj.getId()
-        name = obj.getModel()
-        position = list(obj.getPosition())
-        positionOnImage = list(obj.getPositionOnImage())
-        orientation = list(obj.getOrientation())
-        size = list(obj.getSize())
-        sizeOnImage = list(obj.getSizeOnImage())
-        relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
-        relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
-        yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
-        jsonData.append({
-            "id": id,
-            "name": name,
-            "position": position,
-            "positionOnImage": positionOnImage,
-            "orientation": orientation,
-            "size": size,
-            "sizeOnImage": sizeOnImage,
-            "relativeSize": relativeSize,
-            "relativePosition": relativePosition
-        })
+        print('Object detected: '+obj.getModel())
 
-    camera.saveImage(imagePath+fileName+".jpg",100)
-    with open(jsonPath+fileName+".json", 'w') as file:
-        json.dump(jsonData, file, indent=4)   
-    with open(annotationPath+fileName+".txt", 'w') as file:
-        file.writelines(yoloData)
+
     
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
