@@ -15,6 +15,7 @@ from scipy.ndimage import zoom
 warnings.filterwarnings("ignore", category=UserWarning) 
 
 SAVEFIGS=True
+categories = ['apple', 'orange', 'bottle']
 
 def imageAiTest(filename="snapshot.jpg", model='retina'):
     imageWidth = 2560
@@ -369,6 +370,11 @@ def callWeBotsRecognitionRoutine(camera):
         print(f'sizeOnImage: {sizeOnImage}')
         print(f'relativeSize: {relativeSize}')
         print('-----------------')
+
+def writeToData(recognizedObjectes, fileName, imageWidth, imageHeight):
+    with open(fileName, 'w') as file:
+        for obj in recognizedObjectes:
+            #file.write(f"{categories.index(obj.getModel())} {xPos} {yPos} {width} {height}\n")
 
 def getRectangleCenter(x1,x2,y1,y2):
     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
