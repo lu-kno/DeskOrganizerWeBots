@@ -292,7 +292,7 @@ def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
 def callWeBotsRecognitionRoutine(camera):
     print('callRecognitionRoutine called')
     recObjs = camera.getRecognitionObjects()
-    for obj in recognizedObjectes:
+    for obj in recObjs:
         print('Object detected: '+obj.getModel())
 
 
