@@ -388,18 +388,14 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-<<<<<<< HEAD
-            TrainingsHelper.makeSnapshot(self.camera,type='train')
+            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            self.randomPosSamplingLoop(200,'train')
         if (key==ord('I')):
             print("pressed: I")
             self.collectData=True
         if (key==ord('O')):
             print("pressed: O")
             self.collectData=False
-=======
-            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            self.randomPosSamplingLoop(200,'train')
->>>>>>> ImageRecognitionDev
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
