@@ -13,6 +13,7 @@ import math
 import warnings
 import random
 from scipy.ndimage import zoom
+import random
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
 imageHeight = 1422
@@ -112,16 +113,29 @@ def startTraining():
     # trainer.trainModel()
     
 def moveTableNodes(supervisor):
+    zCoord = 0.7897645717378102
+    bottomLeft = [1.02418,0.784482,zCoord]
+    topLeft = [2.01797,0.799213,zCoord]
+    bottomRight = [1.02293,-0.993013,zCoord]
+    topRight = [1.99722,-0.990657,zCoord]
+    
     print('moveTableNodes() called')
     apple = supervisor.getFromDef('apple')
-    print(apple.getPosition())
+    #print(apple.getPosition())
     fldTranslation = apple.getField('translation')
 
-    print(dir(fldTranslation))
-    print(fldTranslation.getSFRotation())
-    print(fldTranslation.getMFRotation())
-   # for i in range()
-    #print(dir(apple))
+    print(dir(apple))
+    #print(apple.getField('size').getSFVec3f())
+    #print(fldTranslation.getSFRotation())
+    #print(fldTranslation.getMFRotation())
+    print(fldTranslation.getSFVec3f())
+    objects = [obj1, obj2, obj3]
+    fldTranslation.setSFVec3f([1.9618, -0.891729, 0.7897645717378102])
+    for obj in objects:
+        x = random.uniform(bottomLeft[0], topRight[0])
+        y = random.uniform(bottomLeft[1], topRight[1])
+        z = bottomLeft[2]
+        obj.fldTranslation.setSFVec3f([x, y, z])
 
 if __name__=="__main__":
     startTraining()

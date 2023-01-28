@@ -26,8 +26,8 @@ IMPORTABLE EXTERNPROTO "../protos/Orange.proto"
 WorldInfo {
 }
 DEF Viewpoint Viewpoint {
-  orientation 0.4151972340842966 0.05648565831487861 -0.9079761159928629 2.8149200061326143
-  position 3.9048129273166072 0.4136334915442992 3.3696477044874187
+  orientation 0.3463184524565206 0.04754287299496563 -0.9369115244864402 2.788638960858212
+  position 3.792983099420752 1.0865786056693838 3.1508950213444904
 }
 TexturedBackground {
   texture "factory"
@@ -36,6 +36,7 @@ TexturedBackgroundLight {
   texture "factory"
 }
 RectangleArena {
+  translation 0.000599225 -0.00177854 0
   floorSize 10 10
   floorTileSize 1 1
 }
@@ -94,7 +95,8 @@ SolidBox {
   }
 }
 DEF box Solid {
-  translation 1.55088 0.269899 0.8
+  translation 1.324 0.627887 0.8
+  scale 0.901237 0.901237 0.901237
   children [
     Shape {
       appearance PBRAppearance {
@@ -233,8 +235,6 @@ Irb4600-40 {
   dataCollectionCam [
     DEF DATACAM Camera {
       name "dataCam"
-      rotation 0 0 1 0
-      translation 0 0 0 
       recognitionColors [
         0 0 0
       ]
@@ -249,11 +249,11 @@ Irb4600-40 {
   ]
   staticBase TRUE
 }
-Apple {
-  translation 1.94223 0.720946 0.81
+DEF apple Apple {
+  translation 1.94223 0.720946 0.76
 }
 DEF Follower Solid {
-  translation 1.16 0 0.8
+  translation 0.517137 1.12984 0.8
   children [
     Shape {
       appearance PBRAppearance {
