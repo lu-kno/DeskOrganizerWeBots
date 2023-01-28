@@ -19,7 +19,41 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 SAVEFIGS=True
 categories = ['dummy','','apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
-fileNamePostfix = 1
+
+
+def startTraining():
+    execution_path = os.path.dirname(__file__)
+    data_dir_path = os.path.join(execution_path , "DataSet")
+    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+    createClassFiles(categories[2:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsYOLOv3()
+    trainer.setDataDirectory(data_directory=data_dir_path)
+    objectNames = categories[2:]
+
+    trainer.setTrainConfig(object_names_array=objectNames, num_experiments=200, train_from_pretrained_model=model_path)
+    trainer.trainModel()
+
+def testModel():
+    detector = CustomObjectDetection()
+    detector.setModelTypeAsYOLOv3()
+    detector.setModelPath("yolov3_hololens-yolo_mAP-0.82726_epoch-73.pt") # path to custom trained model
+    detector.setJsonPath("hololens-yolo_yolov3_detection_config.json") # path to corresponding json
+    detector.loadModel()
+    detections = detector.detectObjectsFromImage(input_image="holo1.jpg", output_image_path="holo1-detected.jpg")
+    for detection in detections:
+        print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
+
+def createClassFiles(classes):
+    execution_path = os.path.dirname(__file__)
+    annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
+    annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
+    with open(annotationPathTrain, "w") as file:
+        for obj in classes:
+            file.write(obj+"\n")
+    with open(annotationPathValidation, "w") as file:
+        for obj in classes:
+            file.write(obj+"\n")
 
 def makeSnapshot(camera,type='train'):
     print('Create training image and corresponding files in mode: '+type)
@@ -28,7 +62,7 @@ def makeSnapshot(camera,type='train'):
 
 
 def createTrainingFiles(recognizedObjectes,camera,type):
-    global fileNamePostfix
+    fileNamePostfix = 1
     imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
@@ -68,7 +102,7 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         sizeOnImage = list(obj.getSizeOnImage())
         relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
         relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
-        yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+        yoloData.append(f"{categories.index(name)-2} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
         jsonData.append({
             "id": id,
             "name": name,
@@ -87,37 +121,6 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     with open(annotationPath+fileName+".txt", 'w') as file:
         file.writelines(yoloData)
     print('File: '+fileName+' created')
-
-def createClassFiles(classes):
-    execution_path = os.path.dirname(__file__)
-    annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
-    annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
-    with open(annotationPathTrain, "w") as file:
-        for obj in classes:
-            file.write(obj+"\n")
-    with open(annotationPathValidation, "w") as file:
-        for obj in classes:
-            file.write(obj+"\n")
-      
-
-def startTraining():
-    createClassFiles(categories[2:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsYOLOv3()
-    trainer.setDataDirectory(data_directory="DataSet")
-    objectNames = categories[2:]
-    trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
-    trainer.trainModel()
-
-def testModel():
-    detector = CustomObjectDetection()
-    detector.setModelTypeAsYOLOv3()
-    detector.setModelPath("yolov3_hololens-yolo_mAP-0.82726_epoch-73.pt") # path to custom trained model
-    detector.setJsonPath("hololens-yolo_yolov3_detection_config.json") # path to corresponding json
-    detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image="holo1.jpg", output_image_path="holo1-detected.jpg")
-    for detection in detections:
-        print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
 
 def moveTableNodes(supervisor,table):
     print('Randomize objects position on table')

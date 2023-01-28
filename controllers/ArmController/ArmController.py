@@ -375,7 +375,13 @@ class RobotArm():
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-                  
+        if (key==ord('K')):
+            print("pressed: K")
+            TrainingsHelper.makeSnapshot(self.camera, 'train')   
+        if (key==self.keyboard.SHIFT+ord('K')):  
+            print("pressed: shift K")
+            TrainingsHelper.makeSnapshot(self.camera, 'validation')  
+
     def moveTo(self, pos, rotation=None):
         '''
         Input:
