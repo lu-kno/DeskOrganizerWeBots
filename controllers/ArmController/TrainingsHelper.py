@@ -18,20 +18,19 @@ import random
 warnings.filterwarnings("ignore", category=UserWarning) 
 
 SAVEFIGS=True
-categories = ['dummy','','apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
+categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 
 
 def startTraining():
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
     model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
-    createClassFiles(categories[2:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
+    createClassFiles(categories) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsYOLOv3()
     trainer.setDataDirectory(data_directory=data_dir_path)
-    objectNames = categories[2:]
 
-    trainer.setTrainConfig(object_names_array=objectNames, num_experiments=200, train_from_pretrained_model=model_path)
+    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=200, train_from_pretrained_model=model_path)
     trainer.trainModel()
 
 def testModel():
@@ -102,7 +101,7 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         sizeOnImage = list(obj.getSizeOnImage())
         relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
         relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
-        yoloData.append(f"{categories.index(name)-2} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+        yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
         jsonData.append({
             "id": id,
             "name": name,
@@ -133,8 +132,7 @@ def moveTableNodes(supervisor,table):
     x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
     y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
     y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
-    shortenedCategories = categories[2:] #dummy und empty string will be ignored
-    for cat in shortenedCategories:
+    for cat in categories:
         obj = supervisor.getFromDef(cat)
         x = random.uniform(x_min, x_max)
         y = random.uniform(y_min, y_max)
