@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
-categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','hammer','wooden spoon','beer_bottle','Cylinder','Cube']
+categories = ['dummy','','apple', 'orange', 'bottle','can','computer_mouse','hammer','wooden spoon','beer_bottle','Cylinder','Cube']
 fileNamePostfix = 1
 
 def makeSnapshot(camera,type='train'):
