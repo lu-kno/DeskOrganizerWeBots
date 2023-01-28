@@ -159,8 +159,8 @@ class RobotArm():
         self.viewPoint = self.supervisor.getFromDef('Viewpoint')
         
         self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
-        self.
-        
+        self.loopCount = 0
+        self.dataCount = 0
 
         # Get ArmChain Data
         self.filename = None
@@ -206,6 +206,18 @@ class RobotArm():
     def autoLoop(self):
         self.handleKeystroke()
         self.moveTo([])
+    
+    @looper
+    def randomPosSamplingLoop(self):
+        if self.loopCount % 10 == 0:
+            if self.loopCount % 20 == 0:
+                TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+            else:
+                TrainingsHelper.makeSnapshot(self.camera,'train')
+                self.dataCount +=1
+        self.loopCount += 1
+        if self.dataCount>200:
+            return -1
         
     def stepOperations(self):
         vpPos = self.viewPoint.getField('position').getSFVec3f()
@@ -355,7 +367,8 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            self.randomPosSamplingLoop()
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)

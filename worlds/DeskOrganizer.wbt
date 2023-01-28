@@ -27,16 +27,6 @@ IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
   basicTimeStep 16
-  contactProperties [
-    ContactProperties {
-      coulombFriction [
-        -1
-      ]
-      frictionRotation 2 2
-      rollingFriction 2 2 2
-      bounce 0.1
-    }
-  ]
 }
 DEF Viewpoint Viewpoint {
   orientation 0.3463695516003826 0.049315600823239714 -0.9368009955372554 2.7792703956371
@@ -194,8 +184,8 @@ Irb4600-40 {
       recognitionColors [
         0 0 0
       ]
-      width 2560
-      height 1422
+      width 1920
+      height 1066
       antiAliasing TRUE
       recognition Recognition {
         maxRange 500
@@ -242,13 +232,13 @@ DEF hammer Hammer {
   translation 1.58746 -0.270414 0.774
 }
 Knife {
-  translation 1.31813 0.502401 0.77
+  translation -0.431633 1.12673 0.77
 }
 Fork {
-  translation 1.33 0.28 0.75
+  translation -0.458421 1.16182 0.75
 }
-WoodenSpoon {
-  translation 1.75223 0.560653 0.74
+DEF wooden_spoon WoodenSpoon {
+  translation 0.0770881 1.25193 0.74
 }
 DEF beer_bottle BeerBottle {
   translation 1.28406 -0.482817 0.77
@@ -257,8 +247,8 @@ DEF beer_bottle BeerBottle {
 DEF orange Orange {
   translation 1.74459 -0.603725 0.85
 }
-MyCylinder {
+DEF Cylinder MyCylinder {
 }
-DEF box Cube {
+DEF Cube Cube {
   name "box2"
 }
