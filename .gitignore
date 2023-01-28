@@ -3,3 +3,7 @@ __pycache__/**
 *.pyc
 *.code-workspace
 *.pth
+
+controllers/ArmController/DataSet/*
+controllers/ArmController/DataSet*.zip
+controllers/ArmController/DataSet*
