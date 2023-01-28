@@ -26,6 +26,13 @@ IMPORTABLE EXTERNPROTO "../protos/MyCylinder.proto"
 IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        -1
+      ]
+    }
+  ]
 }
 DEF Viewpoint Viewpoint {
   orientation 0.3463184524565206 0.04754287299496563 -0.9369115244864402 2.788638960858212
@@ -96,7 +103,6 @@ SolidBox {
   physics Physics {
   }
 }
-
 Table {
   translation 0.089999 1.3 0
   name "table(1)"
@@ -122,15 +128,20 @@ WoodenBox {
 }
 DEF MainTable Table {
   translation 1.51 -0.1 0
+  trayAppearance VarnishedPine {
+    colorOverride 0.12549 0.290196 0.529412
+    textureTransform TextureTransform {
+      scale 12 46
+    }
+    IBLStrength 2
+  }
 }
-
-
 DEF MoverReference Transform {
   translation -0.81 1.8 0.73
   rotation 1 0 0 3.141592653589793
   children [
     DEF Mover Solid {
-      translation 0.87 0.42 -0.30
+      translation 0.87 0.42 -0.3
       children [
         Shape {
           appearance PBRAppearance {
@@ -243,9 +254,7 @@ Orange {
   translation 1.74459 -0.603725 0.85
 }
 MyCylinder {
-  translation 1.63 0 0.79
 }
 DEF box Cube {
-  translation 1.324 0.627887 0.8
   name "box2"
 }
