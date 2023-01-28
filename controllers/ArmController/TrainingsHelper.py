@@ -1,5 +1,6 @@
 from imageai.Detection import ObjectDetection  
 from imageai.Detection.Custom import DetectionModelTrainer
+from imageai.Detection.Custom import CustomObjectDetection
 import os
 from pprint import pprint
 import cv2
@@ -18,8 +19,41 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # imageWidth = 2560
 # imageHeight = 1422
 SAVEFIGS=True
-categories = ['dummy','','apple', 'orange', 'bottle','can','computer_mouse','hammer','wooden spoon','beer_bottle','Cylinder','Cube']
-fileNamePostfix = 1
+categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
+
+
+def startTraining():
+    execution_path = os.path.dirname(__file__)
+    data_dir_path = os.path.join(execution_path , "DataSet")
+    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+    createClassFiles(categories) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsYOLOv3()
+    trainer.setDataDirectory(data_directory=data_dir_path)
+
+    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=200, train_from_pretrained_model=model_path)
+    trainer.trainModel()
+
+def testModel():
+    detector = CustomObjectDetection()
+    detector.setModelTypeAsYOLOv3()
+    detector.setModelPath("yolov3_hololens-yolo_mAP-0.82726_epoch-73.pt") # path to custom trained model
+    detector.setJsonPath("hololens-yolo_yolov3_detection_config.json") # path to corresponding json
+    detector.loadModel()
+    detections = detector.detectObjectsFromImage(input_image="holo1.jpg", output_image_path="holo1-detected.jpg")
+    for detection in detections:
+        print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
+
+def createClassFiles(classes):
+    execution_path = os.path.dirname(__file__)
+    annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
+    annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
+    with open(annotationPathTrain, "w") as file:
+        for obj in classes:
+            file.write(obj+"\n")
+    with open(annotationPathValidation, "w") as file:
+        for obj in classes:
+            file.write(obj+"\n")
 
 def makeSnapshot(camera,type='train'):
     print('Create training image and corresponding files in mode: '+type)
@@ -28,7 +62,7 @@ def makeSnapshot(camera,type='train'):
 
 
 def createTrainingFiles(recognizedObjectes,camera,type):
-    global fileNamePostfix
+    fileNamePostfix = 1
     imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
@@ -88,43 +122,9 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         file.writelines(yoloData)
     print('File: '+fileName+' created')
 
-def createClassFiles(classes):
-    execution_path = os.path.dirname(__file__)
-    annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
-    annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
-    with open(annotationPathTrain, "w") as file:
-        i = 0
-        for obj in classes:
-            if(i==0):
-                file.write("unkown\n")
-            else:
-                file.write(obj+"\n")
-            i += 1
-    with open(annotationPathValidation, "w") as file:
-        i = 0
-        for obj in classes:
-            if(i==0):
-                file.write("unkown\n")
-            else:
-                file.write(obj+"\n")
-            i += 1
-
-def startTraining():
-    createClassFiles(categories[1:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
-    # trainer = DetectionModelTrainer()
-    # trainer.setModelTypeAsYOLOv3()
-    # trainer.setDataDirectory(data_directory="DataSet")
-    # objectNames = ['apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
-    # trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
-    # trainer.trainModel()
-    
 def moveTableNodes(supervisor,table):
+    print('Randomize objects position on table')
     margin = 0.1
-    zCoord = 0.7897645717378102
-    # bottomLeft = [1.02418,0.784482,zCoord]
-    # topLeft = [2.01797,0.799213,zCoord]
-    # bottomRight = [1.02293,-0.993013,zCoord]
-    # topRight = [1.99722,-0.990657,zCoord]
     bottomLeft = table.local2world([0,1,0])
     topLeft = table.local2world([0,0,0])
     bottomRight =table.local2world([1,1,0])
@@ -133,39 +133,17 @@ def moveTableNodes(supervisor,table):
     x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
     y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
     y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
-    shortenedCategories = categories[2:] #dummy und empty string will be ignored
-    for cat in shortenedCategories:
-        print(cat)
+    for cat in categories:
         obj = supervisor.getFromDef(cat)
         x = random.uniform(x_min, x_max)
         y = random.uniform(y_min, y_max)
-        z = bottomLeft[2]
+        z = bottomLeft[2]+0.1
         obj.getField('translation').setSFVec3f([x, y, z])
         xRotation = random.uniform(1, 360)
         yRotation = random.uniform(1, 360)
         zRotation = random.uniform(1, 360)
         angle = random.uniform(1, 360)
         obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
-    #print()
-    # print(topLeft)
-    # print(table.local2world([0,0,0])) # top left coords 
-    # print('moveTableNodes() called')
-    # apple = supervisor.getFromDef('apple')
-    # #print(apple.getPosition())
-    # fldTranslation = apple.getField('translation')
-
-    # print(dir(apple))
-    # #print(apple.getField('size').getSFVec3f())
-    # #print(fldTranslation.getSFRotation())
-    # #print(fldTranslation.getMFRotation())
-    # print(fldTranslation.getSFVec3f())
-    # #objects = [obj1, obj2, obj3]
-    # fldTranslation.setSFVec3f([1.9618, -0.891729, 0.7897645717378102])
-    # for obj in objects:
-    #     x = random.uniform(bottomLeft[0], topRight[0])
-    #     y = random.uniform(bottomLeft[1], topRight[1])
-    #     z = bottomLeft[2]
-    #     obj.fldTranslation.setSFVec3f([x, y, z])
 
 def generateTrainingsData(amount, supervisor, camera, table):
     for i in range(amount):

@@ -170,8 +170,8 @@ class RobotArm():
         
         
         self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
-
-        
+        self.loopCount = 0
+        self.dataCount = 0
 
         # Get ArmChain Data
         self.filename = None
@@ -217,6 +217,18 @@ class RobotArm():
     def autoLoop(self):
         self.handleKeystroke()
         self.moveTo([])
+    
+    @looper
+    def randomPosSamplingLoop(self,sampleSize,type):
+        if self.loopCount % 10 == 0:
+            if self.loopCount % 20 == 0:
+                TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+            else:
+                TrainingsHelper.makeSnapshot(self.camera,type)
+                self.dataCount +=1
+        self.loopCount += 1
+        if self.dataCount>sampleSize:
+            return -1
         
     def stepOperations(self):
         vpPos = self.viewPoint.getField('position').getSFVec3f()
@@ -376,6 +388,7 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
+<<<<<<< HEAD
             TrainingsHelper.makeSnapshot(self.camera,type='train')
         if (key==ord('I')):
             print("pressed: I")
@@ -383,13 +396,23 @@ class RobotArm():
         if (key==ord('O')):
             print("pressed: O")
             self.collectData=False
+=======
+            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            self.randomPosSamplingLoop(200,'train')
+>>>>>>> ImageRecognitionDev
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-                  
+        if (key==ord('K')):
+            print("pressed: K")
+            TrainingsHelper.makeSnapshot(self.camera, 'train')   
+        if (key==self.keyboard.SHIFT+ord('K')):  
+            print("pressed: shift K")
+            TrainingsHelper.makeSnapshot(self.camera, 'validation')  
+
     def moveTo(self, pos, rotation=None):
         '''
         Input:
