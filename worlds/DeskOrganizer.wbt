@@ -28,8 +28,8 @@ IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 WorldInfo {
 }
 DEF Viewpoint Viewpoint {
-  orientation 0.3463184524565206 0.04754287299496563 -0.9369115244864402 2.788638960858212
-  position 3.792983099420752 1.0865786056693838 3.1508950213444904
+  orientation 0.3463695516003826 0.049315600823239714 -0.9368009955372554 2.7792703956371
+  position 3.7773814665310415 1.1109967263965121 3.1508950213444904
 }
 TexturedBackground {
   texture "factory"
@@ -42,10 +42,10 @@ RectangleArena {
   floorSize 10 10
   floorTileSize 1 1
 }
-ComputerMouse {
+DEF computer_mouse ComputerMouse {
   translation 1.7833 0.292505 0.77
 }
-Can {
+DEF can Can {
   translation 1.56222 -0.774881 0.94
   rotation 1 0 0 4.692820414042842e-06
 }
@@ -96,7 +96,6 @@ SolidBox {
   physics Physics {
   }
 }
-
 Table {
   translation 0.089999 1.3 0
   name "table(1)"
@@ -123,14 +122,12 @@ WoodenBox {
 DEF MainTable Table {
   translation 1.51 -0.1 0
 }
-
-
 DEF MoverReference Transform {
   translation -0.81 1.8 0.73
   rotation 1 0 0 3.141592653589793
   children [
     DEF Mover Solid {
-      translation 0.87 0.42 -0.30
+      translation 0.87 0.42 -0.3
       children [
         Shape {
           appearance PBRAppearance {
@@ -223,7 +220,7 @@ DEF Follower Solid {
   ]
   name "solid(2)"
 }
-Hammer {
+DEF hammer Hammer {
   translation 1.58746 -0.270414 0.774
 }
 Knife {
@@ -235,17 +232,15 @@ Fork {
 WoodenSpoon {
   translation 1.75223 0.560653 0.74
 }
-BeerBottle {
+DEF beer_bottle BeerBottle {
   translation 1.28406 -0.482817 0.77
   rotation 0.6947480600338772 -0.18615701608601462 0.6947450600336179 -2.7734953071795863
 }
-Orange {
+DEF orange Orange {
   translation 1.74459 -0.603725 0.85
 }
-MyCylinder {
-  translation 1.63 0 0.79
+DEF Cylinder MyCylinder {
 }
-DEF box Cube {
-  translation 1.324 0.627887 0.8
+DEF Cube Cube {
   name "box2"
 }

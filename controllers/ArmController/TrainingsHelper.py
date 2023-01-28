@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
-categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','knife','fork','hammer','wooden spoon','beer bottle']
+categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','hammer','wooden spoon','beer bottle','Cylinder','Cube']
 fileNamePostfix = 1
 
 def makeSnapshot(camera,type='train'):
@@ -116,16 +116,22 @@ def startTraining():
 def moveTableNodes(supervisor,table):
     margin = 0.1
     zCoord = 0.7897645717378102
-    bottomLeft = [1.02418,0.784482,zCoord]
-    topLeft = [2.01797,0.799213,zCoord]
-    bottomRight = [1.02293,-0.993013,zCoord]
-    topRight = [1.99722,-0.990657,zCoord]
+    # bottomLeft = [1.02418,0.784482,zCoord]
+    # topLeft = [2.01797,0.799213,zCoord]
+    # bottomRight = [1.02293,-0.993013,zCoord]
+    # topRight = [1.99722,-0.990657,zCoord]
+    bottomLeft = table.local2world([0,1,0])
+    topLeft = table.local2world([0,0,0])
+    bottomRight =table.local2world([1,1,0])
+    topRight = table.local2world([1,0,0])
     x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
     x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
     y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
     y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
-    objects = [supervisor.getFromDef('apple'), supervisor.getFromDef('beerBottle'), supervisor.getFromDef('can')]
-    for obj in objects:
+    shortenedCategories = categories[2:] #dummy und empty string will be ignored
+    for cat in shortenedCategories:
+        print(cat)
+        obj = supervisor.getFromDef(cat)
         x = random.uniform(x_min, x_max)
         y = random.uniform(y_min, y_max)
         z = bottomLeft[2]
@@ -135,9 +141,9 @@ def moveTableNodes(supervisor,table):
         zRotation = random.uniform(1, 360)
         angle = random.uniform(1, 360)
         obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
-        #print()
+    #print()
     # print(topLeft)
-    # print(table.local2world([-1,-1,0])) # top left coords 
+    # print(table.local2world([0,0,0])) # top left coords 
     # print('moveTableNodes() called')
     # apple = supervisor.getFromDef('apple')
     # #print(apple.getPosition())
@@ -158,7 +164,7 @@ def moveTableNodes(supervisor,table):
 
 def generateTrainingsData(amount, supervisor, camera, table):
     for i in range(amount):
-        moveTableNodes(supervisor,table)
+        moveTableNodes(supervisor,table) #no physics after call?
         makeSnapshot(camera,'train')
             
 
