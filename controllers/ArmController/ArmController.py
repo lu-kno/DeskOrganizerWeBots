@@ -119,9 +119,11 @@ class MyGripper:
         self.enableForceFeedback(*args)        
     
     def enableForceFeedback(self,*args):
-        for f in self.fingers:
-            for j in f:
+        for i, f in enumerate(self.fingers):
+            for ii,j in enumerate(f):
+                print(f'enabling ForceFB: Finger {i}, {ii}')
                 j.enableForceFeedback()
+                print(j.getForceFeedbackSamplingPeriod())
                 j.getPositionSensor().enable(self.timestep)
             
     def printForces(self):
@@ -131,7 +133,7 @@ class MyGripper:
             
 
 class RobotArm():
-    HAND_LENGTH = 0.38 ## To Do: This value needs to be checked. Might need to be .03 larger
+    HAND_LENGTH = 0.375 ## To Do: This value needs to be checked. Might need to be .03 larger
     SAFE_HEIGHT = 0.3
 
     
@@ -353,7 +355,7 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-            TrainingsHelper.makeSnapshot(self.camera,type='train')
+            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
