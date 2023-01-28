@@ -15,8 +15,8 @@ import random
 from scipy.ndimage import zoom
 import random
 warnings.filterwarnings("ignore", category=UserWarning) 
-imageWidth = 2560
-imageHeight = 1422
+# imageWidth = 2560
+# imageHeight = 1422
 SAVEFIGS=True
 categories = ['dummy','','apple', 'orange', 'bottle','can','computer_mouse','hammer','wooden spoon','beer_bottle','Cylinder','Cube']
 fileNamePostfix = 1
@@ -29,6 +29,8 @@ def makeSnapshot(camera,type='train'):
 
 def createTrainingFiles(recognizedObjectes,camera,type):
     global fileNamePostfix
+    imageWidth = camera.getWidth()
+    imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
     if(type=='train'):
         dir = 'train'
@@ -57,6 +59,8 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     for obj in recognizedObjectes:
         id = obj.getId()
         name = obj.getModel()
+        if name not in categories:
+            continue
         position = list(obj.getPosition())
         positionOnImage = list(obj.getPositionOnImage())
         orientation = list(obj.getOrientation())
