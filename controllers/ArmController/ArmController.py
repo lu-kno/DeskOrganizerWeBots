@@ -359,7 +359,7 @@ class RobotArm():
             #self.camera.saveImage("snapshot.jpg",100)
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
-            TrainingsHelper.moveTableNodes(self.supervisor)
+            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
                   
     def moveTo(self, pos, rotation=None):
         '''
