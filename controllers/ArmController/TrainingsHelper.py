@@ -81,6 +81,7 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         json.dump(jsonData, file, indent=4)   
     with open(annotationPath+fileName+".txt", 'w') as file:
         file.writelines(yoloData)
+    print('File: '+fileName+' created')
 
 def createClassFiles(classes):
     execution_path = os.path.dirname(__file__)
@@ -154,6 +155,12 @@ def moveTableNodes(supervisor,table):
     #     y = random.uniform(bottomLeft[1], topRight[1])
     #     z = bottomLeft[2]
     #     obj.fldTranslation.setSFVec3f([x, y, z])
+
+def generateTrainingsData(amount, supervisor, camera, table):
+    for i in range(amount):
+        moveTableNodes(supervisor,table)
+        makeSnapshot(camera,'train')
+            
 
 if __name__=="__main__":
     startTraining()
