@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
-categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','hammer','wooden spoon','beer bottle','Cylinder','Cube']
+categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','hammer','wooden spoon','beer_bottle','Cylinder','Cube']
 fileNamePostfix = 1
 
 def makeSnapshot(camera,type='train'):
@@ -28,6 +28,7 @@ def makeSnapshot(camera,type='train'):
 
 
 def createTrainingFiles(recognizedObjectes,camera,type):
+    global fileNamePostfix
     execution_path = os.path.dirname(__file__)
     if(type=='train'):
         dir = 'train'
