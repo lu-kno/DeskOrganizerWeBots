@@ -6,7 +6,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/WoodenBox.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/VarnishedPine.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/neuronics/ipr/protos/IprHd6m180.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/robotiq/protos/Robotiq3fGripper.proto"
 EXTERNPROTO "../protos/Irb4600-40.proto"
@@ -27,16 +26,6 @@ IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
   basicTimeStep 16
-  contactProperties [
-    ContactProperties {
-      coulombFriction [
-        -1
-      ]
-      frictionRotation 2 2
-      rollingFriction 2 2 2
-      bounce 0.1
-    }
-  ]
 }
 DEF Viewpoint Viewpoint {
   orientation 0.3463695516003826 0.049315600823239714 -0.9368009955372554 2.7792703956371
