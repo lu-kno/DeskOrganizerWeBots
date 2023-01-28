@@ -6,6 +6,7 @@ import ImageDetector, TrainingsHelper
 import time
 from controller import Supervisor, Robot, Camera
 import numbers
+from warnings import warn
 
 try:
     import ikpy
@@ -46,8 +47,8 @@ def looperTimeout(func):
     return inner
 
 class MyGripper:
-    SPEED = 0.05 # SPEED in DEGREES
-    GRIP_FORCE = 1.5
+    SPEED = 5 # SPEED in DEGREES
+    GRIP_FORCE = 2
     
     def __init__(self,master):
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
@@ -83,7 +84,7 @@ class MyGripper:
         
     @looperTimeout
     def close(self):
-        inc = self.SPEED * np.pi/180 * self.timestep
+        inc = self.SPEED * np.pi/180 #* self.timestep
         forces = np.array([f[0].getForceFeedback() for f in self.fingers])
         maxPositions = np.array([f[0].getMaxPosition() for f in self.fingers])
         minPositionsTip = np.array([f[2].getMinPosition() for f in self.fingers])
@@ -122,7 +123,13 @@ class MyGripper:
         for i, f in enumerate(self.fingers):
             for ii,j in enumerate(f):
                 print(f'enabling ForceFB: Finger {i}, {ii}')
-                j.enableForceFeedback()
+                try:
+                    j.enableForceFeedback(self.timestep)
+                except TypeError as te:
+                    warn(te, category=None, stacklevel=1)
+                    warn('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
+                    j.enableForceFeedback()
+                    
                 print(j.getForceFeedbackSamplingPeriod())
                 j.getPositionSensor().enable(self.timestep)
             
@@ -157,6 +164,10 @@ class RobotArm():
         self.dataCam.enable(int(1000/24))
         self.dataCam.recognitionEnable(self.timestep)
         self.viewPoint = self.supervisor.getFromDef('Viewpoint')
+        self.collectData = False
+        self.lastDCamPos = np.zeros(3)
+        self.lastDCamOri = np.zeros(4)
+        
         
         self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
         self.loopCount = 0
@@ -225,6 +236,16 @@ class RobotArm():
         
         self.arm.getField('dataCamTrans').setSFVec3f(vpPos)
         self.arm.getField('dataCamRot').setSFRotation(vpOri)
+        
+        diffP = self.lastDCamPos - np.array(vpPos)
+        diffO = self.lastDCamOri - np.array(vpOri)
+        
+        # print(f'PosDiff: {diffP}')
+        # print(f'OriDiff: {diffO}')
+        if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
+            self.lastDCamPos = np.array(vpPos)
+            self.lastDCamOri = np.array(vpOri)
+            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         
         return
         
@@ -369,6 +390,12 @@ class RobotArm():
             print("pressed: P")
             #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
             self.randomPosSamplingLoop(200,'train')
+        if (key==ord('I')):
+            print("pressed: I")
+            self.collectData=True
+        if (key==ord('O')):
+            print("pressed: O")
+            self.collectData=False
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
