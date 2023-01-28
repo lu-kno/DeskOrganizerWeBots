@@ -5,3 +5,4 @@ __pycache__/**
 *.pth
 controllers/ArmController/DataSet/*
 controllers/ArmController/DataSet*.zip
+controllers/ArmController/DataSet*
