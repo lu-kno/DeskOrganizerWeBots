@@ -18,6 +18,7 @@ imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
 categories = ['dummy','','apple', 'orange', 'bottle','can','computer mouse','knife','fork','hammer','wooden spoon','beer bottle']
+fileNamePostfix = 1
 
 def makeSnapshot(camera,type='train'):
     print('Create training image and corresponding files in mode: '+type)
@@ -41,14 +42,14 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     if not os.path.exists(imagePath):
         os.makedirs(imagePath)
     # get current fileName
-    i = 1
+    
     while True:
-        filename = f"image_{i}.txt"
+        filename = f"image_{fileNamePostfix}.txt"
         filepath = os.path.join(annotationPath, filename)
         if not os.path.isfile(filepath):
             break
-        i += 1
-    fileName = f"image_{i}"
+        fileNamePostfix += 1
+    fileName = f"image_{fileNamePostfix}"
     jsonData = []
     yoloData = []
     for obj in recognizedObjectes:
@@ -102,7 +103,7 @@ def createClassFiles(classes):
             i += 1
 
 def startTraining():
-    createClassFiles(categories[1:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "leer" wird ausgelassen
+    createClassFiles(categories[1:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
     # trainer = DetectionModelTrainer()
     # trainer.setModelTypeAsYOLOv3()
     # trainer.setDataDirectory(data_directory="DataSet")
@@ -110,6 +111,17 @@ def startTraining():
     # trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
     # trainer.trainModel()
     
+def moveTableNodes(supervisor):
+    print('moveTableNodes() called')
+    apple = supervisor.getFromDef('apple')
+    print(apple.getPosition())
+    fldTranslation = apple.getField('translation')
+
+    print(dir(fldTranslation))
+    print(fldTranslation.getSFRotation())
+    print(fldTranslation.getMFRotation())
+   # for i in range()
+    #print(dir(apple))
 
 if __name__=="__main__":
     startTraining()

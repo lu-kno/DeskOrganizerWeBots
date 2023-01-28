@@ -2,7 +2,7 @@ import sys
 import tempfile
 import numpy as np
 import math
-import ImageDetector
+import ImageDetector, TrainingsHelper
 import time
 from controller import Supervisor, Robot, Camera
 import numbers
@@ -349,12 +349,13 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-            ImageDetector.callWeBotsRecognitionRoutine(self.camera)
+            TrainingsHelper.makeSnapshot(self.camera,type='train')
         if (key==ord('L')):
             print("pressed: L")
-            self.camera.saveImage("snapshot.jpg",100)
+            #self.camera.saveImage("snapshot.jpg",100)
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
-            ImageDetector.imageAiTest()
+            #ImageDetector.imageAiTest()
+            TrainingsHelper.moveTableNodes(self.supervisor)
                   
     def moveTo(self, pos, rotation=None):
         '''
