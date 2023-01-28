@@ -213,10 +213,10 @@ class RobotArm():
             if self.loopCount % 20 == 0:
                 TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
             else:
-                TrainingsHelper.makeSnapshot(self.camera,'train')
+                TrainingsHelper.makeSnapshot(self.camera,'validation')
                 self.dataCount +=1
         self.loopCount += 1
-        if self.dataCount>200:
+        if self.dataCount>40:
             return -1
         
     def stepOperations(self):

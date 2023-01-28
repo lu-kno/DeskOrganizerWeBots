@@ -29,7 +29,7 @@ def makeSnapshot(camera,type='train'):
 
 def createTrainingFiles(recognizedObjectes,camera,type):
     global fileNamePostfix
-    imageWidth = camera.getWidht()
+    imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
     if(type=='train'):
@@ -93,30 +93,21 @@ def createClassFiles(classes):
     annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
     annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
     with open(annotationPathTrain, "w") as file:
-        i = 0
         for obj in classes:
-            if(i==0):
-                file.write("unkown\n")
-            else:
-                file.write(obj+"\n")
-            i += 1
+            file.write(obj+"\n")
     with open(annotationPathValidation, "w") as file:
-        i = 0
         for obj in classes:
-            if(i==0):
-                file.write("unkown\n")
-            else:
-                file.write(obj+"\n")
-            i += 1
+            file.write(obj+"\n")
+      
 
 def startTraining():
-    createClassFiles(categories[1:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
-    # trainer = DetectionModelTrainer()
-    # trainer.setModelTypeAsYOLOv3()
-    # trainer.setDataDirectory(data_directory="DataSet")
-    # objectNames = categories[2:]
-    # trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
-    # trainer.trainModel()
+    createClassFiles(categories[2:]) #Erzeuge "classes.txt" anhand von categorien Liste. Erstes element "dummy" wird ausgelassen
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsYOLOv3()
+    trainer.setDataDirectory(data_directory="DataSet")
+    objectNames = categories[2:]
+    trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
+    trainer.trainModel()
 
 def testModel():
     detector = CustomObjectDetection()
