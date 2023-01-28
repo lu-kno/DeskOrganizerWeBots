@@ -155,6 +155,10 @@ class RobotArm():
         self.dataCam.enable(int(1000/24))
         self.dataCam.recognitionEnable(self.timestep)
         self.viewPoint = self.supervisor.getFromDef('Viewpoint')
+        
+        self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
+
+        
 
         # Get ArmChain Data
         self.filename = None
@@ -194,7 +198,7 @@ class RobotArm():
         '''Main loop of the robots controller'''
         self.followSphereFromAbove()
         self.handleKeystroke()
-        image2worldTest(self.supervisor)
+        image2worldTest(self)
     
     @looper
     def autoLoop(self):
@@ -533,63 +537,114 @@ class RobotArm():
         
 
         
-def image2worldTest(supervisor):
-    mover = supervisor.getFromDef('Mover').getField('translation')
-    imageRef = supervisor.getFromDef('MoverReference')
-    MainTable = supervisor.getFromDef('MainTable')
+        
+def image2worldTest(arm):
+    mover = arm.supervisor.getFromDef('Mover').getField('translation')
+    imageRef = arm.supervisor.getFromDef('MoverReference')
+    # MainTable = supervisor.getFromDef('MainTable')
     
     
-    follower = supervisor.getFromDef('Follower').getField('translation')
+    follower = arm.supervisor.getFromDef('Follower').getField('translation')
     
     #print(f'mover -> {mover}')
     #print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
     
-    res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
+    # res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
+    res = arm.mainTable.local2world(mover.getSFVec3f())
     
     xn,yn,zn = res
     follower.setSFVec3f([xn,yn,zn])
     # follower.setSFVec3f(np.array([0,0,0]))
     
         
-def image2world(pos, tableOrigin, tableSize=None, rotation=None):
-    ''' this function tranforms the coordinates from the table to world coordinates.
-    if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
+# def image2world(pos, tableOrigin, tableSize=None, rotation=None):
+#     ''' this function tranforms the coordinates from the table to world coordinates.
+#     if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
     
 
-    Sx, Sy, Sz = -1,1,-1
-    tx,ty,tz = tableOrigin
-    tx+=tableSize[0]/2
-    ty+=tableSize[1]/2
+#     Sx, Sy, Sz = -1,1,-1
+#     tx,ty,tz = tableOrigin
+#     tx+=tableSize[0]/2
+#     ty+=tableSize[1]/2
         
-    if tableSize is not None:
-        tz=tz+tableSize[2]
-        # Sx, Sy, Sz = tableSize[0]/2, tableSize[1]/2, 1
+#     if tableSize is not None:
+#         tz=tz+tableSize[2]
+#         # Sx, Sy, Sz = tableSize[0]/2, tableSize[1]/2, 1
     
-    if rotation is None:
-        rotation[0,0,1,0]
-    a = rotation[2]*rotation[3]
+#     if rotation is None:
+#         rotation[0,0,1,0]
+#     a = rotation[2]*rotation[3]
     
-    # tMat = [
-    #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
-    #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
-    #     [0,               0,              Sz,   tz],
-    #     [0,               0,              0,    1]
-    # ]
-    tMat = [
-        [0,  -Sy,   0,    tx],
-        [Sx,  0,    0,    ty],
-        [0,   0,    Sz,   tz],
-        [0,   0,    0,    1]
-    ]
+#     # tMat = [
+#     #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
+#     #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
+#     #     [0,               0,              Sz,   tz],
+#     #     [0,               0,              0,    1]
+#     # ]
+#     tMat = [
+#         [0,  -Sy,   0,    tx],
+#         [Sx,  0,    0,    ty],
+#         [0,   0,    Sz,   tz],
+#         [0,   0,    0,    1]
+#     ]
     
-    if len(pos)==3:
-        pos = np.array([*pos,1])
+#     if len(pos)==3:
+#         pos = np.array([*pos,1])
     
-    res = np.matmul(tMat,pos)[:3]
-    #print(f'pos: {pos}')
-    #print(f'result: {res}')
-    return res
+#     res = np.matmul(tMat,pos)[:3]
+#     #print(f'pos: {pos}')
+#     #print(f'result: {res}')
+#     return res
     
+    
+class Table:
+    def __init__(self, node):
+        self.node = node
+        self.size = node.getField('size').getSFVec3f()
+        self.rotation = node.getField('rotation').getSFRotation()
+        self.position = node.getPosition()
+        
+        self.orientation = node.getOrientation()
+        
+    def local2world(self, pos):
+        ''' this function tranforms the coordinates from the table to world coordinates.
+        if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
+        
+
+        Sx, Sy, Sz = -1,1,-1
+        tx,ty,tz = self.position
+        tx+=self.size[0]/2
+        ty+=self.size[1]/2
+            
+        if self.size is not None:
+            tz=tz+self.size[2]
+            # Sx, Sy, Sz = self.size[0]/2, self.size[1]/2, 1
+        
+        if self.rotation is None:
+            self.rotation[0,0,1,0]
+        a = self.rotation[2]*self.rotation[3]
+        
+        # tMat = [
+        #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
+        #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
+        #     [0,               0,              Sz,   tz],
+        #     [0,               0,              0,    1]
+        # ]
+        tMat = [
+            [0,  -Sy,   0,    tx],
+            [Sx,  0,    0,    ty],
+            [0,   0,    Sz,   tz],
+            [0,   0,    0,    1]
+        ]
+        
+        if len(pos)==3:
+            pos = np.array([*pos,1])
+        
+        res = np.matmul(tMat,pos)[:3]
+        #print(f'pos: {pos}')
+        #print(f'result: {res}')
+        return res
+        
         
         
 robot = RobotArm()
