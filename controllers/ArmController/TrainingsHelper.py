@@ -128,7 +128,7 @@ def moveTableNodes(supervisor,table):
         yRotation = random.uniform(1, 360)
         zRotation = random.uniform(1, 360)
         agleRotation = random.uniform(1, 360)
-        obj.getField('rotation').setSFVec3f([xRotation, yRotation, zRotation, agleRotation])
+        obj.getField('rotation').setSFVec3f([xRotation, yRotation, zRotation])
 
     # print(topLeft)
     # print(table.local2world([-1,-1,0])) # top left coords 
