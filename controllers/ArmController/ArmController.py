@@ -46,7 +46,7 @@ def looperTimeout(func):
     return inner
 
 class MyGripper:
-    SPEED = 0.05 # SPEED in DEGREES
+    SPEED = 5 # SPEED in DEGREES
     GRIP_FORCE = 1.5
     
     def __init__(self,master):
@@ -83,7 +83,7 @@ class MyGripper:
         
     @looperTimeout
     def close(self):
-        inc = self.SPEED * np.pi/180 * self.timestep
+        inc = self.SPEED * np.pi/180 #* self.timestep
         forces = np.array([f[0].getForceFeedback() for f in self.fingers])
         maxPositions = np.array([f[0].getMaxPosition() for f in self.fingers])
         minPositionsTip = np.array([f[2].getMinPosition() for f in self.fingers])
@@ -157,6 +157,10 @@ class RobotArm():
         self.dataCam.enable(int(1000/24))
         self.dataCam.recognitionEnable(self.timestep)
         self.viewPoint = self.supervisor.getFromDef('Viewpoint')
+        self.collectData = False
+        self.lastDCamPos = np.zeros(3)
+        self.lastDCamOri = np.zeros(4)
+        
         
         self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
 
@@ -213,6 +217,16 @@ class RobotArm():
         
         self.arm.getField('dataCamTrans').setSFVec3f(vpPos)
         self.arm.getField('dataCamRot').setSFRotation(vpOri)
+        
+        diffP = self.lastDCamPos - np.array(vpPos)
+        diffO = self.lastDCamOri - np.array(vpOri)
+        
+        # print(f'PosDiff: {diffP}')
+        # print(f'OriDiff: {diffO}')
+        if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
+            self.lastDCamPos = np.array(vpPos)
+            self.lastDCamOri = np.array(vpOri)
+            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         
         return
         
@@ -355,7 +369,13 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            TrainingsHelper.makeSnapshot(self.camera,type='train')
+        if (key==ord('I')):
+            print("pressed: I")
+            self.collectData=True
+        if (key==ord('O')):
+            print("pressed: O")
+            self.collectData=False
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
