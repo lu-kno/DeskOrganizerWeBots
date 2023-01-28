@@ -109,7 +109,7 @@ def startTraining():
     # trainer = DetectionModelTrainer()
     # trainer.setModelTypeAsYOLOv3()
     # trainer.setDataDirectory(data_directory="DataSet")
-    # objectNames = ['apple', 'orange', 'bottle','can','computer mouse','knife','fork','hammer','wooden spoon','beer bottle']
+    # objectNames = ['apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
     # trainer.setTrainConfig(object_names_array=objectNames, batch_size=4, num_experiments=200, train_from_pretrained_model="Modelle/yolov3.pt")
     # trainer.trainModel()
     

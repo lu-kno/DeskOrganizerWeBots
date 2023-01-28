@@ -26,6 +26,17 @@ IMPORTABLE EXTERNPROTO "../protos/MyCylinder.proto"
 IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
+  basicTimeStep 16
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        -1
+      ]
+      frictionRotation 2 2
+      rollingFriction 2 2 2
+      bounce 0.1
+    }
+  ]
 }
 DEF Viewpoint Viewpoint {
   orientation 0.3463695516003826 0.049315600823239714 -0.9368009955372554 2.7792703956371
@@ -121,6 +132,13 @@ WoodenBox {
 }
 DEF MainTable Table {
   translation 1.51 -0.1 0
+  trayAppearance VarnishedPine {
+    colorOverride 0.12549 0.290196 0.529412
+    textureTransform TextureTransform {
+      scale 12 46
+    }
+    IBLStrength 2
+  }
 }
 DEF MoverReference Transform {
   translation -0.81 1.8 0.73
@@ -239,8 +257,8 @@ DEF beer_bottle BeerBottle {
 DEF orange Orange {
   translation 1.74459 -0.603725 0.85
 }
-DEF Cylinder MyCylinder {
+MyCylinder {
 }
-DEF Cube Cube {
+DEF box Cube {
   name "box2"
 }
