@@ -22,6 +22,8 @@ IMPORTABLE EXTERNPROTO "../protos/ComputerMouse.proto"
 IMPORTABLE EXTERNPROTO "../protos/BeerBottle.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/drinks/protos/WaterBottle.proto"
 IMPORTABLE EXTERNPROTO "../protos/Orange.proto"
+IMPORTABLE EXTERNPROTO "../protos/MyCylinder.proto"
+IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
 }
@@ -94,30 +96,7 @@ SolidBox {
   physics Physics {
   }
 }
-DEF box Solid {
-  translation 1.324 0.627887 0.8
-  scale 0.901237 0.901237 0.901237
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 0 0 1
-        metalness 0
-      }
-      geometry Box {
-        size 0.1 0.1 0.1
-      }
-    }
-  ]
-  name "box2"
-  boundingObject Box {
-    size 0.1 0.1 0.1
-  }
-  physics Physics {
-  }
-  recognitionColors [
-    0.59 0.75 0.28
-  ]
-}
+
 Table {
   translation 0.089999 1.3 0
   name "table(1)"
@@ -144,37 +123,14 @@ WoodenBox {
 DEF MainTable Table {
   translation 1.51 -0.1 0
 }
-Solid {
-  translation 1.63 0 0.79
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 0 1 0
-        metalness 0
-      }
-      geometry Cylinder {
-        height 0.1
-        radius 0.05
-      }
-    }
-  ]
-  name "cyclinder"
-  boundingObject Cylinder {
-    height 0.1
-    radius 0.05
-  }
-  physics Physics {
-  }
-  recognitionColors [
-    0.59 0.75 0.28
-  ]
-}
+
+
 DEF MoverReference Transform {
   translation -0.81 1.8 0.73
   rotation 1 0 0 3.141592653589793
   children [
     DEF Mover Solid {
-      translation 0.87 0.42 -0.01
+      translation 0.87 0.42 -0.30
       children [
         Shape {
           appearance PBRAppearance {
@@ -285,4 +241,11 @@ BeerBottle {
 }
 Orange {
   translation 1.74459 -0.603725 0.85
+}
+MyCylinder {
+  translation 1.63 0 0.79
+}
+DEF box Cube {
+  translation 1.324 0.627887 0.8
+  name "box2"
 }

@@ -1,0 +1,42 @@
+#VRML_SIM R2023a utf8
+
+PROTO Cube [
+  field SFVec3f    translation         1.324 0.627887 0.8
+  field SFVec3f    scale 0.901237 0.901237 0.901237
+  field SFRotation rotation            0 0 1 0
+  field SFString   name                "box"
+  field SFFloat    mass                0.15      # Defines the mass of the apple in kg.
+  field MFNode     immersionProperties []        # Is `Solid.immersionProperties`.
+]
+{
+
+
+  Solid {
+    translation IS translation
+    scale IS scale
+    rotation IS rotation
+    name IS name
+    model "Cube"
+    immersionProperties IS immersionProperties
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColor 0 0 1
+          metalness 0
+        }
+        geometry Box {
+          size 0.1 0.1 0.1
+        }
+      }
+    ]
+    boundingObject Box {
+      size 0.1 0.1 0.1
+    }
+    physics Physics {
+      mass IS mass
+    }
+    recognitionColors [
+      0.59 0.75 0.28
+    ]
+  }
+}

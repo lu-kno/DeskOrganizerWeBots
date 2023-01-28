@@ -1,0 +1,41 @@
+#VRML_SIM R2023a utf8
+
+
+PROTO MyCylinder [
+  field SFVec3f    translation         1.63 0 0.79
+  field SFRotation rotation            0 0 1 0
+  field SFString   name                "cylinder"
+  field SFFloat    mass                0.15      # Defines the mass of the apple in kg.
+  field MFNode     immersionProperties []        # Is `Solid.immersionProperties`.
+]
+{
+
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    model "Cylinder"
+    immersionProperties IS immersionProperties
+    recognitionColors [0.59 0.75 0.28]
+
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColor 0 1 0
+          metalness 0
+        }
+        geometry Cylinder {
+          height 0.1
+          radius 0.05
+        }
+      }
+    ]
+    boundingObject Cylinder {
+      height 0.1
+      radius 0.05
+    }
+    physics Physics {
+      mass IS mass
+    }
+  }
+}
