@@ -349,7 +349,7 @@ class RobotArm():
         #trigger Camera and Img interpretation
         if (key==ord('P')):
             print("pressed: P")
-            TrainingsHelper.makeSnapshot(self.camera,type='train')
+            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
