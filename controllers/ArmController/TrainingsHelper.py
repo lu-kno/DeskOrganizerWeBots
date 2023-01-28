@@ -113,23 +113,28 @@ def startTraining():
     # trainer.trainModel()
     
 def moveTableNodes(supervisor,table):
+    margin = 0.1
     zCoord = 0.7897645717378102
     bottomLeft = [1.02418,0.784482,zCoord]
     topLeft = [2.01797,0.799213,zCoord]
     bottomRight = [1.02293,-0.993013,zCoord]
     topRight = [1.99722,-0.990657,zCoord]
+    x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
+    x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
+    y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
+    y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
     objects = [supervisor.getFromDef('apple'), supervisor.getFromDef('beerBottle'), supervisor.getFromDef('can')]
     for obj in objects:
-        x = random.uniform(bottomLeft[0], topRight[0])
-        y = random.uniform(bottomLeft[1], topRight[1])
+        x = random.uniform(x_min, x_max)
+        y = random.uniform(y_min, y_max)
         z = bottomLeft[2]
         obj.getField('translation').setSFVec3f([x, y, z])
         xRotation = random.uniform(1, 360)
         yRotation = random.uniform(1, 360)
         zRotation = random.uniform(1, 360)
-        agleRotation = random.uniform(1, 360)
-        obj.getField('rotation').setSFVec3f([xRotation, yRotation, zRotation])
-
+        angle = random.uniform(1, 360)
+        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+        #print()
     # print(topLeft)
     # print(table.local2world([-1,-1,0])) # top left coords 
     # print('moveTableNodes() called')
