@@ -26,11 +26,15 @@ IMPORTABLE EXTERNPROTO "../protos/MyCylinder.proto"
 IMPORTABLE EXTERNPROTO "../protos/Cube.proto"
 
 WorldInfo {
+  basicTimeStep 16
   contactProperties [
     ContactProperties {
       coulombFriction [
         -1
       ]
+      frictionRotation 2 2
+      rollingFriction 2 2 2
+      bounce 0.1
     }
   ]
 }
