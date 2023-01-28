@@ -635,7 +635,7 @@ class Table:
         tMat = [
             [0,  -Sy*self.size[0],   0,    tx],
             [Sx*self.size[1],  0,    0,    ty],
-            [0,   0,    Sz,   tz],
+            [0,   0,    -Sz,   tz],
             [0,   0,    0,    1]
         ]
         
