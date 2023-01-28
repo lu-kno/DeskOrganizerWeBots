@@ -6,6 +6,7 @@ import ImageDetector, TrainingsHelper
 import time
 from controller import Supervisor, Robot, Camera
 import numbers
+from warnings import warn
 
 try:
     import ikpy
@@ -47,7 +48,7 @@ def looperTimeout(func):
 
 class MyGripper:
     SPEED = 5 # SPEED in DEGREES
-    GRIP_FORCE = 1.5
+    GRIP_FORCE = 2
     
     def __init__(self,master):
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
@@ -122,7 +123,13 @@ class MyGripper:
         for i, f in enumerate(self.fingers):
             for ii,j in enumerate(f):
                 print(f'enabling ForceFB: Finger {i}, {ii}')
-                j.enableForceFeedback()
+                try:
+                    j.enableForceFeedback(self.timestep)
+                except TypeError as te:
+                    warn(te, category=None, stacklevel=1)
+                    warn('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
+                    j.enableForceFeedback()
+                    
                 print(j.getForceFeedbackSamplingPeriod())
                 j.getPositionSensor().enable(self.timestep)
             
