@@ -124,9 +124,6 @@ Table {
     }
   }
 }
-IprHd6m180 {
-  translation -0.287526 1.55754 0.74
-}
 WoodenBox {
   translation -0.26 -2.24 0.3
 }
@@ -209,8 +206,8 @@ Irb4600-40 {
       recognitionColors [
         0 0 0
       ]
-      width 2560
-      height 1422
+      width 640
+      height 360
       antiAliasing TRUE
       recognition Recognition {
         maxRange 500
