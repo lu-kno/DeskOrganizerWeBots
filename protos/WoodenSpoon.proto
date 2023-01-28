@@ -1,12 +1,12 @@
 #VRML_SIM R2023a utf8
 # license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
 # license url: https://cyberbotics.com/webots_assets_license
-# A wooden spoon.
+# A wooden_spoon.
 
 PROTO WoodenSpoon [
   field SFVec3f    translation 0 0 0
   field SFRotation rotation    0 0 1 0
-  field SFString   name        "wooden spoon"
+  field SFString   name        "wooden_spoon"
   field MFString   textureUrl  "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/utensils/protos/textures/wooden_spoon.jpg"  # Defines the texture used for the spoon.
 ]
 {
@@ -44,7 +44,7 @@ PROTO WoodenSpoon [
       }
     ]
     name IS name
-    model "wooden spoon"
+    model "wooden_spoon"
     boundingObject Group {
       children [
         Transform {

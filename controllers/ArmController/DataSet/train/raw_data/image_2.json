@@ -1,7 +1,7 @@
 [
     {
         "id": 155,
-        "name": "computer mouse",
+        "name": "computer_mouse",
         "position": [
             2.1750383136905413,
             0.39250505509807715,
@@ -281,7 +281,7 @@
     },
     {
         "id": 1799,
-        "name": "wooden spoon",
+        "name": "wooden_spoon",
         "position": [
             2.187561048472247,
             0.6606529999999999,
@@ -316,7 +316,7 @@
     },
     {
         "id": 1814,
-        "name": "beer bottle",
+        "name": "beer_bottle",
         "position": [
             2.159314440421048,
             -0.3828170801468316,

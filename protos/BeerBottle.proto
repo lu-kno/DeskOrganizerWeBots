@@ -1,13 +1,13 @@
 #VRML_SIM R2023a utf8
 # license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
 # license url: https://cyberbotics.com/webots_assets_license
-# A beer bottle.
+# A beer_bottle.
 # template language: javascript
 
 PROTO BeerBottle [
   field SFVec3f    translation 0 0 0
   field SFRotation rotation    0 0 1 0
-  field SFString   name        "beer bottle"
+  field SFString   name        "beer_bottle"
   field SFFloat    mass        0.4
 ]
 {
@@ -63,7 +63,7 @@ Solid {
     }
   ]
   name IS name
-  model "beer bottle"
+  model "beer_bottle"
   boundingObject Group {
     children [
       Transform {

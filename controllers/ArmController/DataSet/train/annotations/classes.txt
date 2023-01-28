@@ -3,9 +3,9 @@ apple
 orange
 bottle
 can
-computer mouse
+computer_mouse
 knife
 fork
 hammer
-wooden spoon
-beer bottle
+wooden_spoon
+beer_bottle

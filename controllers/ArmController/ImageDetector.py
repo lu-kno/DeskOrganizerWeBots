@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
-categories = ['','apple', 'orange', 'bottle','can','computer mouse','knife','fork','hammer','wooden spoon','beer bottle']
+categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
 
 def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
