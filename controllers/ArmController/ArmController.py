@@ -159,7 +159,7 @@ class RobotArm():
         self.viewPoint = self.supervisor.getFromDef('Viewpoint')
         
         self.mainTable = Table(self.supervisor.getFromDef('MainTable'))
-
+        self.
         
 
         # Get ArmChain Data
