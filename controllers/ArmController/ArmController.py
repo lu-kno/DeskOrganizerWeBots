@@ -608,8 +608,10 @@ class Table:
         
     def local2world(self, pos):
         ''' this function tranforms the coordinates from the table to world coordinates.
-        if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
+        if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
         
+        # for i in range(3):
+        #     pos[i]=pos[i]*self.size[i]
 
         Sx, Sy, Sz = -1,1,-1
         tx,ty,tz = self.position
@@ -631,8 +633,8 @@ class Table:
         #     [0,               0,              0,    1]
         # ]
         tMat = [
-            [0,  -Sy,   0,    tx],
-            [Sx,  0,    0,    ty],
+            [0,  -Sy*self.size[0],   0,    tx],
+            [Sx*self.size[1],  0,    0,    ty],
             [0,   0,    Sz,   tz],
             [0,   0,    0,    1]
         ]
