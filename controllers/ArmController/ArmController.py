@@ -4,9 +4,17 @@ import numpy as np
 import math
 import ImageDetector, TrainingsHelper
 import time
-from controller import Supervisor, Robot, Camera
+from controller import Supervisor, Robot, Camera, Motor
 import numbers
 from warnings import warn
+
+from controller.wb import wb
+
+def _enableFB(self, sampling_period: int):
+    wb.wb_motor_enable_force_feedback(self._tag, sampling_period)
+    
+Motor.enableForceFeedback = _enableFB
+
 
 try:
     import ikpy
