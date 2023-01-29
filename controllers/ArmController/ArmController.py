@@ -218,7 +218,19 @@ class RobotArm():
         self.loopCount += 1
         if self.dataCount>sampleSize:
             return -1
-        
+
+    @looper
+    def randomRotationSamplingLoop(self,sampleSize,type):
+        if self.loopCount % 10 == 0:
+            if self.loopCount % 20 == 0:
+                TrainingsHelper.spinTableNodes(self.supervisor,self.mainTable)
+            else:
+                TrainingsHelper.makeSnapshot(self.camera,type)
+                self.dataCount +=1
+        self.loopCount += 1
+        if self.dataCount>sampleSize:
+            return -1
+
     def stepOperations(self):
         vpPos = self.viewPoint.getField('position').getSFVec3f()
         vpOri = self.viewPoint.getField('orientation').getSFRotation()
@@ -368,7 +380,11 @@ class RobotArm():
         if (key==ord('P')):
             print("pressed: P")
             #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            self.randomPosSamplingLoop(200,'train')
+            self.randomPosSamplingLoop(150,'train')
+        if (key==self.keyboard.SHIFT+ord('P')):
+            print("pressed: P")
+            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            self.randomPosSamplingLoop(60,'validation')    
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
@@ -377,6 +393,7 @@ class RobotArm():
             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
         if (key==ord('K')):
             print("pressed: K")
+            #self.camera.saveImage("snapshot.jpg",100)
             TrainingsHelper.makeSnapshot(self.camera, 'train')   
         if (key==self.keyboard.SHIFT+ord('K')):  
             print("pressed: shift K")
