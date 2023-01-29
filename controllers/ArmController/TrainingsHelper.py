@@ -16,7 +16,8 @@ import random
 from scipy.ndimage import zoom
 import random
 warnings.filterwarnings("ignore", category=UserWarning) 
-
+# imageWidth = 2560
+# imageHeight = 1422
 SAVEFIGS=True
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 

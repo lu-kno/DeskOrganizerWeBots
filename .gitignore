@@ -1,5 +1,7 @@
 controllers/ArmController/Modelle/*
 controllers/ArmController/DataSet/*
+controllers/ArmController/DataSet*.zip
+controllers/ArmController/DataSet*
 __pycache__/**
 *.pyc
 *.code-workspace
