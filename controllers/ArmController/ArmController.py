@@ -51,27 +51,6 @@ class MyGripper(logger):
         self.timestep = master.timestep
         
     @looperTimeout
-    def closeOld(self):
-        # inc = 0.5
-        closed = np.array([0 for f in self.fingers])
-        maxDiff = 0
-        for i, f in enumerate(self.fingers):
-            maxDiff = max(abs(f[0].getPositionSensor().getValue() - f[0].getMaxPosition()),maxDiff)
-            # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
-            if f[0].getForceFeedback()<self.GRIP_FORCE:
-                f[0].setPosition(f[0].getMaxPosition())
-            else:
-                f[0].setPosition(f[0].getPositionSensor().getValue())
-                closed[i] = 1
-                
-        if np.all(closed==1):
-            return -1
-            
-        if maxDiff<0.05:
-            self.logV('Gripper Closed Completely')
-            return -1
-        
-    @looperTimeout
     def close(self):
         inc = self.SPEED * np.pi/180 #* self.timestep
         forces = np.array([f[0].getForceFeedback() for f in self.fingers])
@@ -119,7 +98,7 @@ class MyGripper(logger):
                     j.enableForceFeedback(self.timestep)
                 except TypeError as te:
                     warn(te, category=None, stacklevel=1)
-                    warn('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
+                    self.logW('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
                     j.enableForceFeedback()
                     
                 self.logD(j.getForceFeedbackSamplingPeriod())
@@ -358,10 +337,7 @@ class RobotArm(logger):
         
         x,y,z = self.target.getPosition()
         ballSpeed = 0.03
-        
-        # if (key==ord('T')):
-            # goToSphere()           
-            
+                    
         # print positions
         if (key==ord('F')):
             self.log(f'targetPosition - > {self.target.getPosition()}')
@@ -479,7 +455,6 @@ class RobotArm(logger):
             self.setPosition(motor_angles)
             self.awaitPosition(motor_angles)
                 
-                
         except Exception as e:
             self.logW(e)
             
@@ -594,12 +569,7 @@ class RobotArm(logger):
         self.pickUpObject(position, rotation=rotation)
         self.deliverObject(destination, method=place_method)
         
-            
-    # def sleep(self, ms):
-    #     while ms>0:
-    #         self.supervisor.step(self.timestep)
-    #         ms -= self.timestep
-        
+
         
         
         
@@ -609,20 +579,13 @@ class RobotArm(logger):
 def image2worldTest(arm):
     mover = arm.supervisor.getFromDef('Mover').getField('translation')
     imageRef = arm.supervisor.getFromDef('MoverReference')
-    # MainTable = supervisor.getFromDef('MainTable')
-    
     
     follower = arm.supervisor.getFromDef('Follower').getField('translation')
     
-    #print(f'mover -> {mover}')
-    #print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
-    
-    # res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
     res = arm.mainTable.local2world(mover.getSFVec3f())
     
     xn,yn,zn = res
     follower.setSFVec3f([xn,yn,zn])
-    # follower.setSFVec3f(np.array([0,0,0]))
     
         
     
