@@ -13,12 +13,69 @@ import math
 import warnings
 import random
 from scipy.ndimage import zoom
+import yaml
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=True
 categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
+
+
+class ImageScanner:
+    def __init__(self, master, model='webots'):
+        if model=='webots':
+            self.scanImage = self.webotsScan
+        else:
+            self.scanImage = self.imageAIScan
+        
+        self.master=master
+        self.camera=master.camera
+        
+    def webotsScan(self):
+        img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
+        if not np.any(img):
+            return []
+        objectsRes = self.camera.getRecognitionObjects()
+        print(f"np.max(img) = {np.max(img)}")
+        print(f"np.shape(img) = {np.shape(img)}")
+        # print(img)
+
+        objects=[]
+        for o in objectsRes:
+            size=np.array(list(o.getSizeOnImage()))
+            
+            pos = np.array(list(o.getPositionOnImage()))
+            
+            minCorner = (pos-size/2).astype('int')
+            maxCorner = (minCorner+size).astype('int')
+            
+            boxPoints = np.array([minCorner, maxCorner])
+            
+            objImage = img[minCorner[0]:maxCorner[0],minCorner[1]:maxCorner[1],:3]
+            # print(f"Name = {o.getModel()}")
+            # print(f"size  = {size}")
+            # print(f"pos  = {pos}")
+            # print(f"objImage.shape = {objImage.shape}")
+            # print(f"np.max(objImage) = {np.max(objImage)}")
+            
+            # objImage = img[]
+            oValues = dict(  id=o.getId(), 
+                            name=o.getModel(), 
+                            position=(pos/img.shape[:2]).tolist(), 
+                            boxPoints=boxPoints.tolist(),
+                            orientation=getAngle(objImage),
+                            )
+            objects.append(oValues)
+        
+        # print(json.dumps(objects,indent=4))
+        with open('recognitionObject.yaml','w+') as f:
+            f.write(yaml.dump(objects))
+        print(yaml.dump(objects))
+        return objects
+        
+
+
 
 def imageAiTest(filename="snapshot.jpg"):
     imageWidth = 2560
