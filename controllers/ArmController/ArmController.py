@@ -239,12 +239,14 @@ class RobotArm():
             return -1
 
     @looper
-    def randomRotationSamplingLoop(self,sampleSize,type):
+    def singleObjectImageLoop(self,sampleSize,type):
+        if(self.loopCount == 0):
+            TrainingsHelper.moveViewPointAround(self.supervisor,self.mainTable)
         if self.loopCount % 10 == 0:
             if self.loopCount % 20 == 0:
-                TrainingsHelper.spinTableNodes(self.supervisor,self.mainTable)
+                TrainingsHelper.spinTableNode(self.supervisor,self.mainTable)
             else:
-                TrainingsHelper.makeSnapshot(self.camera,type)
+                #TrainingsHelper.makeSnapshot(self.camera,type)
                 self.dataCount +=1
         self.loopCount += 1
         if self.dataCount>sampleSize:
@@ -406,10 +408,7 @@ class RobotArm():
             self.targetTranslation.setSFVec3f([x,y,z-ballSpeed])
 
         #trigger Camera and Img interpretation
-        if (key==ord('P')):
-            print("pressed: P")
-            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            self.randomPosSamplingLoop(200,'train')
+
         if (key==ord('I')):
             print("pressed: I")
             self.collectData=True
@@ -417,10 +416,14 @@ class RobotArm():
             print("pressed: O")
             self.collectData=False
             self.randomPosSamplingLoop(150,'train')
-        if (key==self.keyboard.SHIFT+ord('P')):
+        if (key==ord('P')):
             print("pressed: P")
             #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            self.randomPosSamplingLoop(60,'validation')    
+            #self.randomPosSamplingLoop(400,'train')
+        if (key==self.keyboard.SHIFT+ord('P')):
+            print("pressed:shift +  P")
+            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+            #self.randomPosSamplingLoop(100,'validation')    
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
@@ -430,10 +433,11 @@ class RobotArm():
         if (key==ord('K')):
             print("pressed: K")
             #self.camera.saveImage("snapshot.jpg",100)
-            TrainingsHelper.makeSnapshot(self.camera, 'train')   
+            #TrainingsHelper.makeSnapshot(self.camera, 'train')
+            TrainingsHelper.moveViewPointAround(self.supervisor,self.mainTable)   
         if (key==self.keyboard.SHIFT+ord('K')):  
             print("pressed: shift K")
-            TrainingsHelper.makeSnapshot(self.camera, 'validation')  
+            #TrainingsHelper.makeSnapshot(self.camera, 'validation')  
 
     def moveTo(self, pos, rotation=None):
         '''

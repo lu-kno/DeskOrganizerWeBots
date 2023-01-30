@@ -20,30 +20,31 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # imageHeight = 1422
 SAVEFIGS=True
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
-
-
+lastViewPointPos = 0
+single_objectImage_setup_counter = 0
 def startTraining():
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
-    model_path = os.path.join(execution_path , "Modelle/yolov3_DataSet_mixedData_epoch-50.pt")
+    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
     createClassFiles(categories) 
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsYOLOv3()
     trainer.setDataDirectory(data_directory=data_dir_path)
-    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=30, train_from_pretrained_model=model_path)
+    trainer.setTrainConfig(object_names_array=categories, batch_size=64, num_experiments=50, train_from_pretrained_model=model_path)
     trainer.trainModel()
 
 def testModel():
     execution_path = os.path.dirname(__file__)
     detector = CustomObjectDetection()
     detector.setModelTypeAsYOLOv3()
-    detector.setModelPath(os.path.join(execution_path , "Modelle/yolov3_DataSet_last.pt")) # path to custom trained model
-    detector.setJsonPath(os.path.join(execution_path , "Modelle/DataSet_yolov3_detection_config.json")) # path to corresponding json
+    modelPath = os.path.join(execution_path , "Modelle/mixed_data_merged/yolov3_DataSet_mixedData_epoch-80.pt")
+    jsonPath = os.path.join(execution_path , "Modelle/DataSet_yolov3_detection_config.json")
+    detector.setModelPath(modelPath) # path to custom trained model
+    detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path ,
-    'snapshot.jpg'), output_image_path=os.path.join(execution_path ,'snapshot-detected.jpg'),
-    nms_treshold = 0.1,
-    objectness_treshold = 0.6)
+    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path ,'snapshot.jpg'), output_image_path=os.path.join(execution_path ,'snapshot-detected.jpg'),
+    nms_treshold = 0.4,
+    objectness_treshold = 0.4)
     for detection in detections:
         print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
 
@@ -148,21 +149,51 @@ def moveTableNodes(supervisor,table):
         angle = random.uniform(1, 360)
         obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
 
-def spinTableNodes(supervisor,table):
-    print('Randomize objects rotation on table')
+
+def single_objectImage_setup(supervisor,table):
+    global single_objectImage_setup_counter
+    
+
+def moveViewPointAround(supervisor,table):
+    global lastViewPointPos
+    print(f'moveViewPoint with index: {lastViewPointPos} called')
+    positions = [[1.1844, -0.101363, 1.13083],
+                [1.50827,-0.565378,1.0785],
+                [1.8847,-0.0885509,1.08804],
+                [1.48313,0.243925,1.06886]]
+    orientations = [[0.0315591,0.999032,0.0306494,0.832904],
+                    [-0.264641,0.28607,0.920939,1.6946],
+                    [-0.358425,0.00291554,0.933554,3.21961],
+                    [0.327652,0.330169,-0.88523,1.57763]]
+    viewPoint = supervisor.getFromDef('Viewpoint')
+    orientation = viewPoint.getField('orientation')
+    position = viewPoint.getField('position')
+    orientation.setSFRotation(orientations[lastViewPointPos])
+    position.setSFVec3f(positions[lastViewPointPos])
+    lastViewPointPos = (lastViewPointPos+1)%4
+  
+
+def swapObj(index,table,supervisor):
+    baseX = -0.115024
+    baseY = -2.20312
+    baseZ = 0.74
     for cat in categories:
         obj = supervisor.getFromDef(cat)
-        xRotation = random.uniform(1, 360)
-        yRotation = random.uniform(1, 360)
-        zRotation = random.uniform(1, 360)
-        angle = random.uniform(1, 360)
-        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+        obj.getField('translation').setSFVec3f([baseX, baseY, baseZ])
+    tableCenter = table.local2world([0.5,0.5,0])
+    x = tableCenter[0]
+    y = tableCenter[1]
+    print(tableCenter)    
+    supervisor.getFromDef(categories[index]).getField('translation').setSFVec3f([x,y,baseZ])
 
-def generateTrainingsData(amount, supervisor, camera, table):
-    for i in range(amount):
-        moveTableNodes(supervisor,table) #no physics after call?
-        makeSnapshot(camera,'train')
-            
+def spinTableNode(supervisor,index):
+    obj = supervisor.getFromDef(categories[index])
+    xRotation = random.uniform(1, 360)
+    yRotation = random.uniform(1, 360)
+    zRotation = random.uniform(1, 360)
+    angle = random.uniform(1, 360)
+    obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+
 def compare_directories(path1, path2):
     files1 = []
     for file in os.listdir(path1):
