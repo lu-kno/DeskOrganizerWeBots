@@ -239,17 +239,15 @@ class RobotArm():
             return -1
 
     @looper
-    def singleObjectImageLoop(self,sampleSize,type):
-        if(self.loopCount == 0):
-            TrainingsHelper.moveViewPointAround(self.supervisor,self.mainTable)
+    def singleObjectImageLoop(self,imagesPerPerspective,type):
         if self.loopCount % 10 == 0:
             if self.loopCount % 20 == 0:
-                TrainingsHelper.spinTableNode(self.supervisor,self.mainTable)
+                TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
             else:
-                #TrainingsHelper.makeSnapshot(self.camera,type)
+                TrainingsHelper.makeSnapshot(self.dataCam,type)
                 self.dataCount +=1
         self.loopCount += 1
-        if self.dataCount>sampleSize:
+        if self.dataCount>imagesPerPerspective*32: # amountPerspectives*amountObjects = 32 
             return -1
 
     def stepOperations(self):
@@ -418,12 +416,10 @@ class RobotArm():
             self.randomPosSamplingLoop(150,'train')
         if (key==ord('P')):
             print("pressed: P")
-            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            #self.randomPosSamplingLoop(400,'train')
+            self.randomPosSamplingLoop(200,'train')
         if (key==self.keyboard.SHIFT+ord('P')):
             print("pressed:shift +  P")
-            #TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-            #self.randomPosSamplingLoop(100,'validation')    
+            self.randomPosSamplingLoop(50,'validation')    
         if (key==ord('L')):
             print("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
@@ -432,14 +428,10 @@ class RobotArm():
             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
         if (key==ord('K')):
             print("pressed: K")
-            #self.camera.saveImage("snapshot.jpg",100)
-            #TrainingsHelper.makeSnapshot(self.camera, 'train')
-            #TrainingsHelper.spinTableNode(self.supervisor,4)
-            TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,2)  
+            self.singleObjectImageLoop(8,'train')
         if (key==self.keyboard.SHIFT+ord('K')):  
             print("pressed: shift K")
-            #TrainingsHelper.swapObj(4,self.mainTable,self.supervisor)
-            #TrainingsHelper.makeSnapshot(self.camera, 'validation')  
+            self.singleObjectImageLoop(2,'validation')
         if (key==ord('7')):  
             TrainingsHelper.moveViewPoint(self.supervisor,0)
         if (key==ord('8')):  

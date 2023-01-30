@@ -199,8 +199,8 @@ Irb4600-40 {
       recognitionColors [
         0 0 0
       ]
-      width 2560
-      height 1422
+      width 416
+      height 416
       antiAliasing TRUE
       recognition Recognition {
         maxRange 500

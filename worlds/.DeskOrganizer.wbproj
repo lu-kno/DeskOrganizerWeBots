@@ -11,4 +11,4 @@ textFiles: -1
 globalOptionalRendering: CoordinateSystem::JointAxes::ConnectorAxes
 consoles: Console:All:All
 renderingDevicePerspectives: IRB 4600/40:camera;1;0.510013;0;0.0020284
-renderingDevicePerspectives: IRB 4600/40:dataCam;1;0.104274;0.682573;0.0073593
+renderingDevicePerspectives: IRB 4600/40:dataCam;1;0.0944468;0.682573;0.0073593
