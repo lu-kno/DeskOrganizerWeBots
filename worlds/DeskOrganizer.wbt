@@ -6,7 +6,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/WoodenBox.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/VarnishedPine.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/neuronics/ipr/protos/IprHd6m180.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/robotiq/protos/Robotiq3fGripper.proto"
 EXTERNPROTO "../protos/Irb4600-40.proto"
@@ -44,10 +43,10 @@ RectangleArena {
   floorTileSize 1 1
 }
 DEF computer_mouse ComputerMouse {
-  translation 0.116771 -1.83369 0.77
+  translation 1.7833 0.292505 0.77
 }
 DEF can Can {
-  translation 0.119615 -1.97009 0.94
+  translation 1.56222 -0.774881 0.94
   rotation 1 0 0 4.692820414042842e-06
 }
 DEF TARGET Solid {
@@ -113,9 +112,6 @@ Table {
       scale 4 5
     }
   }
-}
-IprHd6m180 {
-  translation -0.287526 1.55754 0.74
 }
 WoodenBox {
   translation -0.26 -2.24 0.3
@@ -211,7 +207,7 @@ Irb4600-40 {
   staticBase TRUE
 }
 DEF apple Apple {
-  translation -0.321182 -2.1365 0.76
+  translation 1.94223 0.720946 0.76
 }
 DEF Follower Solid {
   translation 0.517137 1.12984 0.8
@@ -229,7 +225,7 @@ DEF Follower Solid {
   name "solid(2)"
 }
 DEF hammer Hammer {
-  translation -0.130906 -1.86575 0.774
+  translation 1.58746 -0.270414 0.774
 }
 Knife {
   translation -0.431633 1.12673 0.77
@@ -241,16 +237,14 @@ DEF wooden_spoon WoodenSpoon {
   translation 0.0770881 1.25193 0.74
 }
 DEF beer_bottle BeerBottle {
-  translation -0.242403 -1.9668 0.77
+  translation 1.28406 -0.482817 0.77
   rotation 0.6947480600338772 -0.18615701608601462 0.6947450600336179 -2.7734953071795863
 }
 DEF orange Orange {
-  translation 0.223066 -1.90298 0.85
+  translation 1.74459 -0.603725 0.85
 }
 DEF Cylinder MyCylinder {
-  translation 0.116671 -2.1705 0.79
 }
 DEF Cube Cube {
-  translation -0.115024 -2.20312 0.8
   name "box2"
 }
