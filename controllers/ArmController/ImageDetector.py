@@ -14,6 +14,7 @@ import warnings
 import random
 from scipy.ndimage import zoom
 import yaml
+from logger import logger
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
@@ -22,8 +23,9 @@ SAVEFIGS=True
 categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
 
 
-class ImageScanner:
-    def __init__(self, master, model='webots'):
+class ImageScanner(logger):
+    def __init__(self, master, model='webots',**kwargs):
+        super().__init__(**kwargs)
         if model=='webots':
             self.scanImage = self.webotsScan
         else:
@@ -37,8 +39,8 @@ class ImageScanner:
         if not np.any(img):
             return []
         objectsRes = self.camera.getRecognitionObjects()
-        print(f"np.max(img) = {np.max(img)}")
-        print(f"np.shape(img) = {np.shape(img)}")
+        self.logD(f"np.max(img) = {np.max(img)}")
+        self.logD(f"np.shape(img) = {np.shape(img)}")
         # print(img)
 
         objects=[]
@@ -71,7 +73,7 @@ class ImageScanner:
         # print(json.dumps(objects,indent=4))
         with open('recognitionObject.yaml','w+') as f:
             f.write(yaml.dump(objects))
-        print(yaml.dump(objects))
+        self.logD(yaml.dump(objects))
         return objects
         
 
