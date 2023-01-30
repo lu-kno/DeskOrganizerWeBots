@@ -434,10 +434,20 @@ class RobotArm():
             print("pressed: K")
             #self.camera.saveImage("snapshot.jpg",100)
             #TrainingsHelper.makeSnapshot(self.camera, 'train')
-            TrainingsHelper.moveViewPointAround(self.supervisor,self.mainTable)   
+            #TrainingsHelper.spinTableNode(self.supervisor,4)
+            TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,2)  
         if (key==self.keyboard.SHIFT+ord('K')):  
             print("pressed: shift K")
+            #TrainingsHelper.swapObj(4,self.mainTable,self.supervisor)
             #TrainingsHelper.makeSnapshot(self.camera, 'validation')  
+        if (key==ord('7')):  
+            TrainingsHelper.moveViewPoint(self.supervisor,0)
+        if (key==ord('8')):  
+            TrainingsHelper.moveViewPoint(self.supervisor,1)
+        if (key==ord('9')):  
+            TrainingsHelper.moveViewPoint(self.supervisor,2)
+        if (key==ord('0')):  
+            TrainingsHelper.moveViewPoint(self.supervisor,3)
 
     def moveTo(self, pos, rotation=None):
         '''

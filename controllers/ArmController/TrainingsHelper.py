@@ -20,8 +20,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # imageHeight = 1422
 SAVEFIGS=True
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
-lastViewPointPos = 0
-single_objectImage_setup_counter = 0
+
 def startTraining():
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
@@ -149,14 +148,30 @@ def moveTableNodes(supervisor,table):
         angle = random.uniform(1, 360)
         obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
 
+lastViewPointPos = 0
+count = 0
+currentNode = 0
+def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
+    global count, currentNode, lastViewPointPos
+    amountViewpoints = 4
+    # init Viewpoint pos for first run
+    if(count==0): 
+        moveViewPoint(supervisor,lastViewPointPos)
+        swapObj(currentNode,table,supervisor)
+    # change Viewpoint if given imagesPerViewpoint is met
+    if((count % imagesPerViewpoint) == 0):
+        lastViewPointPos = (lastViewPointPos+1)%4
+        moveViewPoint(supervisor,lastViewPointPos)
+    # change object if given parameter is met
+    if((count % (imagesPerViewpoint*amountViewpoints))==0):
+        currentNode = (currentNode+1) % len(categories)
+        swapObj(currentNode,table,supervisor)
 
-def single_objectImage_setup(supervisor,table):
-    global single_objectImage_setup_counter
+    spinTableNode(supervisor,table,currentNode)
+    count += 1
     
-
-def moveViewPointAround(supervisor,table):
-    global lastViewPointPos
-    print(f'moveViewPoint with index: {lastViewPointPos} called')
+def moveViewPoint(supervisor,index):
+    print(f'moveViewPoint with index: {index} called')
     positions = [[1.1844, -0.101363, 1.13083],
                 [1.50827,-0.565378,1.0785],
                 [1.8847,-0.0885509,1.08804],
@@ -168,31 +183,36 @@ def moveViewPointAround(supervisor,table):
     viewPoint = supervisor.getFromDef('Viewpoint')
     orientation = viewPoint.getField('orientation')
     position = viewPoint.getField('position')
-    orientation.setSFRotation(orientations[lastViewPointPos])
-    position.setSFVec3f(positions[lastViewPointPos])
-    lastViewPointPos = (lastViewPointPos+1)%4
+    orientation.setSFRotation(orientations[index])
+    position.setSFVec3f(positions[index])
   
 
 def swapObj(index,table,supervisor):
+    print(f'swapObj with index: {index} called')
     baseX = -0.115024
     baseY = -2.20312
-    baseZ = 0.74
+    baseZ = 0.9
     for cat in categories:
         obj = supervisor.getFromDef(cat)
-        obj.getField('translation').setSFVec3f([baseX, baseY, baseZ])
+        obj.getField('translation').setSFVec3f([baseX, baseY, 0])
     tableCenter = table.local2world([0.5,0.5,0])
     x = tableCenter[0]
     y = tableCenter[1]
     print(tableCenter)    
     supervisor.getFromDef(categories[index]).getField('translation').setSFVec3f([x,y,baseZ])
 
-def spinTableNode(supervisor,index):
+def spinTableNode(supervisor,table,index):
     obj = supervisor.getFromDef(categories[index])
+    tableCenter = table.local2world([0.5,0.5,0])
+    x = tableCenter[0]
+    y = tableCenter[1]
+    z = 0.9
     xRotation = random.uniform(1, 360)
     yRotation = random.uniform(1, 360)
     zRotation = random.uniform(1, 360)
     angle = random.uniform(1, 360)
     obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+    obj.getField('translation').setSFVec3f([x, y, z])
 
 def compare_directories(path1, path2):
     files1 = []
