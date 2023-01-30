@@ -9,6 +9,7 @@ import numbers
 from warnings import warn
 import yaml
 from logger import logger
+from looper import looper, looperTimeout
 
 from controller.wb import wb
 
@@ -29,32 +30,6 @@ if ikpy.__version__[0] < '3':
     sys.exit('The "ikpy" Python module version is too old. '
              'Please upgrade "ikpy" Python module to version "3.0" or newer with this command: "pip install --upgrade ikpy"')
 IKPY_MAX_ITERATIONS = 4
-
-
-    
-def looper(func):
-    '''Wrapper to loop function while continuing simulation until '-1' is returned'''
-    def inner(self,*args,**kwargs):
-        while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
-            if func(self, *args,**kwargs)==-1:
-                return
-    return inner    
-
-def looperTimeout(func):
-    '''Wrapper to loop function while continuing simulation until '-1' is returned or timeout is reached'''
-    def inner(self,*args,**kwargs):
-        timeout = 10000
-        while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
-            if func(self, *args,**kwargs)==-1:
-                return
-
-            timeout-=self.timestep
-            if timeout<0:
-                self.logW(f'TIMED OUT: {func.__name__}')
-                return
-    return inner
 
 
 
