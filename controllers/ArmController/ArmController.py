@@ -7,6 +7,9 @@ import time
 from controller import Supervisor, Robot, Camera, Motor
 import numbers
 from warnings import warn
+import yaml
+from logger import logger
+from looper import looper, looperTimeout
 
 from controller.wb import wb
 
@@ -29,36 +32,14 @@ if ikpy.__version__[0] < '3':
 IKPY_MAX_ITERATIONS = 4
 
 
-    
-def looper(func):
-    '''Wrapper to loop function while continuing simulation until '-1' is returned'''
-    def inner(self,*args,**kwargs):
-        while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
-            if func(self, *args,**kwargs)==-1:
-                return
-    return inner    
 
-def looperTimeout(func):
-    '''Wrapper to loop function while continuing simulation until '-1' is returned or timeout is reached'''
-    def inner(self,*args,**kwargs):
-        timeout = 10000
-        while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
-            if func(self, *args,**kwargs)==-1:
-                return
-
-            timeout-=self.timestep
-            if timeout<0:
-                print(f'TIMED OUT: {func.__name__}')
-                return
-    return inner
-
-class MyGripper:
+class MyGripper(logger):
     SPEED = 5 # SPEED in DEGREES
     GRIP_FORCE = 2
     
-    def __init__(self,master):
+    def __init__(self,master, **kwargs):
+        super().__init__(**kwargs)
+        
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
         self.f2 = [master.supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
         self.f3 = [master.supervisor.getDevice(f'finger_middle_joint_{i}') for i in [1,2,3]]
@@ -68,27 +49,6 @@ class MyGripper:
         self.master = master
         self.supervisor = master.supervisor
         self.timestep = master.timestep
-        
-    @looperTimeout
-    def closeOld(self):
-        # inc = 0.5
-        closed = np.array([0 for f in self.fingers])
-        maxDiff = 0
-        for i, f in enumerate(self.fingers):
-            maxDiff = max(abs(f[0].getPositionSensor().getValue() - f[0].getMaxPosition()),maxDiff)
-            # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
-            if f[0].getForceFeedback()<self.GRIP_FORCE:
-                f[0].setPosition(f[0].getMaxPosition())
-            else:
-                f[0].setPosition(f[0].getPositionSensor().getValue())
-                closed[i] = 1
-                
-        if np.all(closed==1):
-            return -1
-            
-        if maxDiff<0.05:
-            print('Gripper Closed Completely')
-            return -1
         
     @looperTimeout
     def close(self):
@@ -101,10 +61,8 @@ class MyGripper:
         # currentPositionsTip = np.array([f[2].getPositionSensor().getValue() for f in self.fingers])
         closedFingers = []
                 
-        print(f'speed -> {inc/self.timestep}')
-        # print(f'meanForce -> {np.mean(forces)}')
-        # print(f'maxForce -> {np.max(forces)}')
-        print(f'Forces:  {"   ".join([f"{f:>7.2f}" for f in forces])}')
+        self.logVV(f'speed -> {inc/self.timestep}')
+        self.logVV(f'Forces:  {"   ".join([f"{f:>7.2f}" for f in forces])}')
         
         for finger, force, maxPos, minPosTip, pos in zip(self.fingers,forces,maxPositions, minPositionsTip,positions): #
             if abs(pos-maxPos)<0.05 or force>self.GRIP_FORCE:
@@ -118,11 +76,16 @@ class MyGripper:
         if np.all(closedFingers):
             return -1    
             
+    @looperTimeout
     def open(self):
+        maxForce = 0
         for f in self.fingers:
             # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
             f[0].setPosition(f[0].getMinPosition())
             f[2].setPosition(f[2].getMaxPosition())
+            maxForce = max(maxForce,f[0].getForceFeedback(),f[1].getForceFeedback())
+        if maxForce<self.GRIP_FORCE:
+            return -1
             
     def enable(self,*args):
         self.enableForceFeedback(*args)        
@@ -130,29 +93,31 @@ class MyGripper:
     def enableForceFeedback(self,*args):
         for i, f in enumerate(self.fingers):
             for ii,j in enumerate(f):
-                print(f'enabling ForceFB: Finger {i}, {ii}')
+                self.logD(f'enabling ForceFB: Finger {i}, {ii}')
                 try:
                     j.enableForceFeedback(self.timestep)
                 except TypeError as te:
                     warn(te, category=None, stacklevel=1)
-                    warn('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
+                    self.logW('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
                     j.enableForceFeedback()
                     
-                print(j.getForceFeedbackSamplingPeriod())
+                self.logD(j.getForceFeedbackSamplingPeriod())
                 j.getPositionSensor().enable(self.timestep)
             
     def printForces(self):
-        print(f'forces:')
+        self.log(f'forces:')
         for i,f in enumerate(self.fingers):
-            print(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
+            self.log(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
             
 
-class RobotArm():
-    HAND_LENGTH = 0.375 ## To Do: This value needs to be checked. Might need to be .03 larger
+class RobotArm(logger):
+    HAND_LENGTH = 0.365#75 ## To Do: This value needs to be checked. Might need to be .03 larger
     SAFE_HEIGHT = 0.3
-
+    HOME_POSITION = [0.7, 0, 1.1]
     
-    def __init__(self):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        
         self.supervisor = Supervisor()
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
         
@@ -161,7 +126,7 @@ class RobotArm():
         self.keyboard = self.supervisor.getKeyboard()
         self.keyboard.enable(10)
         
-        self.gripper = MyGripper(self)
+        self.gripper = MyGripper(self, logging=self.logging)
         self.gripper.enable(self.timestep)
 
         self.camera = Camera('camera')
@@ -208,11 +173,20 @@ class RobotArm():
         
         # Get Self
         self.arm = self.supervisor.getSelf()
+        
+        # Get Image Scanner
+        self.imageScanner = ImageDetector.ImageScanner(self, model='webots')
+        self.foundObjects = []
+        
+        # Object Info
+        with open('Objects.yaml','r') as f:
+            self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
+        self.logVV('Known Object Info: \n',self.objectInfo)
 
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
-        self.loop()
+        self.autoloop()
     
     @looper
     def loop(self):
@@ -222,9 +196,28 @@ class RobotArm():
         image2worldTest(self)
     
     @looper
-    def autoLoop(self):
+    def autoloop(self):
         self.handleKeystroke()
-        self.moveTo([])
+        self.moveTo(self.HOME_POSITION)
+        objects = self.imageScanner.scanImage()
+        self.organizeObjects(objects)
+        
+        
+    def organizeObjects(self, objects):
+        for obj in objects:
+            destination = self.mainTable.local2world([-0.1,0.9,0])
+            voffset = 0
+            
+            if obj['name'] in self.objectInfo.keys():
+                voffset = self.objectInfo[obj['name']]['voffset'] 
+                destination = self.objectInfo[obj['name']]['destination']
+                
+            destination[2] = destination[2] + voffset
+            worldpos = self.mainTable.local2world(obj['position']+[voffset])
+            self.logV(f"{obj['name']} Pos in Table: {obj['position']}")
+            self.logV(f"{obj['name']} Pos in World: {worldpos}")
+            
+            self.pickNplace(worldpos, destination , rotation=obj['orientation']-np.pi/2)
     
     @looper
     def randomPosSamplingLoop(self,sampleSize,type):
@@ -260,8 +253,6 @@ class RobotArm():
         diffP = self.lastDCamPos - np.array(vpPos)
         diffO = self.lastDCamOri - np.array(vpOri)
         
-        # print(f'PosDiff: {diffP}')
-        # print(f'OriDiff: {diffO}')
         if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
             self.lastDCamPos = np.array(vpPos)
             self.lastDCamOri = np.array(vpOri)
@@ -285,7 +276,7 @@ class RobotArm():
     
         # Call "ikpy" to compute the inverse kinematics of the arm.
         initial_position = [0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
-        print(f'len(initial_position) -> {len(initial_position)}')
+        self.logV(f'len(initial_position) -> {len(initial_position)}')
         ikResults = self.armChain.inverse_kinematics([x, y, z], max_iter=IKPY_MAX_ITERATIONS, initial_position=initial_position)
     
         # Actuate the 3 first arm motors with the IK results.
@@ -302,7 +293,7 @@ class RobotArm():
         elif self.supervisor.getTime() > 1.5:
             # Note: start to draw at 1.5 second to be sure the arm is well located.
             # supervisor.getFromDef('GRIPPER').close(True)
-            print("TO DO: Close Gripper")
+            self.logV("TO DO: Close Gripper")
         return
     
     
@@ -358,37 +349,32 @@ class RobotArm():
         
         x,y,z = self.target.getPosition()
         ballSpeed = 0.03
-        
-        # if (key==ord('T')):
-            # goToSphere()           
-            
+                    
         # print positions
         if (key==ord('F')):
-            print(f'targetPosition - > {self.target.getPosition()}')
-            print(f'armPosition - > {self.arm.getPosition()}')
-            print(f'motorPositions:\n\t{[m.getPositionSensor().getValue() for m in self.motors]}')
-        
-        #gripper.printForces()
-        
+            self.log(f'targetPosition - > {self.target.getPosition()}')
+            self.log(f'armPosition - > {self.arm.getPosition()}')
+            self.log(f'motorPositions:\n\t{[m.getPositionSensor().getValue() for m in self.motors]}')
+                
         if (key==ord('Q')):
             self.gripper.close()
-            print('closing grip')
+            self.log('closing grip')
         if (key==ord('E')):
             self.gripper.open()
-            print('opening grip')  
+            self.log('opening grip')  
             
         if (key==ord('1')):
-            print('Picking Up Object')
+            self.log('Picking Up Object')
             self.pickUpObject([x,y,z])
         if (key==ord('3')):
-            print('Releasing object')   
+            self.log('Releasing object')   
             self.deliverObject([x,y,z])     
     
     
         #reset starting position
         if (key==ord('R')):
-            print(self.target)
-            print(type(self.target))
+            self.log(self.target)
+            self.log(type(self.target))
             self.targetTranslation.setSFVec3f([1.44, 0, 1.77])
             
         if (key==ord('W')):
@@ -406,12 +392,11 @@ class RobotArm():
             self.targetTranslation.setSFVec3f([x,y,z-ballSpeed])
 
         #trigger Camera and Img interpretation
-
         if (key==ord('I')):
-            print("pressed: I")
+            self.log("pressed: I")
             self.collectData=True
         if (key==ord('O')):
-            print("pressed: O")
+            self.log("pressed: O")
             self.collectData=False
             self.randomPosSamplingLoop(150,'train')
         if (key==ord('P')):
@@ -421,7 +406,7 @@ class RobotArm():
             print("pressed:shift +  P")
             self.randomPosSamplingLoop(50,'validation')    
         if (key==ord('L')):
-            print("pressed: L")
+            self.log("pressed: L")
             #self.camera.saveImage("snapshot.jpg",100)
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
@@ -480,7 +465,9 @@ class RobotArm():
             
             w3 = 0 # forearm rotation (should always point to 0 (down))
             w4 = math.pi/2-w1-w2#math.atan(h/z) + math.acos((b*b+c*c-a*a)/(2*b*c)) - math.pi/2# wrist direction
+            
             w5 = w0 + rotation# wrist rotation
+            # w5 = ((w0+np.pi/2)%np.pi)-np.pi + rotation
             
             if x<0:
                 w0 += math.pi
@@ -491,9 +478,8 @@ class RobotArm():
             self.setPosition(motor_angles)
             self.awaitPosition(motor_angles)
                 
-                
         except Exception as e:
-            print(e)
+            self.logW(e)
             
     def clipAngles(self, angles):
         '''
@@ -606,12 +592,7 @@ class RobotArm():
         self.pickUpObject(position, rotation=rotation)
         self.deliverObject(destination, method=place_method)
         
-            
-    # def sleep(self, ms):
-    #     while ms>0:
-    #         self.supervisor.step(self.timestep)
-    #         ms -= self.timestep
-        
+
         
         
         
@@ -621,61 +602,15 @@ class RobotArm():
 def image2worldTest(arm):
     mover = arm.supervisor.getFromDef('Mover').getField('translation')
     imageRef = arm.supervisor.getFromDef('MoverReference')
-    # MainTable = supervisor.getFromDef('MainTable')
-    
     
     follower = arm.supervisor.getFromDef('Follower').getField('translation')
     
-    #print(f'mover -> {mover}')
-    #print(f'mover.getSFVec3f() -> {mover.getSFVec3f()}')
-    
-    # res = image2world(mover.getSFVec3f(),MainTable.getPosition(), rotation=MainTable.getField('rotation').getSFVec3f(),tableSize=MainTable.getField('size').getSFVec3f())
     res = arm.mainTable.local2world(mover.getSFVec3f())
     
     xn,yn,zn = res
     follower.setSFVec3f([xn,yn,zn])
-    # follower.setSFVec3f(np.array([0,0,0]))
     
         
-# def image2world(pos, tableOrigin, tableSize=None, rotation=None):
-#     ''' this function tranforms the coordinates from the table to world coordinates.
-#     if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from -1 to +1'''
-    
-
-#     Sx, Sy, Sz = -1,1,-1
-#     tx,ty,tz = tableOrigin
-#     tx+=tableSize[0]/2
-#     ty+=tableSize[1]/2
-        
-#     if tableSize is not None:
-#         tz=tz+tableSize[2]
-#         # Sx, Sy, Sz = tableSize[0]/2, tableSize[1]/2, 1
-    
-#     if rotation is None:
-#         rotation[0,0,1,0]
-#     a = rotation[2]*rotation[3]
-    
-#     # tMat = [
-#     #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
-#     #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
-#     #     [0,               0,              Sz,   tz],
-#     #     [0,               0,              0,    1]
-#     # ]
-#     tMat = [
-#         [0,  -Sy,   0,    tx],
-#         [Sx,  0,    0,    ty],
-#         [0,   0,    Sz,   tz],
-#         [0,   0,    0,    1]
-#     ]
-    
-#     if len(pos)==3:
-#         pos = np.array([*pos,1])
-    
-#     res = np.matmul(tMat,pos)[:3]
-#     #print(f'pos: {pos}')
-#     #print(f'result: {res}')
-#     return res
-    
     
 class Table:
     def __init__(self, node):
@@ -729,7 +664,7 @@ class Table:
         
         
         
-robot = RobotArm()
+robot = RobotArm(logging='Very_verbose')
 robot.start()
 
 
