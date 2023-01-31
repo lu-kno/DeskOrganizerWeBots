@@ -197,7 +197,7 @@ class RobotArm(logger):
         '''Robots setup routine'''
         # self.drawCircle()
         self.moveTo(self.HOME_POSITION)
-        self.loop()
+        self.autoloop()
     
     @looper
     def loop(self):
