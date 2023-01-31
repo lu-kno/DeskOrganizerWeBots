@@ -5,6 +5,8 @@ import os
 from pprint import pprint
 import cv2
 import numpy as np
+import matplotlib
+matplotlib.use('TKAgg')
 from matplotlib import pyplot as plt
 import ctypes
 from pathlib import Path
@@ -15,11 +17,37 @@ import warnings
 import random
 from scipy.ndimage import zoom
 import random
+from logger import logger
 warnings.filterwarnings("ignore", category=UserWarning) 
 # imageWidth = 2560
 # imageHeight = 1422
 SAVEFIGS=True
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
+
+class MyModel(logger):
+    def __init__(self, logging='D', logName='ImageAImodel'):
+        super().__init__(logging=logging, logName=logName)
+        
+        self.execution_path = os.path.dirname(__file__)
+        self.detector = CustomObjectDetection()
+        self.detector.setModelTypeAsYOLOv3()
+        self.modelPath = os.path.join(self.execution_path , "Modelle/first/yolov3_DataSet_last.pt")
+        self.jsonPath = os.path.join(self.execution_path , "Modelle/first/DataSet_yolov3_detection_config.json")
+        self.detector.setModelPath(self.modelPath) # path to custom trained model
+        self.detector.setJsonPath(self.jsonPath) # path to corresponding json
+        self.detector.loadModel()
+
+    def getObjectsFromImage(self, image):
+        
+        detections = self.detector.detectObjectsFromImage(input_image=image, 
+                                                    output_image_path=os.path.join(self.execution_path ,'snapshot-detected.jpg'),
+                                                    nms_treshold = 0.05,
+                                                    objectness_treshold = 0.5,
+                                                    minimum_percentage_probability = 90)
+        
+        return detections
+        
+
 
 def startTraining():
     execution_path = os.path.dirname(__file__)

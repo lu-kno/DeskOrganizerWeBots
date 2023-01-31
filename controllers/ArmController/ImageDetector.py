@@ -24,8 +24,8 @@ categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','for
 
 
 class ImageScanner(logger):
-    def __init__(self, master, model='webots',**kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, master, model='webots', logging='D', logName='ImageScanner', **kwargs):
+        super().__init__(logging=logging, logName=logName, **kwargs)
         if model=='webots':
             self.scanImage = self.webotsScan
         else:
@@ -33,14 +33,83 @@ class ImageScanner(logger):
         
         self.master=master
         self.camera=master.camera
+        self.imageAImodel=TrainingsHelper.MyModel(logging=logging)
+        
+    def imageAIScan(self):
+        
+        self.camera.saveImage('snapshot.jpg',100)
+        img = cv2.imread('snapshot.jpg').astype('uint8')
+        plt.imshow(img)
+        plt.suptitle('using saveImage and imread')
+        plt.show()
+        
+        # # The following block is bugged
+        # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
+        # plt.imshow(img)
+        # plt.suptitle('using getImageArray and removing alpha')
+        # plt.show()
+        
+        # imgraw = np.array(list(self.camera.getImageArray()),dtype='uint8').reshape((1066, 1920, 3))
+        # img = imgraw[:,:,::-1]
+        # plt.imshow(img)
+        # plt.suptitle('using getImageArray, removing alpha and reshape((HEIGTH, WIDTH, 3)')
+        # plt.show()
+        # plt.imshow(imgraw)
+        # plt.suptitle('using getImageArray, removing alpha and reshape((HEIGTH, WIDTH, 3)')
+        # plt.show()
+        
+        
+        self.log(f"img.shape: {img.shape}")
+        self.log(f"img.dtype: {img.dtype}")
+        self.log(f"img.unique: {np.unique(img)}")
+        if not np.any(img):
+            return []
+        objectsRaw = self.imageAImodel.getObjectsFromImage(img)
+        
+        objects = []
+        
+        for obj in objectsRaw:
+            
+            boxPoints = np.reshape(obj['box_points'],[2,2]) # reshape from [4] to [2x2]
+            
+            posAbsolute = boxPoints.mean(0)
+            pos = posAbsolute/np.array(img.shape[1::-1])
+            
+            # boxPointsMargin = boxPoints+ np.array([[-5,-5],[5,5]])
+            
+            
+            objImage = img[boxPoints[0,1]:boxPoints[1,1],boxPoints[0,0]:boxPoints[1,0]]
+            
+            # objImage = img[max(boxPoints[0,0]-5,0):min(boxPoints[1,0]+5,img.shape[0]),max(boxPoints[0,1]-5,0):min(boxPoints[1,1]+5,img.shape[1]),:3]
+            self.logD(f"Name = {obj['name']}")
+            self.logD(f"img.shape [y,x,f] = {img.shape}")
+            self.logD(f"boxPoints  [x1,y1],[x2,y2] = {boxPoints.tolist()}")
+            self.logD(f"pos x,y = {pos}")
+            self.logD(f"objImage.shape [y,x,f] = {objImage.shape}")
+            self.logD(f"np.max(objImage) = {np.max(objImage)}")
+            self.logD(f"====================================")
+            
+            
+            oValues = dict(name = obj['name'],
+                           position = pos.tolist(),
+                           boxPoints = boxPoints.tolist(),
+                           orientation = getAngle(objImage))
+            objects.append(oValues)
+
+        with open('recognitionObject.yaml','w+') as f:
+            f.write(yaml.dump(objects))
+        self.logD(yaml.dump(objects))
+        return objects
+                           
         
     def webotsScan(self):
-        img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
+        
+        self.camera.saveImage('snapshot.jpg', 100)
+        img = cv2.imread('snapshot.jpg')
+        # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
         if not np.any(img):
             return []
         objectsRes = self.camera.getRecognitionObjects()
-        self.logD(f"np.max(img) = {np.max(img)}")
-        self.logD(f"np.shape(img) = {np.shape(img)}")
         # print(img)
 
         objects=[]
@@ -54,12 +123,14 @@ class ImageScanner(logger):
             
             boxPoints = np.array([minCorner, maxCorner])
             
-            objImage = img[minCorner[0]:maxCorner[0],minCorner[1]:maxCorner[1],:3]
-            # print(f"Name = {o.getModel()}")
-            # print(f"size  = {size}")
-            # print(f"pos  = {pos}")
-            # print(f"objImage.shape = {objImage.shape}")
-            # print(f"np.max(objImage) = {np.max(objImage)}")
+            objImage = img[max(minCorner[0]-5,0):min(maxCorner[0],size[0]),max(minCorner[1],0):min(maxCorner[1],size[1]),:3]
+            self.logD(f"Name = {o.getModel()}")
+            self.logD(f"size = {size}")
+            self.logD(f"pos  = {pos}")
+            self.logD(f"objImage.shape = {objImage.shape}")
+            self.logD(f"np.max(objImage) = {np.max(objImage)}")
+            # self.logD(f"np.max(img) = {np.max(img)}")
+            # self.logD(f"np.shape(img) = {np.shape(img)}")
             
             # objImage = img[]
             oValues = dict(  id=o.getId(), 
@@ -377,3 +448,6 @@ matplotlib.use('TKAgg')
 if __name__=="__main__":
     imageAiTest()
     print('DONE')
+
+
+
