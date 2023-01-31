@@ -79,6 +79,10 @@ PROTO WoodenSpoon [
       inertiaMatrix [
         5.86e-06 7.85e-05 8.26e-05 0 1.27e-06 0
       ]
+      damping Damping {
+        linear 0.9
+        angular 0.9
+      }
     }
   }
 }

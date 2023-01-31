@@ -75,6 +75,10 @@ PROTO Fork [
       inertiaMatrix [
         5.59e-06 6.23e-05 5.86e-05 -4.51e-08 -7.39e-06 -2.06e-07
       ]
+      damping Damping {
+        linear 0.9
+        angular 0.9
+      }
     }
   }
 }

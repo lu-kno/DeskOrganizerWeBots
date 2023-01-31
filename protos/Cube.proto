@@ -34,6 +34,10 @@ PROTO Cube [
     }
     physics Physics {
       mass IS mass
+      damping Damping {
+        linear 0.9
+        angular 0.9
+      }
     }
     recognitionColors [
       0.59 0.75 0.28

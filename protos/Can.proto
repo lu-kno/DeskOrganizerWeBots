@@ -58,6 +58,10 @@ Solid {
   physics Physics {
     density -1
     mass IS mass
+    damping Damping {
+      linear 0.9
+      angular 0.9
+    }
   }
 }
 }

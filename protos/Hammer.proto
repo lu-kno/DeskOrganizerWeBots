@@ -1567,6 +1567,10 @@ PROTO Hammer [
       centerOfMass [
         0.08 0 0
       ]
+      damping Damping {
+        linear 0.9
+        angular 0.9
+      }
     }
   }
 }
