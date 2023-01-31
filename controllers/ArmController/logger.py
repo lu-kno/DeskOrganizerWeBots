@@ -24,4 +24,8 @@ class logger():
             self.__print('VV', *args,**kwargs)
             
     def __print(self, level, *args, **kwargs):
-        print(f'[{datetime.datetime.now().time()}][{self.logName}][{level}]',*args,**kwargs)
+        statement = ' '.join([i.__str__() for i in args])
+        prefix = f'[{datetime.datetime.now().time()}][{self.logName}][{level}]'
+        for s in statement.split('\n'):
+            print(prefix,s,**kwargs)
+            prefix = '-'*len(prefix)

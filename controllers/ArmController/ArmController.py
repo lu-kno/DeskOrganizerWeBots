@@ -177,6 +177,7 @@ class RobotArm(logger):
         # Get Image Scanner
         self.imageScanner = ImageDetector.ImageScanner(self, model='imageai',logging=logging)
         self.foundObjects = []
+        self.stopOrganization = False
         
         # Object Info
         with open('Objects.yaml','r') as f:
@@ -200,7 +201,7 @@ class RobotArm(logger):
     def loop(self):
         '''Main loop of the robots controller'''
         self.followSphereFromAbove()
-        self.handleKeystroke()
+        # self.handleKeystroke()
         image2worldTest(self)
     
     @looper
@@ -213,6 +214,9 @@ class RobotArm(logger):
         
     def organizeObjects(self, objects):
         for obj in objects:
+            if self.stopOrganization:
+                self.stopOrganization=False
+                return
             destination = self.mainTable.local2world([-0.1,0.9,0])
             voffset = 0
             
@@ -225,7 +229,7 @@ class RobotArm(logger):
             self.logV(f"{obj['name']} Pos in Table: {obj['position']}")
             self.logV(f"{obj['name']} Pos in World: {worldpos}")
             
-            self.pickNplace(worldpos, destination , rotation=obj['orientation'])#-np.pi/2
+            self.pickNplace(worldpos, destination , rotation=-obj['orientation'])#-np.pi/2
     
     @looper
     def randomPosSamplingLoop(self,sampleSize,type):
@@ -409,10 +413,10 @@ class RobotArm(logger):
             self.collectData=False
             self.randomPosSamplingLoop(150,'train')
         if (key==ord('P')):
-            print("pressed: P")
+            self.log("pressed: P")
             #self.randomPosSamplingLoop(200,'train')
         if (key==self.keyboard.SHIFT+ord('P')):
-            print("pressed:shift +  P")
+            self.log("pressed:shift +  P")
             #self.randomPosSamplingLoop(50,'validation')    
         if (key==ord('L')):
             self.log("pressed: L")
@@ -422,11 +426,12 @@ class RobotArm(logger):
             #ImageDetector.imageAiTest()
             #TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
         if (key==ord('K')):
-            print("pressed: K")
-            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+            self.log("pressed: K")
+            TrainingsHelper.moveTableNodes(self,self.mainTable)
+            self.stopOrganization = True
             #self.singleObjectImageLoop(8,'train')
         if (key==self.keyboard.SHIFT+ord('K')):  
-            print("pressed: shift K")
+            self.log("pressed: shift K")
             #self.singleObjectImageLoop(2,'validation')
         if (key==ord('7')):  
             TrainingsHelper.moveViewPoint(self.supervisor,0)
@@ -670,7 +675,7 @@ class Table(logger):
         if len(pos)==3:
             pos = np.array([*pos,1])
         
-        self.log(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
+        self.logW(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
         
         res = np.matmul(tMat,pos)[:3]
         #print(f'pos: {pos}')

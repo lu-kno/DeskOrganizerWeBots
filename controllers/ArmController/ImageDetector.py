@@ -39,9 +39,9 @@ class ImageScanner(logger):
         
         self.camera.saveImage('snapshot.jpg',100)
         img = cv2.imread('snapshot.jpg').astype('uint8')
-        plt.imshow(img)
-        plt.suptitle('using saveImage and imread')
-        plt.show()
+        # plt.imshow(img)
+        # plt.suptitle('using saveImage and imread')
+        # plt.show()
         
         # # The following block is bugged
         # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]

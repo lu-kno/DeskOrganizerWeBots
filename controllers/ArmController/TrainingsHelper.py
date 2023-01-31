@@ -154,7 +154,7 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         file.writelines(yoloData)
     print('File: '+fileName+' created')
 
-def moveTableNodes(supervisor,table):
+def moveTableNodes(master,table):
     print('Randomize objects position and rotation on table')
     margin = 0.1
     bottomLeft = table.local2world([0,1,0])
@@ -166,16 +166,28 @@ def moveTableNodes(supervisor,table):
     y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
     y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
     for cat in categories:
-        obj = supervisor.getFromDef(cat)
+        obj = master.supervisor.getFromDef(cat)
         x = random.uniform(x_min, x_max)
         y = random.uniform(y_min, y_max)
-        z = bottomLeft[2]+0.1
+        z = bottomLeft[2]#+0.1
         obj.getField('translation').setSFVec3f([x, y, z])
         xRotation = random.uniform(1, 360)
         yRotation = random.uniform(1, 360)
         zRotation = random.uniform(1, 360)
         angle = random.uniform(1, 360)
         obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+    
+    # master.sleep(2)
+    
+    # for cat in categories:
+    #     obj = master.supervisor.getFromDef(cat)
+    #     obj.getField('linearVelocity').setSFVec3f([0,0,0])
+    #     obj.getField('angularVelocity').setSFVec3f([0,0,0])
+    #     self.log(f"{cat} linearVelocity: {obj.getField('linearVelocity').setSFVec3f([0,0,0])}")
+    #     self.log(f"{cat} angularVelocity: {obj.getField('angularVelocity').setSFVec3f([0,0,0])}")
+    
+
+        
 
 lastViewPointPos = 0
 count = 0
