@@ -24,26 +24,27 @@ categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','C
 def startTraining():
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
-    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+    model_path = os.path.join(execution_path , "Modelle/last/yolov3_DataSet_last.pt")
     createClassFiles(categories) 
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsYOLOv3()
     trainer.setDataDirectory(data_directory=data_dir_path)
-    trainer.setTrainConfig(object_names_array=categories, batch_size=64, num_experiments=50, train_from_pretrained_model=model_path)
+    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=50, train_from_pretrained_model=model_path)
     trainer.trainModel()
 
 def testModel():
     execution_path = os.path.dirname(__file__)
     detector = CustomObjectDetection()
     detector.setModelTypeAsYOLOv3()
-    modelPath = os.path.join(execution_path , "Modelle/mixed_data_merged/yolov3_DataSet_mixedData_epoch-80.pt")
-    jsonPath = os.path.join(execution_path , "Modelle/DataSet_yolov3_detection_config.json")
+    modelPath = os.path.join(execution_path , "Modelle/first/yolov3_DataSet_last.pt")
+    jsonPath = os.path.join(execution_path , "Modelle/first/DataSet_yolov3_detection_config.json")
     detector.setModelPath(modelPath) # path to custom trained model
     detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
     detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path ,'snapshot.jpg'), output_image_path=os.path.join(execution_path ,'snapshot-detected.jpg'),
-    nms_treshold = 0.4,
-    objectness_treshold = 0.4)
+    nms_treshold = 0.05,
+    objectness_treshold = 0.5,
+    minimum_percentage_probability = 90)
     for detection in detections:
         print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
 
@@ -261,7 +262,7 @@ def dataSetIntegrityTest():
     print(f"Validation folder integrity: {compare_directories(annotationPathValidation,imagePathValidation)}")
 
 if __name__=="__main__":
-    #testModel()
-    startTraining()
+    testModel()
+    #startTraining()
     #dataSetIntegrityTest()
     print('DONE')

@@ -186,7 +186,7 @@ class RobotArm(logger):
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
-        self.autoloop()
+        self.loop()
     
     @looper
     def loop(self):
@@ -401,22 +401,24 @@ class RobotArm(logger):
             self.randomPosSamplingLoop(150,'train')
         if (key==ord('P')):
             print("pressed: P")
-            self.randomPosSamplingLoop(200,'train')
+            #self.randomPosSamplingLoop(200,'train')
         if (key==self.keyboard.SHIFT+ord('P')):
             print("pressed:shift +  P")
-            self.randomPosSamplingLoop(50,'validation')    
+            #self.randomPosSamplingLoop(50,'validation')    
         if (key==ord('L')):
             self.log("pressed: L")
-            #self.camera.saveImage("snapshot.jpg",100)
+            self.camera.saveImage("snapshot.jpg",100)
+            TrainingsHelper.testModel()
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
-            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+            #TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
         if (key==ord('K')):
             print("pressed: K")
-            self.singleObjectImageLoop(8,'train')
+            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+            #self.singleObjectImageLoop(8,'train')
         if (key==self.keyboard.SHIFT+ord('K')):  
             print("pressed: shift K")
-            self.singleObjectImageLoop(2,'validation')
+            #self.singleObjectImageLoop(2,'validation')
         if (key==ord('7')):  
             TrainingsHelper.moveViewPoint(self.supervisor,0)
         if (key==ord('8')):  
