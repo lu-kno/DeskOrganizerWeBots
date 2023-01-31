@@ -38,7 +38,7 @@ class MyGripper(logger):
     GRIP_FORCE = 2
     
     def __init__(self,master, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(logName='Gripper', **kwargs)
         
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
         self.f2 = [master.supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
@@ -116,7 +116,7 @@ class RobotArm(logger):
     HOME_POSITION = [0.7, 0, 1.1]
     
     def __init__(self,**kwargs):
-        super().__init__(**kwargs)
+        super().__init__(logName='RobotArm', **kwargs)
         
         self.supervisor = Supervisor()
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
@@ -175,23 +175,25 @@ class RobotArm(logger):
         self.arm = self.supervisor.getSelf()
         
         # Get Image Scanner
-        self.imageScanner = ImageDetector.ImageScanner(self, model='webots')
+        self.imageScanner = ImageDetector.ImageScanner(self, model='webots', logging='V_V')
         self.foundObjects = []
         
         # Object Info
         with open('Objects.yaml','r') as f:
             self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
         self.logVV('Known Object Info: \n',self.objectInfo)
+        self.PhotoshootIndex=0
 
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
-        self.autoloop()
+        self.moveTo(self.HOME_POSITION)
+        self.loop()
     
     @looper
     def loop(self):
         '''Main loop of the robots controller'''
-        self.followSphereFromAbove()
+        # self.followSphereFromAbove()
         self.handleKeystroke()
         image2worldTest(self)
     
@@ -202,6 +204,10 @@ class RobotArm(logger):
         objects = self.imageScanner.scanImage()
         self.organizeObjects(objects)
         
+    def singleItemPhotoshoot(self, next=True):
+        if next: 
+            self.PhotoshootIndex= (self.PhotoshootIndex+1)%8
+        TrainingsHelper.swapObj(self.PhotoshootIndex, self.mainTable, self.supervisor)
         
     def organizeObjects(self, objects):
         for obj in objects:
@@ -253,9 +259,11 @@ class RobotArm(logger):
         diffP = self.lastDCamPos - np.array(vpPos)
         diffO = self.lastDCamOri - np.array(vpOri)
         
+        self.lastDCamPos = np.array(vpPos)
+        self.lastDCamOri = np.array(vpOri)
+        
         if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
-            self.lastDCamPos = np.array(vpPos)
-            self.lastDCamOri = np.array(vpOri)
+            self.logV('Taking Snapshot')
             TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         
         return
@@ -398,7 +406,12 @@ class RobotArm(logger):
         if (key==ord('O')):
             self.log("pressed: O")
             self.collectData=False
-            self.randomPosSamplingLoop(150,'train')
+        if (key==ord('N')):
+            self.log("pressed: N")
+            self.singleItemPhotoshoot(next=True)
+            # self.randomPosSamplingLoop(150,'train')
+            
+            
         if (key==ord('P')):
             print("pressed: P")
             self.randomPosSamplingLoop(200,'train')

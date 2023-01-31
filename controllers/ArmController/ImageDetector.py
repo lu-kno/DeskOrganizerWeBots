@@ -15,6 +15,7 @@ import random
 from scipy.ndimage import zoom
 import yaml
 from logger import logger
+import time
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
@@ -25,7 +26,7 @@ categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','for
 
 class ImageScanner(logger):
     def __init__(self, master, model='webots',**kwargs):
-        super().__init__(**kwargs)
+        super().__init__(logName='ImageDetector', **kwargs)
         if model=='webots':
             self.scanImage = self.webotsScan
         else:
@@ -35,14 +36,18 @@ class ImageScanner(logger):
         self.camera=master.camera
         
     def webotsScan(self):
+        t0 = time.perf_counter()
         img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
         if not np.any(img):
             return []
+        self.logV(f"Get Image took {time.perf_counter()- t0}")
+        t0 = time.perf_counter()
         objectsRes = self.camera.getRecognitionObjects()
         self.logD(f"np.max(img) = {np.max(img)}")
         self.logD(f"np.shape(img) = {np.shape(img)}")
+        self.logV(f"Get Objects took {time.perf_counter()- t0}")
+        t0 = time.perf_counter()
         # print(img)
-
         objects=[]
         for o in objectsRes:
             size=np.array(list(o.getSizeOnImage()))
@@ -55,11 +60,11 @@ class ImageScanner(logger):
             boxPoints = np.array([minCorner, maxCorner])
             
             objImage = img[minCorner[0]:maxCorner[0],minCorner[1]:maxCorner[1],:3]
-            # print(f"Name = {o.getModel()}")
-            # print(f"size  = {size}")
-            # print(f"pos  = {pos}")
-            # print(f"objImage.shape = {objImage.shape}")
-            # print(f"np.max(objImage) = {np.max(objImage)}")
+            self.logV(f"Name = {o.getModel()}")
+            self.logV(f"size  = {size}")
+            self.logV(f"pos  = {pos}")
+            self.logV(f"objImage.shape = {objImage.shape}")
+            self.logV(f"np.max(objImage) = {np.max(objImage)}")
             
             # objImage = img[]
             oValues = dict(  id=o.getId(), 
@@ -69,11 +74,16 @@ class ImageScanner(logger):
                             orientation=getAngle(objImage),
                             )
             objects.append(oValues)
+            self.logV(f"Processing Object took {time.perf_counter()- t0}")
+            t0 = time.perf_counter()
         
         # print(json.dumps(objects,indent=4))
         with open('recognitionObject.yaml','w+') as f:
             f.write(yaml.dump(objects))
         self.logD(yaml.dump(objects))
+    
+        self.logV(f"Writing File took {time.perf_counter()- t0}")
+        t0 = time.perf_counter()
         return objects
         
 
