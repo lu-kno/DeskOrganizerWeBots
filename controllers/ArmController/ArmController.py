@@ -37,8 +37,8 @@ class MyGripper(logger):
     SPEED = 5 # SPEED in DEGREES
     GRIP_FORCE = 2
     
-    def __init__(self,master, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self,master, logging='D', logName='Gripper'):
+        super().__init__(logging=logging, logName=logName)
         
         self.f1 = [master.supervisor.getDevice(f'finger_1_joint_{i}') for i in [1,2,3]]
         self.f2 = [master.supervisor.getDevice(f'finger_2_joint_{i}') for i in [1,2,3]]
@@ -115,8 +115,8 @@ class RobotArm(logger):
     SAFE_HEIGHT = 0.3
     HOME_POSITION = [0.7, 0, 1.1]
     
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
+    def __init__(self,logging='D', logName='RobotArm'):
+        super().__init__(logging=logging, logName=logName)
         
         self.supervisor = Supervisor()
         self.timestep = int(4 * self.supervisor.getBasicTimeStep())
@@ -175,7 +175,7 @@ class RobotArm(logger):
         self.arm = self.supervisor.getSelf()
         
         # Get Image Scanner
-        self.imageScanner = ImageDetector.ImageScanner(self, model='webots')
+        self.imageScanner = ImageDetector.ImageScanner(self, model='imageai',logging=logging)
         self.foundObjects = []
         
         # Object Info
@@ -183,10 +183,18 @@ class RobotArm(logger):
             self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
         self.logVV('Known Object Info: \n',self.objectInfo)
 
+    def sleep(self, _time):
+        time = _time
+        while self.supervisor.step(self.timestep) != -1:
+            self.master.stepOperations()
+            time = time - self.timestep
+            if time<0:
+                return
+
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
-        self.loop()
+        self.autoloop()
     
     @looper
     def loop(self):
@@ -197,7 +205,7 @@ class RobotArm(logger):
     
     @looper
     def autoloop(self):
-        self.handleKeystroke()
+        # self.handleKeystroke()
         self.moveTo(self.HOME_POSITION)
         objects = self.imageScanner.scanImage()
         self.organizeObjects(objects)
@@ -217,7 +225,7 @@ class RobotArm(logger):
             self.logV(f"{obj['name']} Pos in Table: {obj['position']}")
             self.logV(f"{obj['name']} Pos in World: {worldpos}")
             
-            self.pickNplace(worldpos, destination , rotation=obj['orientation']-np.pi/2)
+            self.pickNplace(worldpos, destination , rotation=obj['orientation'])#-np.pi/2
     
     @looper
     def randomPosSamplingLoop(self,sampleSize,type):
@@ -244,6 +252,7 @@ class RobotArm(logger):
             return -1
 
     def stepOperations(self):
+        self.handleKeystroke()
         vpPos = self.viewPoint.getField('position').getSFVec3f()
         vpOri = self.viewPoint.getField('orientation').getSFRotation()
         
@@ -614,8 +623,10 @@ def image2worldTest(arm):
     
         
     
-class Table:
-    def __init__(self, node):
+class Table(logger):
+        
+    def __init__(self, node, logging='D', logName='Table'):
+        super().__init__(logging=logging, logName=logName)
         self.node = node
         self.size = node.getField('size').getSFVec3f()
         self.rotation = node.getField('rotation').getSFRotation()
@@ -658,6 +669,8 @@ class Table:
         
         if len(pos)==3:
             pos = np.array([*pos,1])
+        
+        self.log(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
         
         res = np.matmul(tMat,pos)[:3]
         #print(f'pos: {pos}')
