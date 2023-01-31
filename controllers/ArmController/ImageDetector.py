@@ -109,9 +109,9 @@ class ImageScanner(logger):
         # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
         if not np.any(img):
             return []
+
         objectsRes = self.camera.getRecognitionObjects()
         # print(img)
-
         objects=[]
         for o in objectsRes:
             size=np.array(list(o.getSizeOnImage()))
@@ -145,6 +145,7 @@ class ImageScanner(logger):
         with open('recognitionObject.yaml','w+') as f:
             f.write(yaml.dump(objects))
         self.logD(yaml.dump(objects))
+    
         return objects
         
 

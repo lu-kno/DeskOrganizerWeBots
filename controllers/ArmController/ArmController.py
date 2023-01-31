@@ -183,6 +183,7 @@ class RobotArm(logger):
         with open('Objects.yaml','r') as f:
             self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
         self.logVV('Known Object Info: \n',self.objectInfo)
+        self.PhotoshootIndex=0
 
     def sleep(self, _time):
         time = _time
@@ -195,7 +196,8 @@ class RobotArm(logger):
     def start(self):
         '''Robots setup routine'''
         # self.drawCircle()
-        self.autoloop()
+        self.moveTo(self.HOME_POSITION)
+        self.loop()
     
     @looper
     def loop(self):
@@ -211,6 +213,10 @@ class RobotArm(logger):
         objects = self.imageScanner.scanImage()
         self.organizeObjects(objects)
         
+    def singleItemPhotoshoot(self, next=True):
+        if next: 
+            self.PhotoshootIndex= (self.PhotoshootIndex+1)%8
+        TrainingsHelper.swapObj(self.PhotoshootIndex, self.mainTable, self.supervisor)
         
     def organizeObjects(self, objects):
         for obj in objects:
@@ -266,9 +272,11 @@ class RobotArm(logger):
         diffP = self.lastDCamPos - np.array(vpPos)
         diffO = self.lastDCamOri - np.array(vpOri)
         
+        self.lastDCamPos = np.array(vpPos)
+        self.lastDCamOri = np.array(vpOri)
+        
         if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
-            self.lastDCamPos = np.array(vpPos)
-            self.lastDCamOri = np.array(vpOri)
+            self.logV('Taking Snapshot')
             TrainingsHelper.makeSnapshot(self.dataCam,type='train')
         
         return
@@ -411,7 +419,12 @@ class RobotArm(logger):
         if (key==ord('O')):
             self.log("pressed: O")
             self.collectData=False
-            self.randomPosSamplingLoop(150,'train')
+        if (key==ord('N')):
+            self.log("pressed: N")
+            self.singleItemPhotoshoot(next=True)
+            # self.randomPosSamplingLoop(150,'train')
+            
+            
         if (key==ord('P')):
             self.log("pressed: P")
             #self.randomPosSamplingLoop(200,'train')
