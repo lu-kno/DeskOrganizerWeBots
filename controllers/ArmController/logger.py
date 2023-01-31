@@ -24,4 +24,4 @@ class logger():
             self.__print('VV', *args,**kwargs)
             
     def __print(self, level, *args, **kwargs):
-        print(f'[{datetime.datetime.now().time()}][{self.logName}][{self.logging}]',*args,**kwargs)
+        print(f'[{datetime.datetime.now().time()}][{self.logName}][{level}]',*args,**kwargs)
