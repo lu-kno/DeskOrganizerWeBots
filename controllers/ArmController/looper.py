@@ -10,8 +10,8 @@ def looper(func):
 
 def looperTimeout(func):
     '''Wrapper to loop function while continuing simulation until '-1' is returned or timeout is reached'''
-    def inner(self,*args,**kwargs):
-        timeout = 10000
+    def inner(self,timeout=10000, *args,**kwargs):
+        # timeout = 10000
         while self.supervisor.step(self.timestep) != -1:
             self.master.stepOperations()
             if func(self, *args,**kwargs)==-1:
