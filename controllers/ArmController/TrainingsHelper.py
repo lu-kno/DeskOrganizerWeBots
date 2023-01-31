@@ -24,12 +24,12 @@ categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','C
 def startTraining():
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
-    model_path = os.path.join(execution_path , "Modelle/last/yolov3_DataSet_last.pt")
+    model_path = os.path.join(execution_path , "Modelle/yolov3_DataSet_mAP-0.02411_epoch-10.pt")
     createClassFiles(categories) 
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsYOLOv3()
     trainer.setDataDirectory(data_directory=data_dir_path)
-    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=50, train_from_pretrained_model=model_path)
+    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
     trainer.trainModel()
 
 def testModel():
@@ -262,7 +262,7 @@ def dataSetIntegrityTest():
     print(f"Validation folder integrity: {compare_directories(annotationPathValidation,imagePathValidation)}")
 
 if __name__=="__main__":
-    testModel()
-    #startTraining()
+    #testModel()
+    startTraining()
     #dataSetIntegrityTest()
     print('DONE')
