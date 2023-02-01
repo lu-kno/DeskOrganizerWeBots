@@ -19,7 +19,7 @@ from logger import logger
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
 imageHeight = 1422
-SAVEFIGS=True
+SAVEFIGS=False
 categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
 
 
@@ -81,19 +81,20 @@ class ImageScanner(logger):
             objImage = img[boxPoints[0,1]:boxPoints[1,1],boxPoints[0,0]:boxPoints[1,0]]
             
             # objImage = img[max(boxPoints[0,0]-5,0):min(boxPoints[1,0]+5,img.shape[0]),max(boxPoints[0,1]-5,0):min(boxPoints[1,1]+5,img.shape[1]),:3]
-            self.logD(f"Name = {obj['name']}")
-            self.logD(f"img.shape [y,x,f] = {img.shape}")
-            self.logD(f"boxPoints  [x1,y1],[x2,y2] = {boxPoints.tolist()}")
-            self.logD(f"pos x,y = {pos}")
-            self.logD(f"objImage.shape [y,x,f] = {objImage.shape}")
-            self.logD(f"np.max(objImage) = {np.max(objImage)}")
-            self.logD(f"====================================")
+            printout = f"Name = {obj['name']}\n"
+            printout+= f"img.shape [y,x,f] = {img.shape}\n"
+            printout+= f"boxPoints  [x1,y1],[x2,y2] = {boxPoints.tolist()}\n"
+            printout+= f"pos x,y = {pos}\n"
+            printout+= f"objImage.shape [y,x,f] = {objImage.shape}\n"
+            printout+= f"np.max(objImage) = {np.max(objImage)}\n"
+            printout+= f"===================================="
+            self.logV(printout)
             
             
             oValues = dict(name = obj['name'],
                            position = pos.tolist(),
                            boxPoints = boxPoints.tolist(),
-                           orientation = getAngle(objImage, name=obj['name'], savefig=SAVEFIGS))
+                           orientation = self.getAngle(objImage, name=obj['name'], savefig=SAVEFIGS))
             objects.append(oValues)
 
         with open('recognitionObject.yaml','w+') as f:
@@ -137,7 +138,7 @@ class ImageScanner(logger):
                             name=o.getModel(), 
                             position=(pos/img.shape[:2]).tolist(), 
                             boxPoints=boxPoints.tolist(),
-                            orientation=getAngle(objImage),
+                            orientation=self.getAngle(objImage),
                             )
             objects.append(oValues)
         
@@ -148,7 +149,83 @@ class ImageScanner(logger):
     
         return objects
         
-
+    def getAngle(self, objectImage, name=None, savefig=None):
+        try:
+            # Convert the image to the HSV color space
+            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+            # Apply Canny edge detection
+            edges = cv2.Canny(hsv_image, 50, 150)
+            
+            # Get position of true pixels
+            pos = [i for i in zip(*np.where(edges>100))]
+            
+            # Init masks
+            leftEdgeMask=np.full(np.shape(edges),0)
+            rightEdgeMask=np.full(np.shape(edges),0)
+            topEdgeMask=np.full(np.shape(edges),0)
+            bottomEdgeMask=np.full(np.shape(edges),0)
+            
+            # Init Boundary
+            leftEdge=[1000 for i in range(np.shape(edges)[0])]
+            rightEdge=[0 for i in range(np.shape(edges)[0])]
+            topEdge=[1000 for i in range(np.shape(edges)[1])]
+            bottomEdge=[0 for i in range(np.shape(edges)[1])]
+            
+            # Position Boundary
+            for y,x in pos:
+                leftEdge[y] = min(leftEdge[y],x)
+                rightEdge[y] = max(rightEdge[y],x)
+                topEdge[x] = min(topEdge[x],y)
+                bottomEdge[x] = max(bottomEdge[x],y)
+                
+            # Make Masks from Boundary
+            for y,x in enumerate(leftEdge):
+                leftEdgeMask[y,x:] = 255
+                
+            for y,x in enumerate(rightEdge):
+                rightEdgeMask[y,:x] = 255
+                
+            for x,y in enumerate(topEdge):
+                topEdgeMask[y:,x] = 255
+                
+            for x,y in enumerate(bottomEdge):
+                bottomEdgeMask[:y,x] = 255
+                
+            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+            blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
+            
+            cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+            
+            orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
+            
+            
+            if savefig:
+                if not name:
+                    name=random.randrange(999)
+                    
+                imagePath=os.path.join(os.getcwd(),'savedImages')
+                pathPrefix=os.path.join(imagePath,name)
+                os.makedirs(imagePath, exist_ok=True)
+                
+                plt.imshow(objectImage[...,::-1])
+                plt.savefig(f'{pathPrefix}_0original.png')
+                plt.imshow(hsv_image)
+                plt.savefig(f'{pathPrefix}_1HSVspace.png')
+                plt.imshow(edges)
+                plt.savefig(f'{pathPrefix}_2roughEdges.png')
+                plt.imshow(combined_mask)
+                plt.savefig(f'{pathPrefix}_3objectArea.png')
+                plt.imshow(blur)
+                plt.savefig(f'{pathPrefix}_4blurredObjectArea.png')
+                plt.imshow(cleanEdges)
+                plt.savefig(f'{pathPrefix}_5cleanEdges.png')
+                plt.imshow(contourNangle)
+                plt.savefig(f'{pathPrefix}_6contourNangle.png')
+            
+            return orientation
+        except cv2.error as e:
+            self.logE(e)
+            return 0
 
 
 def imageAiTest(filename="snapshot.jpg"):
@@ -185,79 +262,83 @@ def imageAiTest(filename="snapshot.jpg"):
         
 
 def getAngle(objectImage, name=None, savefig=None):
-    # Convert the image to the HSV color space
-    hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
-    # Apply Canny edge detection
-    edges = cv2.Canny(hsv_image, 50, 150)
-    
-    # Get position of true pixels
-    pos = [i for i in zip(*np.where(edges>100))]
-    
-    # Init masks
-    leftEdgeMask=np.full(np.shape(edges),0)
-    rightEdgeMask=np.full(np.shape(edges),0)
-    topEdgeMask=np.full(np.shape(edges),0)
-    bottomEdgeMask=np.full(np.shape(edges),0)
-    
-    # Init Boundary
-    leftEdge=[1000 for i in range(np.shape(edges)[0])]
-    rightEdge=[0 for i in range(np.shape(edges)[0])]
-    topEdge=[1000 for i in range(np.shape(edges)[1])]
-    bottomEdge=[0 for i in range(np.shape(edges)[1])]
-    
-    # Position Boundary
-    for y,x in pos:
-        leftEdge[y] = min(leftEdge[y],x)
-        rightEdge[y] = max(rightEdge[y],x)
-        topEdge[x] = min(topEdge[x],y)
-        bottomEdge[x] = max(bottomEdge[x],y)
+    try:
+        warnings.warn('Using Deprecated function getAngle. Please use ImageScanner.getAngle()')
+        # Convert the image to the HSV color space
+        hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+        # Apply Canny edge detection
+        edges = cv2.Canny(hsv_image, 50, 150)
         
-    # Make Masks from Boundary
-    for y,x in enumerate(leftEdge):
-        leftEdgeMask[y,x:] = 255
+        # Get position of true pixels
+        pos = [i for i in zip(*np.where(edges>100))]
         
-    for y,x in enumerate(rightEdge):
-        rightEdgeMask[y,:x] = 255
+        # Init masks
+        leftEdgeMask=np.full(np.shape(edges),0)
+        rightEdgeMask=np.full(np.shape(edges),0)
+        topEdgeMask=np.full(np.shape(edges),0)
+        bottomEdgeMask=np.full(np.shape(edges),0)
         
-    for x,y in enumerate(topEdge):
-        topEdgeMask[y:,x] = 255
+        # Init Boundary
+        leftEdge=[1000 for i in range(np.shape(edges)[0])]
+        rightEdge=[0 for i in range(np.shape(edges)[0])]
+        topEdge=[1000 for i in range(np.shape(edges)[1])]
+        bottomEdge=[0 for i in range(np.shape(edges)[1])]
         
-    for x,y in enumerate(bottomEdge):
-        bottomEdgeMask[:y,x] = 255
-        
-    combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
-    blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
-    
-    cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
-    
-    orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
-    
-    
-    if savefig:
-        if not name:
-            name=random.randrange(999)
+        # Position Boundary
+        for y,x in pos:
+            leftEdge[y] = min(leftEdge[y],x)
+            rightEdge[y] = max(rightEdge[y],x)
+            topEdge[x] = min(topEdge[x],y)
+            bottomEdge[x] = max(bottomEdge[x],y)
             
-        imagePath=os.path.join(os.getcwd(),'savedImages')
-        pathPrefix=os.path.join(imagePath,name)
-        os.makedirs(imagePath, exist_ok=True)
+        # Make Masks from Boundary
+        for y,x in enumerate(leftEdge):
+            leftEdgeMask[y,x:] = 255
+            
+        for y,x in enumerate(rightEdge):
+            rightEdgeMask[y,:x] = 255
+            
+        for x,y in enumerate(topEdge):
+            topEdgeMask[y:,x] = 255
+            
+        for x,y in enumerate(bottomEdge):
+            bottomEdgeMask[:y,x] = 255
+            
+        combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+        blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
         
-        plt.imshow(objectImage[...,::-1])
-        plt.savefig(f'{pathPrefix}_0original.png')
-        plt.imshow(hsv_image)
-        plt.savefig(f'{pathPrefix}_1HSVspace.png')
-        plt.imshow(edges)
-        plt.savefig(f'{pathPrefix}_2roughEdges.png')
-        plt.imshow(combined_mask)
-        plt.savefig(f'{pathPrefix}_3objectArea.png')
-        plt.imshow(blur)
-        plt.savefig(f'{pathPrefix}_4blurredObjectArea.png')
-        plt.imshow(cleanEdges)
-        plt.savefig(f'{pathPrefix}_5cleanEdges.png')
-        plt.imshow(contourNangle)
-        plt.savefig(f'{pathPrefix}_6contourNangle.png')
-    
-    return orientation
-
+        cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+        
+        orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
+        
+        
+        if savefig:
+            if not name:
+                name=random.randrange(999)
+                
+            imagePath=os.path.join(os.getcwd(),'savedImages')
+            pathPrefix=os.path.join(imagePath,name)
+            os.makedirs(imagePath, exist_ok=True)
+            
+            plt.imshow(objectImage[...,::-1])
+            plt.savefig(f'{pathPrefix}_0original.png')
+            plt.imshow(hsv_image)
+            plt.savefig(f'{pathPrefix}_1HSVspace.png')
+            plt.imshow(edges)
+            plt.savefig(f'{pathPrefix}_2roughEdges.png')
+            plt.imshow(combined_mask)
+            plt.savefig(f'{pathPrefix}_3objectArea.png')
+            plt.imshow(blur)
+            plt.savefig(f'{pathPrefix}_4blurredObjectArea.png')
+            plt.imshow(cleanEdges)
+            plt.savefig(f'{pathPrefix}_5cleanEdges.png')
+            plt.imshow(contourNangle)
+            plt.savefig(f'{pathPrefix}_6contourNangle.png')
+        
+        return orientation
+    except cv2.error as e:
+        # self.logE(e)
+        return 0
 
 def getOrientationPCA(edges, img):
     '''returns orientation from the contour of an object'''
