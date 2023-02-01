@@ -187,6 +187,7 @@ def imageAiTest(filename="snapshot.jpg"):
 def getAngle(objectImage, name=None, savefig=None):
     # Convert the image to the HSV color space
     hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+    objectImage = objectImage[...,::-1]
     # Apply Canny edge detection
     edges = cv2.Canny(hsv_image, 50, 150)
     
@@ -241,7 +242,7 @@ def getAngle(objectImage, name=None, savefig=None):
         pathPrefix=os.path.join(imagePath,name)
         os.makedirs(imagePath, exist_ok=True)
         
-        plt.imshow(objectImage[...,::-1])
+        plt.imshow(objectImage)
         plt.savefig(f'{pathPrefix}_0original.png')
         plt.imshow(hsv_image)
         plt.savefig(f'{pathPrefix}_1HSVspace.png')
