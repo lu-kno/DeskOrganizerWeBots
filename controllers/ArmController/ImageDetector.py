@@ -93,7 +93,7 @@ class ImageScanner(logger):
             oValues = dict(name = obj['name'],
                            position = pos.tolist(),
                            boxPoints = boxPoints.tolist(),
-                           orientation = getAngle(objImage))
+                           orientation = getAngle(objImage, name=obj['name'], savefig=SAVEFIGS))
             objects.append(oValues)
 
         with open('recognitionObject.yaml','w+') as f:
@@ -241,7 +241,7 @@ def getAngle(objectImage, name=None, savefig=None):
         pathPrefix=os.path.join(imagePath,name)
         os.makedirs(imagePath, exist_ok=True)
         
-        plt.imshow(objectImage)
+        plt.imshow(objectImage[...,::-1])
         plt.savefig(f'{pathPrefix}_0original.png')
         plt.imshow(hsv_image)
         plt.savefig(f'{pathPrefix}_1HSVspace.png')
