@@ -2,14 +2,16 @@ import sys
 import tempfile
 import numpy as np
 import math
-import ImageDetector, TrainingsHelper
+# import TrainingsHelper
+# import ImageDetector
+from . import ImageDetector, TrainingsHelper
 import time
 from controller import Supervisor, Robot, Camera, Motor
 import numbers
 from warnings import warn
 import yaml
-from logger import logger
-from looper import looper, looperTimeout
+from .logger import logger
+from .looper import looper, looperTimeout
 
 from controller.wb import wb
 
@@ -184,20 +186,27 @@ class RobotArm(logger):
             self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
         self.logVV('Known Object Info: \n',self.objectInfo)
         self.PhotoshootIndex=0
+        self.lastScan=0
 
     def sleep(self, _time):
         time = _time
         while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
+            # self.master.stepOperations()
             time = time - self.timestep
             if time<0:
                 return
 
     def start(self):
         '''Robots setup routine'''
-        # self.drawCircle()
-        self.moveTo(self.HOME_POSITION)
-        self.autoloop()
+        try:
+            self.log(Supervisor.SIMULATION_MODE_PAUSE)
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_PAUSE)
+            # self.drawCircle()
+            self.moveTo(self.HOME_POSITION)
+            self.autoloop()
+        except Exception as e:
+            self.logE(e)
+            raise e
     
     @looper
     def loop(self):
@@ -441,6 +450,7 @@ class RobotArm(logger):
         if (key==ord('K')):
             self.log("pressed: K")
             TrainingsHelper.moveTableNodes(self,self.mainTable)
+            self.sleep(2)
             self.stopOrganization = True
             #self.singleObjectImageLoop(8,'train')
         if (key==self.keyboard.SHIFT+ord('K')):  
@@ -698,8 +708,24 @@ class Table(logger):
         
         
 robot = RobotArm(logging='Very_verbose')
-robot.start()
+# robot.start()
 
+
+
+if False:
+    # 
+    import os
+    import sys
+
+    os.environ['LD_LIBRARY_PATH'] = '/usr/local/webots/lib/controller'
+    os.environ['PYTHONPATH'] = '/usr/local/webots/lib/controller/python'
+    os.environ['WEBOTS_PROJECT'] = '/home/lu/Documents/0_MasterDocs/AMS/CubeGrabberExample/Webots/DeskOrganizer/DeskOrganizer.wbt'
+    os.environ['WEBOTS_HOME'] = '/usr/local/webots/'
+    module_path = '/usr/local/webots/lib/controller/python/'
+    if module_path not in sys.path:
+        sys.path.append(module_path)
+        
+    import controller
 
 
 

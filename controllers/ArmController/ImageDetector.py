@@ -1,5 +1,5 @@
 from imageai.Detection import ObjectDetection  
-import TrainingsHelper
+from . import TrainingsHelper
 import os
 from pprint import pprint
 import cv2
@@ -14,7 +14,7 @@ import warnings
 import random
 from scipy.ndimage import zoom
 import yaml
-from logger import logger
+from .logger import logger
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560

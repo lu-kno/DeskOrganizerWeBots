@@ -17,7 +17,7 @@ import warnings
 import random
 from scipy.ndimage import zoom
 import random
-from logger import logger
+from .logger import logger
 warnings.filterwarnings("ignore", category=UserWarning) 
 
 MINIMUM_PERCENTAGE_PROBABILITY = 95
