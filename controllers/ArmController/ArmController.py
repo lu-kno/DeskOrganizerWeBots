@@ -687,8 +687,8 @@ class Table(logger):
         
         if len(pos)==3:
             pos = np.array([*pos,1])
-        
-        self.logW(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
+        if not (np.shape(pos) == (4,)):
+            self.logW(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
         
         res = np.matmul(tMat,pos)[:3]
         #print(f'pos: {pos}')
