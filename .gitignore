@@ -1,4 +1,5 @@
 controllers/ArmController/Modelle/*
+controllers/ArmController/savedImages/*
 controllers/ArmController/DataSet/*
 controllers/ArmController/DataSet*.zip
 controllers/ArmController/DataSet*
