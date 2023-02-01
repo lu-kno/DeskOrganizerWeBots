@@ -19,9 +19,9 @@ from scipy.ndimage import zoom
 import random
 from logger import logger
 warnings.filterwarnings("ignore", category=UserWarning) 
-# imageWidth = 2560
-# imageHeight = 1422
-SAVEFIGS=True
+
+MINIMUM_PERCENTAGE_PROBABILITY = 95
+
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 
 class MyModel(logger):
@@ -43,7 +43,7 @@ class MyModel(logger):
                                                     output_image_path=os.path.join(self.execution_path ,'snapshot-detected.jpg'),
                                                     nms_treshold = 0.05,
                                                     objectness_treshold = 0.5,
-                                                    minimum_percentage_probability = 90)
+                                                    minimum_percentage_probability = MINIMUM_PERCENTAGE_PROBABILITY)
         
         return detections
         
