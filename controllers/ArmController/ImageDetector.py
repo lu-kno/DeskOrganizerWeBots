@@ -75,10 +75,10 @@ class ImageScanner(logger):
             posAbsolute = boxPoints.mean(0)
             pos = posAbsolute/np.array(img.shape[1::-1])
             
-            # boxPointsMargin = boxPoints+ np.array([[-5,-5],[5,5]])
+            boxPointsMargin = boxPoints + np.array([[-10,-10],[10,10]])
             
             
-            objImage = img[boxPoints[0,1]:boxPoints[1,1],boxPoints[0,0]:boxPoints[1,0]]
+            objImage = img[max(boxPointsMargin[0,1],0):min(boxPointsMargin[1,1],img.shape[0]),max(boxPointsMargin[0,0],0):min(boxPointsMargin[1,0],img.shape[1])]
             
             # objImage = img[max(boxPoints[0,0]-5,0):min(boxPoints[1,0]+5,img.shape[0]),max(boxPoints[0,1]-5,0):min(boxPoints[1,1]+5,img.shape[1]),:3]
             self.logD(f"Name = {obj['name']}")
@@ -230,8 +230,8 @@ def getAngle(objectImage, name=None, savefig=None):
     blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
     
     cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
-    
-    orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage)
+        
+    orientation, contourNangle = getOrientationPCA(cleanEdges,objectImage.copy())
     
     
     if savefig:
@@ -272,8 +272,8 @@ def getOrientationPCA(edges, img):
     cntr = (int(mean[0,0]), int(mean[0,1]))
     p1 = (cntr[0] + 0.02 * eigenvectors[0,0] * eigenvalues[0,0], cntr[1] + 0.02 * eigenvectors[0,1] * eigenvalues[0,0])
     p2 = (cntr[0] - 0.02 * eigenvectors[1,0] * eigenvalues[1,0], cntr[1] - 0.02 * eigenvectors[1,1] * eigenvalues[1,0])
-    # img = drawAxis(img, cntr, p1, (255, 255, 0), 1)
-    # img = drawAxis(img, cntr, p2, (0, 0, 255), 5)
+    img = drawAxis(img, cntr, p1, (255, 255, 0), 1)
+    img = drawAxis(img, cntr, p2, (0, 0, 255), 1)
     # img[edges>1]= [225,0,225]
     
     return angle, img
@@ -453,3 +453,11 @@ if __name__=="__main__":
 
 
 
+if False:
+    obj = 'hammer'
+    center = np.array([335,240])
+    ly = np.array([0,60])
+    lx = np.array([30,0])
+    img = cv2.imread(f'./controllers/ArmController/savedImages/{obj}_6contourNangle.png')
+    img = drawAxis(drawAxis(img, center,center-ly,[0,255,255],1),center,center+lx,[255,0,0],1)
+    cv2.imwrite( f'./controllers/ArmController/savedImages/{obj}_6contourNangle2.png',img,)
