@@ -30,7 +30,7 @@ DEF Viewpoint Viewpoint {
   orientation -0.20816732338065733 -0.080643741676922 0.9747630237164718 3.863742444579485
   position 4.217353344511813 3.5162535167509468 3.183667841915466
   follow "IRB 4600/40:solid:solid:solid:solid:solid:solid:ROBOTIQ 3f Gripper"
-  followType "Mounted Shot"
+  followType "Pan and Tilt Shot"
 }
 TexturedBackground {
   texture "factory"
