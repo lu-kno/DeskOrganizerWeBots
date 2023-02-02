@@ -31,7 +31,9 @@ if ikpy.__version__[0] < '3':
              'Please upgrade "ikpy" Python module to version "3.0" or newer with this command: "pip install --upgrade ikpy"')
 IKPY_MAX_ITERATIONS = 4
 
-
+DISABLE_FFB = False
+DISABLE_FINGER_TIP = False
+AUTO_LOOP = True
 
 class MyGripper(logger):
     SPEED = 5 # SPEED in DEGREES
@@ -65,13 +67,14 @@ class MyGripper(logger):
         self.logVV(f'Forces:  {"   ".join([f"{f:>7.2f}" for f in forces])}')
         
         for finger, force, maxPos, minPosTip, pos in zip(self.fingers,forces,maxPositions, minPositionsTip,positions): #
-            if abs(pos-maxPos)<0.05 or force>self.GRIP_FORCE:
+            if (not DISABLE_FFB and force>self.GRIP_FORCE) or abs(pos-maxPos)<0.05  :
                 closedFingers.append(True)
                 continue
             else:
                 closedFingers.append(False)
             finger[0].setPosition(min(pos+inc, maxPos))
-            finger[2].setPosition(max(-pos-inc, minPosTip))
+            if not DISABLE_FINGER_TIP:
+                finger[2].setPosition(max(-pos-inc, minPosTip))
             
         if np.all(closedFingers):
             return -1    
@@ -82,7 +85,8 @@ class MyGripper(logger):
         for f in self.fingers:
             # f[0].setPosition(min(f[0].getPosition()+inc,f[0].getMaxPosition))
             f[0].setPosition(f[0].getMinPosition())
-            f[2].setPosition(f[2].getMaxPosition())
+            if not DISABLE_FINGER_TIP:
+                f[2].setPosition(f[2].getMaxPosition())
             maxForce = max(maxForce,f[0].getForceFeedback(),f[1].getForceFeedback())
         if maxForce<self.GRIP_FORCE:
             return -1
@@ -188,7 +192,7 @@ class RobotArm(logger):
     def sleep(self, _time):
         time = _time
         while self.supervisor.step(self.timestep) != -1:
-            self.master.stepOperations()
+            # self.master.stepOperations()
             time = time - self.timestep
             if time<0:
                 return
@@ -197,14 +201,18 @@ class RobotArm(logger):
         '''Robots setup routine'''
         # self.drawCircle()
         self.moveTo(self.HOME_POSITION)
-        self.autoloop()
+        if AUTO_LOOP:
+            self.autoloop()
+        else:
+            self.loop()
     
     @looper
     def loop(self):
         '''Main loop of the robots controller'''
+        # self.goToSphere()
         self.followSphereFromAbove()
         # self.handleKeystroke()
-        image2worldTest(self)
+        # image2worldTest(self)
     
     @looper
     def autoloop(self):

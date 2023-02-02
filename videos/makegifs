@@ -1,0 +1,11 @@
+ffmpeg -ss 0 -t 11 -i RobotMovementClips.mp4 -vf "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 GripperClaw.gif -y
+
+ffmpeg -ss 11 -t 6 -i RobotMovementClips.mp4  -vf "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 GripperFlat.gif -y
+
+ffmpeg -ss 18 -t 11 -i RobotMovementClips.mp4 -vf "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 GrabCubeFlat.gif -y
+
+ffmpeg -ss 35 -t 22 -i RobotMovementClips.mp4 -vf "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 IKvsTrigonometry.gif -y
+
+ffmpeg -ss 68 -t 25 -i RobotMovementClips.mp4 -vf "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 NoFeedbackForce.gif -y
+
+
