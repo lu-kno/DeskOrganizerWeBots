@@ -83,25 +83,26 @@ Table of contents
 
 ### Solution
 
-### What project environment?
+
 
 #### Real life or simulation -> what simulation?
 
-#### Pros and cons real life vs simulation
+- Pros and cons real life vs simulation
+- What project environment?
 
 ### Introduction Webots
 
 ## Solution Theory (given problems and proposed solutions)
 
-### Milestones or steps needed in project development
+- Milestones or steps needed in project development
 
 #### Object detection
 
 ##### Idea how to solve problem,
 
-##### first approach
+- first approach
 
-##### Pros and cons
+-  Pros and cons
 
 #### Coord transition
 
@@ -111,19 +112,19 @@ Table of contents
 
 ##### ..
 
-## Implementation (implementation of solutions -> going into detail at interesting places )
+## Implementation 
+- (implementation of solutions -> going into detail at interesting places )
 
-### Structure corresponds to chapter in solution theory
+- Structure corresponds to chapter in solution theory
 
-### Point out differences between previously planned solutions and actual implementation
+- Point out differences between previously planned solutions and actual implementation
 
-### How it actually works
+- Describe how it actually works
 
 ### Object detection
 
-#### Trainigns image creation process description
+- Trainigns image creation process description
 
-#### Examples
 
 ### Coord transition
 
