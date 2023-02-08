@@ -59,9 +59,9 @@ class ImageScanner(logger):
         # plt.show()
         
         
-        self.log(f"img.shape: {img.shape}")
-        self.log(f"img.dtype: {img.dtype}")
-        self.log(f"img.unique: {np.unique(img)}")
+        self.logV(f"img.shape: {img.shape}")
+        self.logV(f"img.dtype: {img.dtype}")
+        self.logVV(f"img.unique: {np.unique(img)}")
         if not np.any(img):
             return []
         objectsRaw = self.imageAImodel.getObjectsFromImage(img)
@@ -88,7 +88,7 @@ class ImageScanner(logger):
             printout+= f"objImage.shape [y,x,f] = {objImage.shape}\n"
             printout+= f"np.max(objImage) = {np.max(objImage)}\n"
             printout+= f"===================================="
-            self.logV(printout)
+            self.logD(printout)
             
             
             oValues = dict(name = obj['name'],
@@ -99,7 +99,7 @@ class ImageScanner(logger):
 
         with open('recognitionObject.yaml','w+') as f:
             f.write(yaml.dump(objects))
-        self.logD(yaml.dump(objects))
+        self.logV(yaml.dump(objects))
         return objects
                            
         
@@ -145,7 +145,7 @@ class ImageScanner(logger):
         # print(json.dumps(objects,indent=4))
         with open('recognitionObject.yaml','w+') as f:
             f.write(yaml.dump(objects))
-        self.logD(yaml.dump(objects))
+        self.logV(yaml.dump(objects))
     
         return objects
         

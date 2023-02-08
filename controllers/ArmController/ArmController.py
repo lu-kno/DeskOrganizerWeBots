@@ -667,7 +667,7 @@ class Table(logger):
         # for i in range(3):
         #     pos[i]=pos[i]*self.size[i]
 
-        Sx, Sy, Sz = -1,1,-1
+        Sx, Sy, Sz = 1,1,1
         tx,ty,tz = self.position
         tx+=self.size[0]/2
         ty+=self.size[1]/2
@@ -687,9 +687,9 @@ class Table(logger):
         #     [0,               0,              0,    1]
         # ]
         tMat = [
-            [0,  -Sy*self.size[0],   0,    tx],
-            [Sx*self.size[1],  0,    0,    ty],
-            [0,   0,    -Sz,   tz],
+            [0,  -self.size[0],   0,    tx],
+            [-self.size[1],  0,    0,    ty],
+            [0,   0,    1,   tz],
             [0,   0,    0,    1]
         ]
         
@@ -707,7 +707,3 @@ class Table(logger):
         
 robot = RobotArm(logging='Very_verbose')
 robot.start()
-
-
-
-

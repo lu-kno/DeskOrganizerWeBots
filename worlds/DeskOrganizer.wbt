@@ -27,8 +27,8 @@ WorldInfo {
   basicTimeStep 16
 }
 DEF Viewpoint Viewpoint {
-  orientation -0.20816732338065733 -0.080643741676922 0.9747630237164718 3.863742444579485
-  position 4.217353344511813 3.5162535167509468 3.183667841915466
+  orientation -0.208167329451795 -0.08064374642469864 0.9747630220271473 3.8637424609185214
+  position 5.91702647062081 5.065742195271237 4.2129499360902365
   follow "IRB 4600/40:solid:solid:solid:solid:solid:solid:ROBOTIQ 3f Gripper"
   followType "Pan and Tilt Shot"
 }
@@ -135,6 +135,7 @@ Irb4600-40 {
       rotation 0 1 0 1.5707996938995747
       children [
         Transform {
+          rotation 0 1 0 1.5707996938995747
           children [
             Shape {
               appearance PBRAppearance {
@@ -143,8 +144,8 @@ Irb4600-40 {
                 metalness 0
               }
               geometry Cylinder {
-                height 0.03
-                radius 0.01
+                height 0.11
+                radius 0.03
               }
             }
           ]

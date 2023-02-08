@@ -41,3 +41,36 @@ Movement Routine:
       - Open gripper until no force is detected
       - raise hand to previous position
 
+
+
+
+
+intro to other systems
+intro to my systems
+what are the models
+what is the idea that is being developed
+
+document experiments/results
+
+document difficult parts and possibilities for future improvement
+
+with graphics and images and stuff
+
+paper should be able to be understood with only images, as well as with only text (as much as possible)
+
+source-code should be commented/documented
+not full of debug stuff or unused/old functions
+complete readme.md with requirements
+
+
+
+exam
+zoom
+check mic/speaker/camera
+have MultiCa ready
+
+questions about lecture
+and about project
+
+
+
