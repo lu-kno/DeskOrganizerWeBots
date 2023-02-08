@@ -1,6 +1,6 @@
 # DeskOrganizerWeBots
 
-# Movement
+## Movement
 
 the wrist of the robot now follows the target while positioning the hand/gripper downwards
 gripper is closed with "Q" and opened with "E"
@@ -14,7 +14,7 @@ Movement directions make sense when "standing" in front of the robot
  
 
 
-# To Do
+## To Do
 
  - [X] Separate Movement routines to grab objects from table
    - [X] move to XY position and Z+0.3
@@ -53,7 +53,7 @@ Movement directions make sense when "standing" in front of the robot
 
 
 
-# used to avoid tracking of some world files
+## used to avoid tracking of some world files
 
 `git update-index --assume-unchanged worlds/.DeskOrganizer.wbproj `
 `git update-index --assume-unchanged worlds/.DeskOrganizer.jpg `
@@ -62,7 +62,7 @@ Movement directions make sense when "standing" in front of the robot
 reset with `--no-assume-unchanged` flag
 
 
-# sources
+## sources
 
 PCA analysis to detect orientation of objects
 https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/
