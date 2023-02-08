@@ -75,13 +75,18 @@ Table of contents
 <div style="page-break-after: always"></div>
 
 
-# Final Report Struktur
+# Report: Autonomous workplace organizer
 
-## Project Introduction
+## Introduction
+The purpose of this project is to address the problem of an cluttered work space. The solution we have developed is a robotic arm that is designed to clean up and organize the work area. In this report we will document the development process of the project. The first part is an introduction to the Project. The project idea as well as technology used will be discussed there. The main part of this report will address the solution theory and the implementation. 
 
-### Problem
+ encompassing explanations for the solution theory and implementation, as well as presenting the achieved results. 
 
-### Solution
+## Project introduciton
+
+### Given problem
+
+### Proposed solution
 
 
 
@@ -102,7 +107,7 @@ Table of contents
 
 - first approach
 
--  Pros and cons
+- Pros and cons
 
 #### Coord transition
 
