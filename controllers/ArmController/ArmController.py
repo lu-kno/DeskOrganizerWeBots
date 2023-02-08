@@ -1,25 +1,29 @@
+import math
+import numbers
+import os
 import sys
 import tempfile
+import time
+from warnings import warn
+
 import numpy as np
-import math
+import yaml
+from controller import Camera, Motor, Robot, Supervisor
+from controller.wb import wb
+from utils import logger, looper, looperTimeout
+
 # import TrainingsHelper
 # import ImageDetector
-from . import ImageDetector, TrainingsHelper
-import time
-from controller import Supervisor, Robot, Camera, Motor
-import numbers
-from warnings import warn
-import yaml
-from .logger import logger
-from .looper import looper, looperTimeout
+from ImageDetection import ImageDetector, TrainingsHelper
 
-from controller.wb import wb
+DISABLE_FFB = False
+DISABLE_FINGER_TIP = False
+AUTO_LOOP = True
 
 def _enableFB(self, sampling_period: int):
     wb.wb_motor_enable_force_feedback(self._tag, sampling_period)
     
 Motor.enableForceFeedback = _enableFB
-
 
 try:
     import ikpy
@@ -32,10 +36,6 @@ if ikpy.__version__[0] < '3':
     sys.exit('The "ikpy" Python module version is too old. '
              'Please upgrade "ikpy" Python module to version "3.0" or newer with this command: "pip install --upgrade ikpy"')
 IKPY_MAX_ITERATIONS = 4
-
-DISABLE_FFB = False
-DISABLE_FINGER_TIP = False
-AUTO_LOOP = True
 
 class MyGripper(logger):
     SPEED = 5 # SPEED in DEGREES
@@ -97,23 +97,27 @@ class MyGripper(logger):
         self.enableForceFeedback(*args)        
     
     def enableForceFeedback(self,*args):
+        timestep = args[0] if args else self.timestep
+            
         for i, f in enumerate(self.fingers):
             for ii,j in enumerate(f):
                 self.logD(f'enabling ForceFB: Finger {i}, {ii}')
                 try:
-                    j.enableForceFeedback(self.timestep)
+                    j.enableForceFeedback(timestep)
                 except TypeError as te:
                     warn(te, category=None, stacklevel=1)
                     self.logW('SamplingPeriod of ForceFeedback can not be set without modding the "controller" module', category=None, stacklevel=1)
                     j.enableForceFeedback()
                     
                 self.logD(j.getForceFeedbackSamplingPeriod())
-                j.getPositionSensor().enable(self.timestep)
+                j.getPositionSensor().enable(timestep)
             
     def printForces(self):
-        self.log(f'forces:')
-        for i,f in enumerate(self.fingers):
-            self.log(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
+        printout = 'forces:\n'
+        printout += '\n'.join([f'  Finger {i+1} FF:  {f[0].getForceFeedback()}' for i,f in enumerate(self.fingers)])
+        self.log(printout)
+        # for i,f in enumerate(self.fingers):
+        #     self.log(f'  Finger {i+1} FF:  {f[0].getForceFeedback()}')  
             
 
 class RobotArm(logger):
@@ -186,7 +190,7 @@ class RobotArm(logger):
         self.stopOrganization = False
         
         # Object Info
-        with open('Objects.yaml','r') as f:
+        with open(os.path.join(os.path.dirname(__file__),'data','Objects.yaml'),'r') as f:
             self.objectInfo = yaml.load(f, Loader=yaml.loader.SafeLoader)
         self.logVV('Known Object Info: \n',self.objectInfo)
         self.PhotoshootIndex=0
@@ -203,12 +207,11 @@ class RobotArm(logger):
     def start(self):
         '''Robots setup routine'''
         try:
-            # self.log(Supervisor.SIMULATION_MODE_PAUSE)
-            # self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_PAUSE)
             # self.drawCircle()
             self.moveTo(self.HOME_POSITION)
             self.autoloop()
         except Exception as e:
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_PAUSE)
             self.logE(e)
             raise e
     
@@ -713,7 +716,7 @@ class Table(logger):
         
         
 robot = RobotArm(logging='Very_verbose')
-# robot.start()
+robot.start()
 
 
 

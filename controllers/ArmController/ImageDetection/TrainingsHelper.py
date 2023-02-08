@@ -1,23 +1,26 @@
-from imageai.Detection import ObjectDetection  
-from imageai.Detection.Custom import DetectionModelTrainer
-from imageai.Detection.Custom import CustomObjectDetection
 import os
 from pprint import pprint
+
 import cv2
-import numpy as np
 import matplotlib
+import numpy as np
+from imageai.Detection import ObjectDetection
+from imageai.Detection.Custom import (CustomObjectDetection,
+                                      DetectionModelTrainer)
+
 matplotlib.use('TKAgg')
-from matplotlib import pyplot as plt
 import ctypes
-from pathlib import Path
-from typing import List, Union, Callable
 import json
 import math
+import random
 import warnings
-import random
+from pathlib import Path
+from typing import Callable, List, Union
+
+from matplotlib import pyplot as plt
 from scipy.ndimage import zoom
-import random
-from .logger import logger
+from utils import logger
+
 warnings.filterwarnings("ignore", category=UserWarning) 
 
 MINIMUM_PERCENTAGE_PROBABILITY = 95
@@ -31,8 +34,8 @@ class MyModel(logger):
         self.execution_path = os.path.dirname(__file__)
         self.detector = CustomObjectDetection()
         self.detector.setModelTypeAsYOLOv3()
-        self.modelPath = os.path.join(self.execution_path , "Modelle/first/yolov3_DataSet_last.pt")
-        self.jsonPath = os.path.join(self.execution_path , "Modelle/first/DataSet_yolov3_detection_config.json")
+        self.modelPath = os.path.join(self.execution_path , "../Modelle/first/yolov3_DataSet_last.pt")
+        self.jsonPath = os.path.join(self.execution_path , "../Modelle/first/DataSet_yolov3_detection_config.json")
         self.detector.setModelPath(self.modelPath) # path to custom trained model
         self.detector.setJsonPath(self.jsonPath) # path to corresponding json
         self.detector.loadModel()
