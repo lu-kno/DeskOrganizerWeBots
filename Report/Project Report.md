@@ -77,10 +77,14 @@ Table of contents
 
 # Report: Autonomous workplace organizer
 
-## Introduction
-The purpose of this project is to address the problem of an cluttered work space. The solution we have developed is a robotic arm that is designed to clean up and organize the work area. In this report we will document the development process of the project. The first part is an introduction to the Project. The project idea as well as technology used will be discussed there. The main part of this report will address the solution theory and the implementation. 
 
- encompassing explanations for the solution theory and implementation, as well as presenting the achieved results. 
+## Introduction
+
+The purpose of this project is to address the problem of an cluttered work space. The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
+In this report we will document and discuss the development process of the project. The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. 
+The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
+The "Solution Theory" chapter addresses the problems that needed to be solved in order to realize the project and the corresponding theoretical solutions to solve these problems. 
+The "Implementation" chapter provides detailed explanations of how the solutions were actually implemented and draws a comparison between the theoretical solution and the actual implementation. Finally, the last part of the report focuses on the project results and provides a conclusion, evaluating whether we have achieved our project goals and discussing further improvements for the project as well as learning outcomes. 
 
 ## Project introduciton
 
@@ -100,7 +104,7 @@ The purpose of this project is to address the problem of an cluttered work space
 ## Solution Theory (given problems and proposed solutions)
 
 - Milestones or steps needed in project development
-
+- We define which problems we needed to solve and our first approaches to solve these problems
 #### Object detection
 
 ##### Idea how to solve problem,
