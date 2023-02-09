@@ -33,6 +33,19 @@ h6:before {
     content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) "." counter(h5counter) "." counter(h6counter) ".\0000a0\0000a0";
 }
 
+.center-div {
+    text-align:center;
+}
+
+.center-image {
+    display:block; 
+    margin:auto;
+}
+
+.image-description {
+    font-size: 11px;
+}
+
 </style>
 
 
@@ -93,14 +106,23 @@ The objective of the project is to create a robotic system capable of tidying an
 
 In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. In addition to creating your own robots, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python as the programming language for the project, as it is widely supported in computer vision and machine learning applications.
 
-The project was carried out by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. The initial phase involved the creation of a program that could detect objects in the workspace. The second stage included the development of an algorithm converting the detected objects' relative coordinates from the image to the simulated world coordinate system. The final phase involved the creation of a program to control the robotic arm and determine its movement. The three components were then integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+
+<div class="center-div">
+  <img src="./project2.png"  width="75%" height="75%" class = "center-image" alt="Project setup in Webots" >
+  <p class = "image-description">Figure 1:Project setup in Webots </p>
+</div>
+
+Figure one shows the project setup in Webots. a camera is used to detect objects in the workspace. The robot is equipped with a gripper that can be used to grasp objects. The robot is controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. 
+
+The project was carried out by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. 
+
 
 
 ## Solution Theory (given problems and proposed solutions)
 
-Dieses Kapitel behandelt die
+This chapter addresses the problems that needed to be solved in order to realize the project and is structured according to the previosly mentioned three main components of the project: object detection, coordinate transformation, and robotic arm control. 
 
-This chapter addresses the problems that needed to be solved in order to realize the project and is structured 
+The initial phase involved the creation of a program that could detect objects in the workspace. The second stage included the development of an algorithm converting the detected objects' relative coordinates from the image to the simulated world coordinate system. The final phase involved the creation of a program to control the robotic arm and determine its movement. The three components were then integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
 
 
 - Milestones or steps needed in project development
