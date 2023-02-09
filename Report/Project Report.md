@@ -74,9 +74,9 @@ Table of contents
 
 <div style="page-break-after: always"></div>
 
-
+# Abstract
+- TODO Abstract
 # Report: Autonomous workplace organizer
-
 
 ## Introduction
 
@@ -84,7 +84,7 @@ The purpose of this project is to address the problem of an cluttered work space
 In this report we will document and discuss the development process of the project. 
 
 The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
-The "Solution Theory" chapter addresses the problems that needed to be solved in order to realize the project and the corresponding theoretical solutions to solve these problems. 
+The "Solution Theory" chapter addresses the problems that needed to be solved in order to realize the project and the corresponding theoretical solutions for these problems. 
 The "Implementation" chapter provides detailed explanations of how the solutions were actually implemented and draws a comparison between the theoretical solution and the actual implementation. Finally, the last part of the report focuses on the project results and provides a conclusion, evaluating whether we have achieved our project goals and discussing further improvements for the project as well as learning outcomes. 
 
 ## Project introduction
@@ -105,15 +105,12 @@ This chapter addresses the problems that needed to be solved in order to realize
 
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
+- 
 ### Object detection
-
-
-
-##### Idea how to solve problem,
-
 - first approach
 
-- Pros and cons
+
+
 
 ### Coord transition
 
@@ -124,6 +121,17 @@ This chapter addresses the problems that needed to be solved in order to realize
 ##### ..
 
 ## Implementation 
+
+### Object detection
+- custom detection
+- custom training
+  - trainings data
+      - randomized objects
+      - labeling
+      - automatization of data creation
+  - training itself
+    - Settings
+- detection results
 - (implementation of solutions -> going into detail at interesting places )
 
 - Structure corresponds to chapter in solution theory
