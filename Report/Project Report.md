@@ -81,33 +81,27 @@ Table of contents
 ## Introduction
 
 The purpose of this project is to address the problem of an cluttered work space. The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
-In this report we will document and discuss the development process of the project. The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. 
-The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
+In this report we will document and discuss the development process of the project. 
+
+The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
 The "Solution Theory" chapter addresses the problems that needed to be solved in order to realize the project and the corresponding theoretical solutions to solve these problems. 
 The "Implementation" chapter provides detailed explanations of how the solutions were actually implemented and draws a comparison between the theoretical solution and the actual implementation. Finally, the last part of the report focuses on the project results and provides a conclusion, evaluating whether we have achieved our project goals and discussing further improvements for the project as well as learning outcomes. 
 
 ## Project introduciton
 
-The project idea is to develop a robotic arm that is able to clean up and organize a work area. The robot is equipped with a camera that is used to detect objects on this area. The detected objects are then picked up by the robotic arm and placed in another predefined place.
+The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
 
-During the early stages of development we had to decide whether we wanted to use a real robot or a simulation. We decided to use a simulation, because it is easier to develop and test the project in a simulation environment. We chose to use the Webots simulation environment for this project. It is a free and open source simulation environment that is used for research and education. It is based on the ODE physics engine and the OpenGl graphics library. The simulation environment provides a wide range of sensors and actuators that can be used to develop a robot.
+In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. In addition to creating your own robots, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python as the programming language for the project, as it is widely supported in computer vision and machine learning applications.
 
-The project was developed in a team of two students. The project was divided into three main parts: object detection, coordinate transformation and robot arm control. The first part of the project was to develop a program that is able to detect objects on the work area. The second part was to develop a program that is able to transform the coordinates of the detected objects from the camera coordinate system to the coordinate system of the robot. The third part was to develop a program that is able to control the robot arm and move it to the detected objects.
-
-
-
-#### Real life or simulation -> what simulation?
-
-- Pros and cons real life vs simulation
-- What project environment?
-
-### Introduction Webots
+The project was carried out by a team of two students, who divided the project into three main components: object detection, coordinate transformation, and robotic arm control. The initial task was to create a program that could detect objects in the workspace. The second phase involved the development of an algorithm that could convert the relative coordinates of the detected objects from the image to the simulated world coordinate system. The final phase involved the creation of a program that could control the robotic arm and move it to the detected objects. The three components were then combined into a single routine that could detect objects, move the robotic arm to the objects, and then move the objects to a designated location.
 
 ## Solution Theory (given problems and proposed solutions)
 
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
 ### Object detection
+
+
 
 ##### Idea how to solve problem,
 
