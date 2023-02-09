@@ -208,7 +208,7 @@ class ImageScanner(logger):
                 if not name:
                     name=random.randrange(999)
                     
-                imagePath=os.path.join(os.getcwd(),'savedImages')
+                imagePath=os.path.join(os.getcwd(),'output','savedImages')
                 pathPrefix=os.path.join(imagePath,name)
                 os.makedirs(imagePath, exist_ok=True)
                 

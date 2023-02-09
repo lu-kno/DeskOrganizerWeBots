@@ -43,7 +43,7 @@ class MyModel(logger):
     def getObjectsFromImage(self, image):
         
         detections = self.detector.detectObjectsFromImage(input_image=image, 
-                                                    output_image_path=os.path.join(self.execution_path ,'snapshot-detected.jpg'),
+                                                    output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
                                                     nms_treshold = 0.05,
                                                     objectness_treshold = 0.5,
                                                     minimum_percentage_probability = MINIMUM_PERCENTAGE_PROBABILITY)
@@ -72,7 +72,7 @@ def testModel():
     detector.setModelPath(modelPath) # path to custom trained model
     detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path ,'snapshot.jpg'), output_image_path=os.path.join(execution_path ,'snapshot-detected.jpg'),
+    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path, 'output' ,'snapshot.jpg'), output_image_path=os.path.join(execution_path , 'output' ,'snapshot-detected.jpg'),
     nms_treshold = 0.05,
     objectness_treshold = 0.5,
     minimum_percentage_probability = 90)
