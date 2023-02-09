@@ -74,21 +74,33 @@ h6:before {
 <br>
 <div style="page-break-after: always"></div>
 
+# Table of Content
+## [Introduction](#introduction)
+## [Project introduction](#project-introduction)
+## [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+### [Object detection](#object-detection)
+### [Coord transition](#coord-transition)
+### [Robot arm](#robot-arm)
+## [Implementation](#implementation)
+### [Object detection](#object-detection-1)
 
-Table of contents
----
-## [Jigsaw Puzzle Solver](#jigsaw-puzzle-solver)
-### [Table of contents](#table-of-contents)
-### [AMS Project Intro](#ams-project-intro)
-### [References for Markdown](#references-for-markdown)
+### [Coord transition](#coord-transition-1)
+     
+### [Robot arm](#robot-arm-1)
+     
+## [Results](#Results)
+    
+## [Outlook](#outlook)
 
-
-
+### [same content as in presentation silde](#same-content-as-in-presentation-silde)
+## [References for Markdown](#references-for-markdown)
 
 <div style="page-break-after: always"></div>
 
 # Abstract
 - TODO Abstract
+<div style="page-break-after: always"></div>
+
 # Report: Autonomous workplace organizer
 
 ## Introduction
@@ -112,39 +124,39 @@ In the initial phases of the project, the decision was made to utilize a simulat
   <p class = "image-description">Figure 1:Project setup in Webots </p>
 </div>
 
-Figure one shows the project setup in Webots. a camera is used to detect objects in the workspace. The robot is equipped with a gripper that can be used to grasp objects. The robot is controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. 
+Figure one shows the project setup in Webots. A camera is used to detect objects in the workspace. The robot-arm is equipped with a gripper that can be utilized to grasp objects. The robot and its devices are controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. The entire system is self contained and doesn't require human interaction, other devices or an active web connection.
 
-The project was carried out by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. 
-
+The system was developed by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. 
 
 
 ## Solution Theory (given problems and proposed solutions)
 
-This chapter addresses the problems that needed to be solved in order to realize the project and is structured according to the previosly mentioned three main components of the project: object detection, coordinate transformation, and robotic arm control. 
+This chapter addresses the problems that needed to be solved in order to realize the project and is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control. 
+ 
+### Object detection
+The first component of the project is the object detection. Its purpose is to detect objects in the workspace and determine their relative coordinates and size in the image as well as their orientation in relation to the table. To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerge. 
 
-The initial phase involved the creation of a program that could detect objects in the workspace. The second stage included the development of an algorithm converting the detected objects' relative coordinates from the image to the simulated world coordinate system. The final phase involved the creation of a program to control the robotic arm and determine its movement. The three components were then integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+At this stage of the project the training of a custom object detection model was not intended and it was planned to search for an existing model. To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library widely used in computer vision applications which provides a broad array of functions for image processing. 
+### Coordinates transition
 
+Once the objects are detected, the next step is to determine their coordinates in the simulation. 
 
+- TODO: first / theoretical approach to solve problem(s)
+### Robot controller
+
+Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
+
+- TODO: first / theoretical approach to solve problem(s)
+- 
+These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+
+### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
-- 
-### Object detection
-- first approach
-
-
-
-
-### Coord transition
-
-##### ..
-
-### Robot arm
-
-##### ..
-
 ## Implementation 
 
 ### Object detection
+- How the first approach turned out
 - custom detection
 - custom training
   - trainings data
@@ -154,7 +166,17 @@ The initial phase involved the creation of a program that could detect objects i
   - training itself
     - Settings
 - detection results
-- (implementation of solutions -> going into detail at interesting places )
+
+### Coord transition
+
+- TODO: description of implementation Coord transition
+
+### Robot arm
+
+- TODO: description of implementation Robot arm
+  
+### Notes for this chapter (to be deleted later)
+- implementation of solutions -> going into detail at interesting places 
 
 - Structure corresponds to chapter in solution theory
 
@@ -162,31 +184,16 @@ The initial phase involved the creation of a program that could detect objects i
 
 - Describe how it actually works
 
-### Object detection
-
-- Trainigns image creation process description
-
-
-### Coord transition
-
-#### ..
-
-### Robot arm
-
-#### ..
-
 ## Results
 
-### ..
+- TODO: presenting results
 
 ## Outlook 
 
-### same content as in presentation silde
+- same content as in presentation silde
 
 
-
-
-## References for Markdown
+## References for Markdown (to be deleted later)
 
 ![time spent on different calls](./timespentoncalls.png)
 
