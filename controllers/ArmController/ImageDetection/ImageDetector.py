@@ -1,3 +1,7 @@
+# from __future__ import annotations
+import typing
+from typing import Optional, Iterable, Literal, Any
+
 import ctypes
 import json
 import math
@@ -14,12 +18,12 @@ import numpy as np
 import yaml
 from imageai.Detection import ObjectDetection
 from matplotlib import pyplot as plt
+matplotlib.use('TKAgg')
 from scipy.ndimage import zoom
 from utils import logger
 
 from . import TrainingsHelper
 
-matplotlib.use('TKAgg')
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
@@ -29,7 +33,7 @@ categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','for
 
 
 class ImageScanner(logger):
-    def __init__(self, master, model='webots', logging='D', logName='ImageScanner', **kwargs):
+    def __init__(self, master, model: Any|Literal['webots'] = 'webots', logging: str = 'D', logName: str = 'ImageScanner', **kwargs) -> None:
         super().__init__(logging=logging, logName=logName, **kwargs)
         if model=='webots':
             self.scanImage = self.webotsScan
@@ -40,7 +44,7 @@ class ImageScanner(logger):
         self.camera=master.camera
         self.imageAImodel=TrainingsHelper.MyModel(logging=logging)
         
-    def imageAIScan(self):
+    def imageAIScan(self) -> Iterable[dict]:
         
         self.camera.saveImage('snapshot.jpg',100)
         img = cv2.imread('snapshot.jpg').astype('uint8')
@@ -69,9 +73,9 @@ class ImageScanner(logger):
         self.logVV(f"img.unique: {np.unique(img)}")
         if not np.any(img):
             return []
-        objectsRaw = self.imageAImodel.getObjectsFromImage(img)
+        objectsRaw: list[dict[str,Any]] = self.imageAImodel.getObjectsFromImage(img)
         
-        objects = []
+        objects: list[dict[str,Any]] = []
         
         for obj in objectsRaw:
             
@@ -108,7 +112,7 @@ class ImageScanner(logger):
         return objects
                            
         
-    def webotsScan(self):
+    def webotsScan(self) -> Iterable[dict]:
         
         self.camera.saveImage('snapshot.jpg', 100)
         img = cv2.imread('snapshot.jpg')
@@ -154,7 +158,7 @@ class ImageScanner(logger):
     
         return objects
         
-    def getAngle(self, objectImage, name=None, savefig=None):
+    def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None) -> float:
         try:
             # Convert the image to the HSV color space
             hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
@@ -162,7 +166,7 @@ class ImageScanner(logger):
             edges = cv2.Canny(hsv_image, 50, 150)
             
             # Get position of true pixels
-            pos = [i for i in zip(*np.where(edges>100))]
+            pos: list[tuple[int, int]] = [tuple(i) for i in zip(*np.where(edges>100))]
             
             # Init masks
             leftEdgeMask=np.full(np.shape(edges),0)
@@ -206,7 +210,7 @@ class ImageScanner(logger):
             
             if savefig:
                 if not name:
-                    name=random.randrange(999)
+                    name=str(random.randrange(999))
                     
                 imagePath=os.path.join(os.getcwd(),'output','savedImages')
                 pathPrefix=os.path.join(imagePath,name)
@@ -232,7 +236,7 @@ class ImageScanner(logger):
             self.logE(e)
             return 0
 
-    def getOrientationPCA(self, edges, img):
+    def getOrientationPCA(self, edges, img) -> tuple:
         '''returns orientation from the contour of an object'''
         pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
 

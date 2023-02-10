@@ -1,5 +1,16 @@
+
+# from __future__ import annotations
+
+import ctypes
+import json
+import math
 import os
+import random
+import typing
+import warnings
+from pathlib import Path
 from pprint import pprint
+from typing import Any, Callable, Iterable, List, Literal, Optional, Union
 
 import cv2
 import matplotlib
@@ -7,17 +18,9 @@ import numpy as np
 from imageai.Detection import ObjectDetection
 from imageai.Detection.Custom import (CustomObjectDetection,
                                       DetectionModelTrainer)
-
-matplotlib.use('TKAgg')
-import ctypes
-import json
-import math
-import random
-import warnings
-from pathlib import Path
-from typing import Callable, List, Union
-
 from matplotlib import pyplot as plt
+matplotlib.use('TKAgg')
+
 from scipy.ndimage import zoom
 from utils import logger
 
@@ -28,7 +31,7 @@ MINIMUM_PERCENTAGE_PROBABILITY = 95
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 
 class MyModel(logger):
-    def __init__(self, logging='D', logName='ImageAImodel'):
+    def __init__(self, logging: str = 'D', logName: str = 'ImageAImodel'):
         super().__init__(logging=logging, logName=logName)
         
         self.execution_path = os.path.dirname(__file__)
@@ -40,7 +43,7 @@ class MyModel(logger):
         self.detector.setJsonPath(self.jsonPath) # path to corresponding json
         self.detector.loadModel()
 
-    def getObjectsFromImage(self, image):
+    def getObjectsFromImage(self, image) -> list[dict[str,Any]]:
         
         detections = self.detector.detectObjectsFromImage(input_image=image, 
                                                     output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
@@ -72,7 +75,7 @@ def testModel():
     detector.setModelPath(modelPath) # path to custom trained model
     detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path, 'output' ,'snapshot.jpg'), output_image_path=os.path.join(execution_path , 'output' ,'snapshot-detected.jpg'),
+    detections: list[dict[str,Any]] = detector.detectObjectsFromImage(input_image=os.path.join(execution_path, 'output' ,'snapshot.jpg'), output_image_path=os.path.join(execution_path , 'output' ,'snapshot-detected.jpg'),
     nms_treshold = 0.05,
     objectness_treshold = 0.5,
     minimum_percentage_probability = 90)
@@ -101,13 +104,13 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
-    if(type=='train'):
-        dir = 'train'
     if(type=='validation'):
         dir = 'validation'
-    annotationPath = os.path.join(execution_path , "DataSet/"+dir+"/annotations/")
-    jsonPath = os.path.join(execution_path , "DataSet/"+dir+"/raw_data/")
-    imagePath = os.path.join(execution_path , "DataSet/"+dir+"/images/")
+    else:
+        dir = 'train'
+    annotationPath = os.path.join(execution_path , "DataSet", dir, "annotations/")
+    jsonPath = os.path.join(execution_path , "DataSet", dir, "raw_data/")
+    imagePath = os.path.join(execution_path , "DataSet", dir, "images/")
     if not os.path.exists(annotationPath):
         os.makedirs(annotationPath)
     if not os.path.exists(jsonPath):
