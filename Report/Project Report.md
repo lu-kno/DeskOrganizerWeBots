@@ -1,5 +1,8 @@
 <style>
-body { counter-reset: h1counter h2counter h3counter h4counter h5counter h6counter; }
+body { counter-reset: h1counter h2counter h3counter h4counter h5counter h6counter; 
+
+    //font-size: 12px;
+}
 
 h1 { counter-reset: h2counter; }
 h2 { counter-reset: h3counter; }
@@ -44,6 +47,10 @@ h6:before {
 
 .image-description {
     font-size: 11px;
+}
+
+.sub-header {
+    font-weight: bold;
 }
 
 </style>
@@ -176,11 +183,26 @@ Figure 2 shows the results of the object detection using the YOLOv3 model. The f
 </div>
 
 
-The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
+The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. 
+
+Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
 
 #### Custom detection
 
-The second approach to solve the problem of object detection was to train a custom object detection model. In order to reducte the effort needed to train the model, we decided to use transfer learning. Transfer learning is a machine learning method that utilizes a pre-trained model and adapts it to a new task. The pre-trained model is used as a starting point and the weights of the model are adjusted to fit the new task. This approach is especially useful when the new task is similar to the original task of the pre-trained model.
+The second approach to solve the problem of object detection was to train a custom object detection model. In the project plan, it was not initially planned to train a custom model. However, to streamline the process, the decision was made to utilize the ImageAI library. ImageAI is a Python library that offers a convenient framework for training and utilizing object detection models. In order to reduce the effort needed to train the model, we decided to use transfer learning. 
+
+<p class = "sub-header">Trainings data</p>
+
+- automated data creation in yolo format
+  - labeling 
+    - code example
+  - 
+
+<p class = "sub-header">Training </p>
+
+<p class = "sub-header">Result </p>
+
+#### Conclusion
 
 #### Notes for this chapter (to be deleted later)
 - How the first approach turned out
@@ -188,6 +210,7 @@ The second approach to solve the problem of object detection was to train a cust
   - not enough useable object classes 
   - no Proto files for existing object classes 
 - custom detection
+  - use of imageAI library 
 - custom training
   - transfer learning
   - trainings data
