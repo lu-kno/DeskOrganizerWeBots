@@ -105,7 +105,8 @@ h6:before {
 
 ## Introduction
 
-The purpose of this project is to address the problem of an cluttered work space. The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
+The purpose of this project is to address the problem of an cluttered work space.
+The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
 In this report we will document and discuss the development process of the project. 
 
 The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
@@ -115,6 +116,9 @@ The "Implementation" chapter provides detailed explanations of how the solutions
 ## Project introduction
 
 The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
+
+- prove of concept for varios real world application
+- Solution transferable to other use cases
 
 In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications.
 
@@ -136,7 +140,7 @@ This chapter addresses the solution concepts for the problems that needed to be 
 ### Object detection
 The first component of the project is the object detection. Its purpose is to detect objects in the workspace and determine their relative coordinates and size in the image as well as their orientation in relation to the table. 
 
-To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The yolov3 model was selected due to its wide array of object classes and its high performance. 
+To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The YOLOv3 model, a convolutional neural network that is trained to detect objects in images, was selected due to its wide array of object classes and its high performance.
 
 To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library used in computer vision applications which provides a broad array of functions for image processing. The main idea was to determine the contours of the object by converting the image into the HSV color space and applying different filter. The contours are then used to calculate the main orientation of the object, using principle component analysis. 
 
@@ -160,14 +164,14 @@ These components will then be integrated into a single routine to detect objects
 In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
 
-The first approach 
+The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. The camera perspective in this test scenario was similar to the perspective in the final project setup. The results of the object detection are shown in Figure 2.
 
 <div class="center-div">
   <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing yolov3 model" >
   <p class = "image-description">Figure 2: Object detection results yolov3 model </p>
 </div>
 
-Figure 2 shows the results of the object detection using the yolov3 model.
+Figure 2 shows the results of the object detection using the yolov3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detected by the model: computer mouse, apple, beer can and orange. 
 
 - How the first approach turned out
   - bad accuracy 
