@@ -131,12 +131,12 @@ The system was developed by a team of two students and divided into three main c
 
 ## Solution Theory (given problems and proposed solutions)
 
-This chapter addresses solution concept for the problems that needed to be solved in order to realize the project and is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control. 
+This chapter addresses the solution concepts for the problems that needed to be solved in order to realize the project and is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control. 
  
 ### Object detection
 The first component of the project is the object detection. Its purpose is to detect objects in the workspace and determine their relative coordinates and size in the image as well as their orientation in relation to the table. 
 
-To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing yolov3 model. 
+To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The yolov3 model was selected due to its wide array of object classes and its high performance. 
 
 To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library used in computer vision applications which provides a broad array of functions for image processing. The main idea was to determine the contours of the object by converting the image into the HSV color space and applying different filter. The contours are then used to calculate the main orientation of the object, using principle component analysis. 
 
@@ -150,18 +150,23 @@ Once the objects are detected, the next step is to determine their coordinates i
 Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
 
 - TODO: first / theoretical approach to solve problem(s)
-- 
+  
 These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
 
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
 ## Implementation 
-
+In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
 - How the first approach turned out
+  - bad accuracy 
+  - not enough useable object classes 
+  - no Proto files for existing object classes
+  - 
 - custom detection
 - custom training
+  - transfer learning
   - trainings data
       - randomized objects
       - labeling
