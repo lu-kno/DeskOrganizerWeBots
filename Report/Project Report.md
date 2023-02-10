@@ -164,20 +164,29 @@ These components will then be integrated into a single routine to detect objects
 In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
 
-The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. The camera perspective in this test scenario was similar to the perspective in the final project setup. The results of the object detection are shown in Figure 2.
+#### First approach
+
+The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
+
+Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
 
 <div class="center-div">
-  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing yolov3 model" >
-  <p class = "image-description">Figure 2: Object detection results yolov3 model </p>
+  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 2: Object detection results YOLOv3 model </p>
 </div>
 
-Figure 2 shows the results of the object detection using the yolov3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detected by the model: computer mouse, apple, beer can and orange. 
 
+The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
+
+#### Custom detection
+
+The second approach to solve the problem of object detection was to train a custom object detection model. In order to reducte the effort needed to train the model, we decided to use transfer learning. Transfer learning is a machine learning method that utilizes a pre-trained model and adapts it to a new task. The pre-trained model is used as a starting point and the weights of the model are adjusted to fit the new task. This approach is especially useful when the new task is similar to the original task of the pre-trained model.
+
+#### Notes for this chapter (to be deleted later)
 - How the first approach turned out
   - bad accuracy 
   - not enough useable object classes 
-  - no Proto files for existing object classes
-  - 
+  - no Proto files for existing object classes 
 - custom detection
 - custom training
   - transfer learning
