@@ -121,7 +121,7 @@ In the initial phases of the project, the decision was made to utilize a simulat
 
 <div class="center-div">
   <img src="./project2.png"  width="75%" height="75%" class = "center-image" alt="Project setup in Webots" >
-  <p class = "image-description">Figure 1:Project setup in Webots </p>
+  <p class = "image-description">Figure 1: Project setup in Webots </p>
 </div>
 
 Figure one shows the project setup in Webots. A camera is used to detect objects in the workspace. The robot-arm is equipped with a gripper that can be utilized to grasp objects. The robot and its devices are controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. The entire system is self contained and doesn't require human interaction, other devices or an active web connection.
@@ -157,8 +157,18 @@ These components will then be integrated into a single routine to detect objects
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
 ## Implementation 
-In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control.
+In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
+
+The first approach 
+
+<div class="center-div">
+  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing yolov3 model" >
+  <p class = "image-description">Figure 2: Object detection results yolov3 model </p>
+</div>
+
+Figure 2 shows the results of the object detection using the yolov3 model.
+
 - How the first approach turned out
   - bad accuracy 
   - not enough useable object classes 
