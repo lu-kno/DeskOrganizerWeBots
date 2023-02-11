@@ -173,8 +173,16 @@ Transformation matrix as a Frame <red>(not sure if this is the right term, needs
 
 The rotation matrix for a rotation by the angle beta around an axis given by (x,y,z) can be obtained with the following formula:
 
-// Check if its right
-[[cos(beta) + x^2(1-cos(beta)), xy(1-cos(beta)) - zsin(beta), xz(1-cos(beta)) + ysin(beta)], [xy(1-cos(beta)) + zsin(beta), cos(beta) + y^2(1-cos(beta)), yz(1-cos(beta)) - xsin(beta)], [xz(1-cos(beta)) - ysin(beta), yz(1-cos(beta)) + xsin(beta), cos(beta) + z^2(1-cos(beta))] ]
+<red>Check if its right</red>
+
+$$
+\begin{bmatrix}
+\cos(\beta) + x^2(1-\cos(\beta)) & xy(1-\cos(\beta)) - z\sin(\beta) & xz(1-\cos(\beta)) + y\sin(\beta) \\
+xy(1-\cos(\beta)) + z\sin(\beta) & \cos(\beta) + y^2(1-\cos(\beta)) & yz(1-\cos(\beta)) - x\sin(\beta) \\
+xz(1-\cos(\beta)) - y\sin(\beta) & yz(1-\cos(\beta)) + x\sin(\beta) & \cos(\beta) + z^2(1-\cos(\beta)) \\
+\end{bmatrix}
+$$
+
 
 The translation Matrix is a 1x4 matrix containing the position vector of the tables origin relative to the simulations world origin.
 
@@ -183,10 +191,15 @@ The perspective projection matrix is not used in this project but is included fo
 The scale factor is used to to specify an uniform (isotropic) scaling factor.
 Since the table is a rectangle, the scaling in the different directions is different, so a scaling matrix is used instead of a single factor as follows:
     
-    [[sx, 0, 0, 0], 
-    [0, sy, 0, 0], 
-    [0, 0, sz, 0], 
-    [0, 0, 0, 1]]
+$$
+\begin{bmatrix}
+sx & 0 & 0 & 0 \\
+0 & sy & 0 & 0 \\
+0 & 0 & sz & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
 
 where sx, sy and sz are the dimensions of the table in question.
 
@@ -211,37 +224,46 @@ A transformation matrix is a 4x4 matrix that is used to transform a vector from 
 Rotation Matrix:
 Column A | Column B | Column C
 ---------|----------|---------
- xx(1-cos A) + cos A   | yx(1-cos A) - z sin A | zx(1-cos A) + y sin A
- xy(1-cos A) + z sin A | yy(1-cos A) + cos A   | zy(1-cos A) - x sin A
- xz(1-cos A) - y sin A | yz(1-cos A) + x sin A | zz(1-cos A) + cos A
-
-
-Rotation Matrix:
-Column A | Column B | Column C
----------|----------|---------
- xx(1-cos A) + cos A   | yx(1-cos A) - z sin A | zx(1-cos A) + y sin A
- xy(1-cos A) + z sin A | yy(1-cos A) + cos A   | zy(1-cos A) - x sin A
- xz(1-cos A) - y sin A | yz(1-cos A) + x sin A | zz(1-cos A) + cos A
+$$
+\begin{bmatrix}
+ xx(1-cos A) + cos A   & yx(1-cos A) - z sin A & zx(1-cos A) + y sin A \\
+ xy(1-cos A) + z sin A & yy(1-cos A) + cos A   & zy(1-cos A) - x sin A \\
+ xz(1-cos A) - y sin A & yz(1-cos A) + x sin A & zz(1-cos A) + cos A \\
+\end{bmatrix}
+$$
 
 
 In order to tranform the coordinates from the unit `pixels` to the unit `meters`, the scale matrix is calculated as follows:
-Column A | Column B | Column C | Column D
----------|----------|----------|---------
- width | 0 | 0 | 0
- 0 | height | 0 | 0
- 0 | 0 | depth | 0
- 0 | 0 | 0 | 1
 
- where `width`, `height`, and `depth` are the dimensions of the table in the simulation.
+$$
+\begin{bmatrix}
+ width & 0 & 0 & 0 \\
+ 0 & height & 0 & 0 \\
+ 0 & 0 & depth & 0 \\
+ 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
+where `width`, `height`, and `depth` are the dimensions of the table in the simulation.
+
 
 With the position of the table relative to the simulation origin given as (x, y, z), the translation matrix can be built as follows:  
 Translation Matrix:
-Column A | Column B | Column C | Column D
----------|----------|----------|---------
- 1 | 0 | 0 | x
- 0 | 1 | 0 | y
- 0 | 0 | 1 | z
- 0 | 0 | 0 | 1
+
+$$
+\begin{bmatrix}
+ 1 & 0 & 0 & x \\
+ 0 & 1 & 0 & y \\
+ 0 & 0 & 1 & z \\
+ 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
+
+
+The transformation matrix is then calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix.??????
+
+
 
 
 
