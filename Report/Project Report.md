@@ -53,6 +53,17 @@ h6:before {
     font-weight: bold;
 }
 
+
+red {
+    color: rgb(255, 0, 0);
+}
+
+/* p, li, ul, code {
+    font-size: 12px;
+    line-height:200%;
+} */
+
+
 </style>
 
 
@@ -81,6 +92,10 @@ h6:before {
 <br>
 <div style="page-break-after: always"></div>
 
+# Abstract
+- TODO Abstract
+<div style="page-break-after: always"></div>
+
 # Table of Content
 ## [Introduction](#introduction)
 ## [Project introduction](#project-introduction)
@@ -102,11 +117,8 @@ h6:before {
 ### [same content as in presentation silde](#same-content-as-in-presentation-silde)
 ## [References for Markdown](#references-for-markdown)
 
-<div style="page-break-after: always"></div>
 
-# Abstract
-- TODO Abstract
-<div style="page-break-after: always"></div>
+
 
 # Report: Autonomous workplace organizer
 
@@ -151,11 +163,122 @@ To simplify these problems, we decided to use a top-down view of the workspace. 
 
 To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library used in computer vision applications which provides a broad array of functions for image processing. The main idea was to determine the contours of the object by converting the image into the HSV color space and applying different filter. The contours are then used to calculate the main orientation of the object, using principle component analysis. 
 
-### Coordinates transition
+### Coordinates transformation
 
 Once the objects are detected, the next step is to determine their coordinates in the simulation. 
 
 - TODO: first / theoretical approach to solve problem(s)
+
+Once knowing the coordinates of the detected object in the image, the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used.
+
+This is done using a transformation matrix.
+For this, it is necessary to know the dimensions, position and orientation of the table in the simulation.
+
+
+Transformation matrix as a Frame <red>(not sure if this is the right term, needs to be expanded)</red>:
+
+|Rotation matrix | Translation matrix|
+|Perspective projection matrix | Scale factor|
+
+The rotation matrix for a rotation by the angle beta around an axis given by (x,y,z) can be obtained with the following formula:
+
+<red>Check if its right</red>
+
+$$
+\begin{bmatrix}
+\cos(\beta) + x^2(1-\cos(\beta)) & xy(1-\cos(\beta)) - z\sin(\beta) & xz(1-\cos(\beta)) + y\sin(\beta) \\
+xy(1-\cos(\beta)) + z\sin(\beta) & \cos(\beta) + y^2(1-\cos(\beta)) & yz(1-\cos(\beta)) - x\sin(\beta) \\
+xz(1-\cos(\beta)) - y\sin(\beta) & yz(1-\cos(\beta)) + x\sin(\beta) & \cos(\beta) + z^2(1-\cos(\beta)) \\
+\end{bmatrix}
+$$
+
+
+The translation Matrix is a 1x4 matrix containing the position vector of the tables origin relative to the simulations world origin.
+
+The perspective projection matrix is not used in this project but is included for completeness. It is used to project a 3D point onto a 2D plane. 
+
+The scale factor is used to to specify an uniform (isotropic) scaling factor.
+Since the table is a rectangle, the scaling in the different directions is different, so a scaling matrix is used instead of a single factor as follows:
+    
+$$
+\begin{bmatrix}
+sx & 0 & 0 & 0 \\
+0 & sy & 0 & 0 \\
+0 & 0 & sz & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
+
+where sx, sy and sz are the dimensions of the table in question.
+
+<red> The following is not complete, needs to be reworked and checked </red>
+
+Rotation matrix can be obtained by multiplying the three rotation matrices around the x, y and z axis. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The scale matrix is used to scale the vector by a given factor. The perspective projection matrix is used to project a 3D point onto a 2D plane. The scale factor is used to scale the vector by a given factor.
+
+=========
+
+The transformation matrix is built as follows. First, the scale factor between the image and the simulation is calculated with the tables known dimensions. 
+
+
+This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
+
+Knowing this, it is possible to generate a transformation matrix 
+
+The first step is to determine the dimensions of the table in order to calculate the scale factor between the image and the simulation. Knowing the scale factor, it is necessary to determine the position and orientation of the table, in order to complete the transformation matrix that needs to be use to calculate the coordinates of the object in the simulation.
+
+A transformation matrix is a 4x4 matrix that is used to transform a vector from one coordinate system to another. The transformation matrix is calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The rotation matrix is used to rotate the vector around the origin of the coordinate system. The scale matrix is used to scale the vector to the desired size.
+
+
+Rotation Matrix:
+Column A | Column B | Column C
+---------|----------|---------
+$$
+\begin{bmatrix}
+ xx(1-cos A) + cos A   & yx(1-cos A) - z sin A & zx(1-cos A) + y sin A \\
+ xy(1-cos A) + z sin A & yy(1-cos A) + cos A   & zy(1-cos A) - x sin A \\
+ xz(1-cos A) - y sin A & yz(1-cos A) + x sin A & zz(1-cos A) + cos A \\
+\end{bmatrix}
+$$
+
+
+In order to tranform the coordinates from the unit `pixels` to the unit `meters`, the scale matrix is calculated as follows:
+
+$$
+\begin{bmatrix}
+ width & 0 & 0 & 0 \\
+ 0 & height & 0 & 0 \\
+ 0 & 0 & depth & 0 \\
+ 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
+where `width`, `height`, and `depth` are the dimensions of the table in the simulation.
+
+
+With the position of the table relative to the simulation origin given as (x, y, z), the translation matrix can be built as follows:  
+Translation Matrix:
+
+$$
+\begin{bmatrix}
+ 1 & 0 & 0 & x \\
+ 0 & 1 & 0 & y \\
+ 0 & 0 & 1 & z \\
+ 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
+
+
+
+The transformation matrix is then calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix.??????
+
+
+
+
+
+
+
+
 ### Robot controller
 
 Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
@@ -322,3 +445,7 @@ pSearch(Piece, [Upper, Right, Down, Left]):
 |pieceSearch/3	|0.00%	|16.30%	|5.40%	|2.20%	|0.80%	|1.00%	|0.60%  |
 |pSearch/2	|4.50%	|5.30%	|3.50%	|3.40%	|1.00%	|0.90%	|0.70%  |
 
+
+# Abstract
+- TODO Abstract
+<div style="page-break-after: always"></div>
