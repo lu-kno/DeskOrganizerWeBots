@@ -1,5 +1,8 @@
 <style>
-body { counter-reset: h1counter h2counter h3counter h4counter h5counter h6counter; }
+body { counter-reset: h1counter h2counter h3counter h4counter h5counter h6counter; 
+
+    //font-size: 12px;
+}
 
 h1 { counter-reset: h2counter; }
 h2 { counter-reset: h3counter; }
@@ -46,6 +49,10 @@ h6:before {
     font-size: 11px;
 }
 
+.sub-header {
+    font-weight: bold;
+}
+
 
 red {
     color: rgb(255, 0, 0);
@@ -85,41 +92,40 @@ red {
 <br>
 <div style="page-break-after: always"></div>
 
-<font size='16px'>Table of Contents</font>
+# Abstract
+- TODO Abstract
+<div style="page-break-after: always"></div>
 
-- [Robot Desk Organizer](#robot-desk-organizer)
-- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-  - [Introduction](#introduction)
-  - [Project introduction](#project-introduction)
-  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-    - [Object detection](#object-detection)
-    - [Coordinates transformation](#coordinates-transformation)
-    - [Robot controller](#robot-controller)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-  - [Implementation](#implementation)
-    - [Object detection](#object-detection-1)
-    - [Coord transition](#coord-transition)
-    - [Robot arm](#robot-arm)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-  - [Results](#results)
-  - [Outlook](#outlook)
-  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
-- [Abstract](#abstract)
-
-<div style="page-break-after: always"></div> 
-
-<!-- 
 # Table of Content
+## [Introduction](#introduction)
+## [Project introduction](#project-introduction)
+## [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+### [Object detection](#object-detection)
+### [Coord transition](#coord-transition)
+### [Robot arm](#robot-arm)
+## [Implementation](#implementation)
+### [Object detection](#object-detection-1)
+
+### [Coord transition](#coord-transition-1)
+     
+### [Robot arm](#robot-arm-1)
+     
+## [Results](#Results)
+    
+## [Outlook](#outlook)
+
 ### [same content as in presentation silde](#same-content-as-in-presentation-silde)
 ## [References for Markdown](#references-for-markdown)
--->
+
+
 
 
 # Report: Autonomous workplace organizer
 
 ## Introduction
 
-The purpose of this project is to address the problem of an cluttered work space. The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
+The purpose of this project is to address the problem of an cluttered work space.
+The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
 In this report we will document and discuss the development process of the project. 
 
 The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
@@ -130,12 +136,15 @@ The "Implementation" chapter provides detailed explanations of how the solutions
 
 The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
 
+- prove of concept for varios real world application
+- Solution transferable to other use cases
+
 In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications.
 
 
 <div class="center-div">
   <img src="./project2.png"  width="75%" height="75%" class = "center-image" alt="Project setup in Webots" >
-  <p class = "image-description">Figure 1:Project setup in Webots </p>
+  <p class = "image-description">Figure 1: Project setup in Webots </p>
 </div>
 
 Figure one shows the project setup in Webots. A camera is used to detect objects in the workspace. The robot-arm is equipped with a gripper that can be utilized to grasp objects. The robot and its devices are controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. The entire system is self contained and doesn't require human interaction, other devices or an active web connection.
@@ -150,7 +159,7 @@ This chapter addresses the solution concepts for the problems that needed to be 
 ### Object detection
 The first component of the project is the object detection. Its purpose is to detect objects in the workspace and determine their relative coordinates and size in the image as well as their orientation in relation to the table. 
 
-To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The yolov3 model was selected due to its wide array of object classes and its high performance. 
+To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The YOLOv3 model, a convolutional neural network that is trained to detect objects in images, was selected due to its wide array of object classes and its high performance.
 
 To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library used in computer vision applications which provides a broad array of functions for image processing. The main idea was to determine the contours of the object by converting the image into the HSV color space and applying different filter. The contours are then used to calculate the main orientation of the object, using principle component analysis. 
 
@@ -282,14 +291,49 @@ These components will then be integrated into a single routine to detect objects
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
 ## Implementation 
-In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control.
+In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
+
+#### First approach
+
+The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
+
+Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
+
+<div class="center-div">
+  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 2: Object detection results YOLOv3 model </p>
+</div>
+
+
+The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. 
+
+Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
+
+#### Custom detection
+
+The second approach to solve the problem of object detection was to train a custom object detection model. In the project plan, it was not initially planned to train a custom model. However, to streamline the process, the decision was made to utilize the ImageAI library. ImageAI is a Python library that offers a convenient framework for training and utilizing object detection models. In order to reduce the effort needed to train the model, we decided to use transfer learning. 
+
+<p class = "sub-header">Trainings data</p>
+
+- automated data creation in yolo format
+  - labeling 
+    - code example
+  - 
+
+<p class = "sub-header">Training </p>
+
+<p class = "sub-header">Result </p>
+
+#### Conclusion
+
+#### Notes for this chapter (to be deleted later)
 - How the first approach turned out
   - bad accuracy 
   - not enough useable object classes 
-  - no Proto files for existing object classes
-  - 
+  - no Proto files for existing object classes 
 - custom detection
+  - use of imageAI library 
 - custom training
   - transfer learning
   - trainings data
