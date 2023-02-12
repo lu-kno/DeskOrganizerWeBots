@@ -97,7 +97,31 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-## [Introduction](#introduction)
+1. [Robot Desk Organizer](#robot-desk-organizer)
+2. [Abstract](#abstract)
+3. [Table of Content](#table-of-content)
+4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+   1. [Introduction](#introduction)
+   2. [Project introduction](#project-introduction)
+   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+      1. [Object detection](#object-detection)
+      2. [Coordinates transformation](#coordinates-transformation)
+         1. [Transformation Matrix](#transformation-matrix)
+      3. [Robot controller](#robot-controller)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+   4. [Implementation](#implementation)
+      1. [Object detection](#object-detection-1)
+         1. [First approach](#first-approach)
+         2. [Custom detection](#custom-detection)
+      2. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+   5. [Implementation](#implementation-1)
+      1. [Object detection](#object-detection-2)
+         1. [First approach](#first-approach-1)
+         2. [Second approach / Solution](#second-approach--solution)
+         3. [Trainings data](#trainings-data)
+
+
+<!-- ## [Introduction](#introduction)
 ## [Project introduction](#project-introduction)
 ## [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
 ### [Object detection](#object-detection)
@@ -115,8 +139,8 @@ red {
 ## [Outlook](#outlook)
 
 ### [same content as in presentation silde](#same-content-as-in-presentation-silde)
-## [References for Markdown](#references-for-markdown)
-<div style="page-break-after: always"></div>
+## [References for Markdown](#references-for-markdown) -->
+
 
 
 
@@ -169,77 +193,85 @@ Once the objects are detected, the next step is to determine their coordinates i
 
 - TODO: first / theoretical approach to solve problem(s)
 
-Once knowing the coordinates of the detected object in the image, the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used.
+Once knowing the coordinates of the detected object in the image, 
+the next step is to transform the objects position vector from the image's coordinate system to the world's coordinate system. This type of transformation is best achieved with the use of a transformation matrix.
+<!-- the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used. -->
 
-This is done using a transformation matrix.
-For this, it is necessary to know the dimensions, position and orientation of the table in the simulation.
+#### Transformation Matrix
 
-
-Transformation matrix as a Frame <red>(not sure if this is the right term, needs to be expanded)</red>:
-
-|Rotation matrix | Translation matrix|
-|Perspective projection matrix | Scale factor|
-
-The rotation matrix for a rotation by the angle beta around an axis given by (x,y,z) can be obtained with the following formula:
-
-<red>Check if its right</red>
+A transformation matrix can be represented as a matrix frame, built from a combination of a rotation matrix, a translation vector, a scaling vector and a perspective projection matrix.
 
 $$
+\mathbf{T} = \left[
+\begin{array}{ccc|c}
+\ast&\ast&\ast&\ast\\
+\ast&R   &\ast& T  \\
+\ast&\ast&\ast&\ast\\
+\hline
+\ast&P   &\ast& S
+\end{array}
+\right]
+$$
+where:  
+* $R$ is the rotation matrix with the dimensions $3\times 3$.  
+* $T$ is the translation vector with the dimensions $3\times 1$.  
+* $P$ is the perspective projection matrix with the dimensions $1\times 3$.  
+* $S$ is the scale factor with the dimensions $1\times 1$ (for uniform\isotropic scaling).
+
+The rotation matrix for a rotation around any given axis given by the unit vector $\mathbf{\vec{u}(x,y,z)}$ by an angle $\theta$ is given by the following formula:
+
+$$
+R =
 \begin{bmatrix}
-\cos(\beta) + x^2(1-\cos(\beta)) & xy(1-\cos(\beta)) - z\sin(\beta) & xz(1-\cos(\beta)) + y\sin(\beta) \\
-xy(1-\cos(\beta)) + z\sin(\beta) & \cos(\beta) + y^2(1-\cos(\beta)) & yz(1-\cos(\beta)) - x\sin(\beta) \\
-xz(1-\cos(\beta)) - y\sin(\beta) & yz(1-\cos(\beta)) + x\sin(\beta) & \cos(\beta) + z^2(1-\cos(\beta)) \\
+u_x^2(1-\cos\theta) + \cos\theta & u_xu_y(1-\cos\theta) - u_z\sin\theta & u_xu_z(1-\cos\theta) + u_y\sin\theta \\
+u_xu_y(1-\cos\theta) + u_z\sin\theta & u_y^2(1-\cos\theta) + \cos\theta & u_yu_z(1-\cos\theta) - u_x\sin\theta \\
+u_xu_z(1-\cos\theta) - u_y\sin\theta & u_yu_z(1-\cos\theta) + u_x\sin\theta & u_z^2(1-\cos\theta) + \cos\theta \\
 \end{bmatrix}
 $$
 
 
-The translation Matrix is a 1x4 matrix containing the position vector of the tables origin relative to the simulations world origin.
+The translation vector is the position of the origin from image's coordinate system in the global simulation's coordinate system, i.e. the distance between both origins given as a three dimensional vector.
 
-The perspective projection matrix is not used in this project but is included for completeness. It is used to project a 3D point onto a 2D plane. 
-
-The scale factor is used to to specify an uniform (isotropic) scaling factor.
-Since the table is a rectangle, the scaling in the different directions is different, so a scaling matrix is used instead of a single factor as follows:
-    
 $$
+T =
 \begin{bmatrix}
-sx & 0 & 0 & 0 \\
-0 & sy & 0 & 0 \\
-0 & 0 & sz & 0 \\
-0 & 0 & 0 & 1 \\
+x\\
+y\\
+z\\
+\end{bmatrix}
+$$
+
+The perspective projection matrix is not used in this project due to the camera orientation being perpendicular to the surface of intereset, but is included for completeness.
+
+The scaling factor as given by the frame above can only be used for isotropic scaling, i.e. scaling in all three dimensions by the same factor. Since we are only interested in scaling in the x and y directions by different amounts, a single scaling factor can not be used by itself and needs to be expanded to a scaling matrix $\mathbf{S}$ with the following form:
+
+$$
+\mathbf{S}=
+\begin{bmatrix}
+S_x & 0 & 0   & 0\\
+0 & S_y & 0   & 0\\
+0 & 0   & S_z & 0\\
+0 & 0   & 0   & 1
 \end{bmatrix}
 $$
 
 
-where sx, sy and sz are the dimensions of the table in question.
+where $S_x$, $S_y$ and $S_z$ are the scaling factors in the x, y and z directions respectively.
 
+With the rotation and translation matrices a temporary Transformation matrix $T_{tmp}$ is built as the frame described previously using the unit 1 as a scaling factor. 
+
+The resulting matrix is then multiplied with the sacling matrix  to obtain the final transformation matrix $T$ as follows. 
+
+$$\mathbf{T} = \mathbf{T_{tmp}} \bullet \mathbf{S}$$
+<!-- 
 <red> The following is not complete, needs to be reworked and checked </red>
 
-Rotation matrix can be obtained by multiplying the three rotation matrices around the x, y and z axis. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The scale matrix is used to scale the vector by a given factor. The perspective projection matrix is used to project a 3D point onto a 2D plane. The scale factor is used to scale the vector by a given factor.
-
-=========
-
-The transformation matrix is built as follows. First, the scale factor between the image and the simulation is calculated with the tables known dimensions. 
-
-
 This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
-
-Knowing this, it is possible to generate a transformation matrix 
 
 The first step is to determine the dimensions of the table in order to calculate the scale factor between the image and the simulation. Knowing the scale factor, it is necessary to determine the position and orientation of the table, in order to complete the transformation matrix that needs to be use to calculate the coordinates of the object in the simulation.
 
 A transformation matrix is a 4x4 matrix that is used to transform a vector from one coordinate system to another. The transformation matrix is calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The rotation matrix is used to rotate the vector around the origin of the coordinate system. The scale matrix is used to scale the vector to the desired size.
 
-
-Rotation Matrix:
-Column A | Column B | Column C
----------|----------|---------
-$$
-\begin{bmatrix}
- xx(1-cos A) + cos A   & yx(1-cos A) - z sin A & zx(1-cos A) + y sin A \\
- xy(1-cos A) + z sin A & yy(1-cos A) + cos A   & zy(1-cos A) - x sin A \\
- xz(1-cos A) - y sin A & yz(1-cos A) + x sin A & zz(1-cos A) + cos A \\
-\end{bmatrix}
-$$
 
 
 In order to tranform the coordinates from the unit `pixels` to the unit `meters`, the scale matrix is calculated as follows:
@@ -253,31 +285,7 @@ $$
 \end{bmatrix}
 $$
 
-where `width`, `height`, and `depth` are the dimensions of the table in the simulation.
-
-
-With the position of the table relative to the simulation origin given as (x, y, z), the translation matrix can be built as follows:  
-Translation Matrix:
-
-$$
-\begin{bmatrix}
- 1 & 0 & 0 & x \\
- 0 & 1 & 0 & y \\
- 0 & 0 & 1 & z \\
- 0 & 0 & 0 & 1 \\
-\end{bmatrix}
-$$
-
-
-
-The transformation matrix is then calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix.??????
-
-
-
-
-
-
-
+where `width`, `height`, and `depth` are the dimensions of the table in the simulation. -->
 
 ### Robot controller
 
@@ -286,6 +294,44 @@ Additionally, a robot-controller needs to be developed to control the robotic ar
 - TODO: first / theoretical approach to solve problem(s)
   
 These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+
+### Notes for this chapter (to be deleted later)
+- Milestones or steps needed in project development
+- We define which problems we needed to solve and our first approaches to solve these problems
+## Implementation 
+In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
+### Object detection
+
+#### First approach
+
+The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
+
+Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
+
+<div class="center-div">
+  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 2: Object detection results YOLOv3 model </p>
+</div>
+
+
+The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. 
+
+Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
+
+#### Custom detection
+
+The second approach to solve the problem of object detection was to train a custom object detection model. In the project plan, it was not initially planned to train a custom model. However, to streamline the process, the decision was made to utilize the ImageAI library. ImageAI is a Python library that offers a convenient framework for training and utilizing object detection models. In order to reduce the effort needed to train the model, we decided to use transfer learning. 
+
+<p class = "sub-header">Trainings data</p>
+
+- automated data creation in yolo format
+  - labeling 
+    - code example
+  - 
+
+<p class = "sub-header">Training </p>
+
+<p class = "sub-header">Result </p>
 
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development

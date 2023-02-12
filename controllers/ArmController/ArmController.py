@@ -33,7 +33,7 @@ IKPY_MAX_ITERATIONS = 4
 
 DISABLE_FFB = False
 DISABLE_FINGER_TIP = False
-AUTO_LOOP = False
+AUTO_LOOP = True
 
 class MyGripper(logger):
     SPEED = 5 # SPEED in DEGREES
@@ -442,11 +442,10 @@ class RobotArm(logger):
         if (key==ord('L')):
             self.log("pressed: L")
             self.camera.saveImage("snapshot.jpg",100)
-            #TrainingsHelper.testModel()
+            TrainingsHelper.testModel()
             #ImageDetector.callWeBotsRecognitionRoutine(self.camera)
             #ImageDetector.imageAiTest()
             #TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-            ImageDetector.imageAiTest()
         if (key==ord('K')):
             self.log("pressed: K")
             TrainingsHelper.moveTableNodes(self,self.mainTable)
