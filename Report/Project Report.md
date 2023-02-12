@@ -314,7 +314,7 @@ The second approach to solve the problem of object detection was to train a cust
 
 In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
-#### Trainings data 
+#### Training data 
 
 The first step to train a custom model is to gather and arrange the training data in the YOLO annotation format. In this format the data is divided into two main directories: "train" and "validation". Each of these directories contains two sub-directories: "images" and "annotations". It's recommended to use 80% of the data for training and 20% for validation. The data consists of both images of objects we want to detect and accompanying annotation files. Each image is linked with a corresponding annotation file that shares the same name as the image file and provides information about the objects in the image. The general structure of the object annotation is shown below. 
 
@@ -327,15 +327,19 @@ The file contains one line for each object in the image. The object class is an 
 
 Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
 
-Two setups were prepared to generate training data. The first setup was a top-down view of the table with the objects placed on the table. The second setup was a view from the side of the table with individual objects placed on the table and rotated at 4 different view points.
+Two configurations were set up to generate training data. The first setup produced data with a top-down camera view and multiple objects arranged on the table. The second setup generated images with a side view, with individual objects positioned on the table and rotated at four distinct angles.
 
-The following steps were taken to automate the process:
+<p class = "sub-header">Configuration 1: Top down</p>
+
+To realize the top down configuration the following steps needed to be taken:
 
 1. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
-2. Define a function to take a snapshot of the camera image and create a corresponding annotation file. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
+2. Define a function to take a snapshot of the camera image and create the corresponding annotation files. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
 3. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
 
 - Top down
+
+<p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
 - 4 angled rotation object 
 
