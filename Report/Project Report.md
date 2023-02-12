@@ -373,9 +373,13 @@ The file contains one line for each object in the image. The object class is an 
 
 Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
 
+Two setups were prepared to generate training data. The first setup was a top-down view of the table with the objects placed on the table. The second setup was a view from the side of the table with individual objects placed on the table and rotated at 4 different view points.
+
 The following steps were taken to automate the process:
 
 1. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
+2. Define a function to take a snapshot of the camera image and create a corresponding annotation file. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
+3. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
 
 - Top down
 
