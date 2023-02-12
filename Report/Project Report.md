@@ -113,15 +113,12 @@ red {
       1. [Object detection](#object-detection-1)
          1. [First approach](#first-approach)
          2. [Custom detection](#custom-detection)
-         3. [Conclusion](#conclusion)
-         4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-      2. [Coord transition](#coord-transition)
-      3. [Robot arm](#robot-arm)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-   5. [Results](#results)
-   6. [Outlook](#outlook)
-   7. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
-5. [Abstract](#abstract-1)
+      2. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+   5. [Implementation](#implementation-1)
+      1. [Object detection](#object-detection-2)
+         1. [First approach](#first-approach-1)
+         2. [Second approach / Solution](#second-approach--solution)
+         3. [Trainings data](#trainings-data)
 
 
 <!-- ## [Introduction](#introduction)
@@ -336,7 +333,88 @@ The second approach to solve the problem of object detection was to train a cust
 
 <p class = "sub-header">Result </p>
 
+### Notes for this chapter (to be deleted later)
+- Milestones or steps needed in project development
+- We define which problems we needed to solve and our first approaches to solve these problems
+
+## Implementation 
+In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
+### Object detection
+
+#### First approach
+The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
+
+Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
+
+<div class="center-div">
+  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 2: Object detection results YOLOv3 model </p>
+</div>
+
+
+The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed.
+
+#### Second approach / Solution
+
+The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. 
+
+In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
+
+#### Trainings data 
+
+The first step to train a custom model is to gather and arrange the training data in the YOLO annotation format. In this format the data is divided into two main directories: "train" and "validation". Each of these directories contains two sub-directories: "images" and "annotations". It's recommended to use 80% of the data for training and 20% for validation. The data consists of both images of objects we want to detect and accompanying annotation files. Each image is linked with a corresponding annotation file that shares the same name as the image file and provides information about the objects in the image. The general structure of the object annotation is shown below. 
+
+```prolog
+<object-class><x-pos><y-pos><width><height>
+```	
+The file contains one line for each object in the image. The object class is an integer that represents the type of the object. The value corresponds to a list of objects in another file named "classes.txt" inside the "annotation" directory and is encoded by the index of the object in the list. The x-pos, y-pos, width, and height are the information for the bounding box of the object in the image. The values are normalized to the range [0, 1] and are relative to the width and height of the image.
+
+<p class = "sub-header">Automatization</p>
+
+Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
+
+The following steps were taken to automate the process:
+
+1. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
+
+- Top down
+
+- 4 angled rotation object 
+
+(The following steps were taken to automate the process:)
+
+
+
+- automated data creation in yolo format
+  - labeling 
+    - code example
+  - Table and 4 angle single 
+
+<p class = "sub-header">Training </p>
+
+After the data was created and labeled, the training process could be started. The training was done using the ImageAI library. 
+
+- hardware used
+- settings
+  - batch size
+  - epochs
+  - ..
+- trainings results
+- 
+
+<p class = "sub-header">Result </p>
+
+ - weakness
+   - Fragments of objects are detected as the object with a high probability (99%+)
+- Still convicing performance if the nms is tweaked right
+
 #### Conclusion
+
+- Framework created to automate the process of creating training data 
+  - Possibly transfarable to other projects
+    - Depending on the quality of the object animation. (Proto files)
+      - number of polygons
+      - textures  
 
 #### Notes for this chapter (to be deleted later)
 - How the first approach turned out
@@ -380,6 +458,16 @@ The second approach to solve the problem of object detection was to train a cust
 
 - same content as in presentation silde
 
+
+
+<div style="page-break-after: always"></div>
+
+# Sources
+
+[1] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+
+
+<div style="page-break-after: always"></div>
 
 ## References for Markdown (to be deleted later)
 
@@ -455,8 +543,3 @@ pSearch(Piece, [Upper, Right, Down, Left]):
 |matchRight/6	|25.40%	|5.00%	|4.00%	|2.60%	|0.90%	|0.60%	|0.40%  |
 |pieceSearch/3	|0.00%	|16.30%	|5.40%	|2.20%	|0.80%	|1.00%	|0.60%  |
 |pSearch/2	|4.50%	|5.30%	|3.50%	|3.40%	|1.00%	|0.90%	|0.70%  |
-
-
-# Abstract
-- TODO Abstract
-<div style="page-break-after: always"></div>
