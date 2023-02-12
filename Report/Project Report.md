@@ -308,42 +308,49 @@ Figure 2 shows the results of the object detection using the YOLOv3 model. The f
 
 The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed.
 
-#### Custom detection
+#### Second approach / Solution
 
 The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. 
 
 In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
-<p class = "sub-header">Trainings data</p>
+#### Trainings data 
 
-The first step in training a custom model is to gather and arrange the training data in the YOLO annotation format. This training data is separated into the directories "train" and "validation" each containing the sub-directories "images" and "annotations". A recommended ratio is 80% training data to 20% validation data. The data includes images of the objects to be detected as well as annotation files. Each image file is linked with a corresponding annotation file that shares the same name as the image file but has the ".txt" extension. The annotation file contains information about the objects in the image, such as:
+The first step to train a custom model is to gather and arrange the training data in the YOLO annotation format. In this format the data is divided into two main directories: "train" and "validation". Each of these directories contains two sub-directories: "images" and "annotations". It's recommended to use 80% of the data for training and 20% for validation. The data consists of both images of objects we want to detect and accompanying annotation files. Each image is linked with a corresponding annotation file that shares the same name as the image file and provides information about the objects in the image. The general structure of the object annotation is shown below. 
 
 ```prolog
 <object-class><x-pos><y-pos><width><height>
 ```	
-The annotation file contains one line for each object in the image. The object class is an integer that represents the type of the object. The x-pos, y-pos, width, and height are the information for the bounding box of the object in the image. The coordinates are normalized to the range [0, 1] and are relative to the width and height of the image.
-
-
-
-- Data needs to be splitted into training and validation directories
-
-- description of YOLO annotation format
+The file contains one line for each object in the image. The object class is an integer that represents the type of the object. The value corresponds to a list of objects in another file named "classes.txt" inside the "annotation" directory and is encoded by the index of the object in the list. The x-pos, y-pos, width, and height are the information for the bounding box of the object in the image. The values are normalized to the range [0, 1] and are relative to the width and height of the image.
 
 <p class = "sub-header">Automatization</p>
 
-Instead of creating and labeling the images ourselves we decided to automate the process. (The following steps were taken to automate the process:)
+Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
+
+The following steps were taken to automate the process:
+
+1. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
+
+- Top down
+
+- 4 angled rotation object 
+
+(The following steps were taken to automate the process:)
 
 
 
 - automated data creation in yolo format
   - labeling 
     - code example
-  - 
+  - Table and 4 angle single 
 
 <p class = "sub-header">Training </p>
 
+After the data was created and labeled, the training process could be started. The training was done using the ImageAI library. 
+
 - hardware used
 - settings
+  - batch size
   - epochs
   - ..
 - trainings results
