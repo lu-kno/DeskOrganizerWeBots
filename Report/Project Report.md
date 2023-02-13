@@ -207,13 +207,14 @@ the next step is to transform the objects position vector from the image's coord
 
 #### Transformation Matrix
 
+Assuming a current coordinate system $\mathbf{A}$ and a target coordinate system $\mathbf{B}$, the transformation matrix $\mathbf{T}$ can be used to transform a vector $\vec{v}$ from $\mathbf{A}$ to $\mathbf{B}$.
 A transformation matrix can be represented as a matrix frame, built from a combination of a rotation matrix, a translation vector, a scaling vector and a perspective projection matrix.
 
 $$
 \mathbf{T} = \left[
 \begin{array}{ccc|c}
 \ast&\ast&\ast&\ast\\
-\ast&R   &\ast& T  \\
+\ast&R   &\ast& \vec{t}  \\
 \ast&\ast&\ast&\ast\\
 \hline
 \ast&P   &\ast& S
@@ -222,7 +223,7 @@ $$
 $$
 where:  
 * $R$ is the rotation matrix with the dimensions $3\times 3$.  
-* $T$ is the translation vector with the dimensions $3\times 1$.  
+* $\vec{t}$ is the translation vector with the dimensions $3\times 1$.  
 * $P$ is the perspective projection matrix with the dimensions $1\times 3$.  
 * $S$ is the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).
 
@@ -237,22 +238,33 @@ u_xu_z(1-\cos\theta) - u_y\sin\theta & u_yu_z(1-\cos\theta) + u_x\sin\theta & u_
 \end{bmatrix}
 $$
 
+If the rotation is performed around the z axis, the rotation matrix can be simplified to the following form:
+$$
+R =
+\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta & 0 \\
+0 & 0 & 1 \\
+\end{bmatrix}
+$$
 
 
-The translation vector is the position of the origin from image's coordinate system in the global simulation's coordinate system, i.e. the distance between both origins given as a three dimensional vector. 
+The translation vector is the position of the origin from current coordinate system $O_{current}$ 
+relative to the target coordinate system $O_{target}$, i.e. the distance between both origins given as a three dimensional vector. 
 
 $$
-T =
+\vec{t} =
 \begin{bmatrix}
 x\\
 y\\
 z\\
-\end{bmatrix}
+\end{bmatrix}=
+O_{current}-O_{target}
 $$
 
 The perspective projection matrix is not used in this project due to the camera orientation being perpendicular to the surface of intereset, but is included for completeness.
 
-The scaling factor as given by the frame above can only be used for isotropic scaling, i.e. scaling in all three dimensions by the same factor. Since we are only interested in scaling in the x and y directions by different amounts, a single scaling factor can not be used by itself and needs to be expanded to a scaling matrix $\mathbf{S}$ with the following form:
+The scaling factor as given in the frame above can only be used for isotropic scaling, i.e. scaling in all three dimensions by the same factor. Since we are mainly interested in scaling in the x and y directions by different amounts, a single scaling factor can not be used by itself and needs to be expanded to a scaling matrix $\mathbf{S}$ with the following form:
 
 $$
 \mathbf{S}=
@@ -267,11 +279,12 @@ $$
 
 where $S_x$, $S_y$ and $S_z$ are the scaling factors in the x, y and z directions respectively.
 
-With the rotation and translation matrices a temporary Transformation matrix $T_{tmp}$ is built as the frame described previously using the unit 1 as a scaling factor. 
+With the rotation and translation matrices a primary Transformation matrix $T_{0}$ is built with the previously described frame using the unit 1 as a scaling factor and a null matrix as the perspective matrix. 
+This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the complete transformation matrix $T$ as follows. 
 
-The resulting matrix is then multiplied with the sacling matrix  to obtain the final transformation matrix $T$ as follows. 
+$$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
-$$\mathbf{T} = \mathbf{T_{tmp}} \bullet \mathbf{S}$$
+
 <!-- 
 <red> The following is not complete, needs to be reworked and checked </red>
 
@@ -306,19 +319,21 @@ These components will then be integrated into a single routine to detect objects
 
 #### Robot Kinematics
 
-The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
-Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+The Robot chosen for this task consists of a robotic arm with a gripper attached to the end of the arm. The robot by itself can be represented as a kinematic chain with 6 joints, resulting in 6 degrees of freedom.
+Calculating the position of the gripper (the end effector) from the known position of each individual motor can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
-Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
+Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain for a given position of the end effector presents a more challenging problem. 
+
+<red>Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters. DOES IT REALLY?</red>
+
+This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
+
+The analytical methods are based on the use of trigonometric formulas, which can be used to calculate the required position values for the motors. However, these methods are limited to a specific number of degrees of freedom, and can only be used for a limited number of cases.
+
+The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and is a non-deterministic procedure, meaning there can be more than one solution for a given point.
 
 
-
-To go around this problem, it is possible to use inverse kinematics
-
-One option would be to use inverse kinematics to aproximate the required result.
-
-<red>explain ik in depth</red>
-
+<red>following is probably better in implementation</red>  
 Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
 
 The following figure shows the robot's coordinate system and the position of the objects in the simulation.
@@ -700,6 +715,8 @@ After the data was created and labeled, the training process could be started. T
 # Sources
 
 [1] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+
+[2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021
 
 
 <div style="page-break-after: always"></div>
