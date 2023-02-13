@@ -1,23 +1,29 @@
-from imageai.Detection import ObjectDetection  
-from imageai.Detection.Custom import DetectionModelTrainer
-from imageai.Detection.Custom import CustomObjectDetection
-import os
-from pprint import pprint
-import cv2
-import numpy as np
-import matplotlib
-matplotlib.use('TKAgg')
-from matplotlib import pyplot as plt
+
+# from __future__ import annotations
+
 import ctypes
-from pathlib import Path
-from typing import List, Union, Callable
 import json
 import math
+import os
+import random
+import typing
 import warnings
-import random
+from pathlib import Path
+from pprint import pprint
+from typing import Any, Callable, Iterable, List, Literal, Optional, Union
+
+import cv2
+import matplotlib
+import numpy as np
+from imageai.Detection import ObjectDetection
+from imageai.Detection.Custom import (CustomObjectDetection,
+                                      DetectionModelTrainer)
+from matplotlib import pyplot as plt
+matplotlib.use('TKAgg')
+
 from scipy.ndimage import zoom
-import random
-from logger import logger
+from utils import logger
+
 warnings.filterwarnings("ignore", category=UserWarning) 
 
 MINIMUM_PERCENTAGE_PROBABILITY = 95
@@ -25,22 +31,22 @@ MINIMUM_PERCENTAGE_PROBABILITY = 95
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 
 class MyModel(logger):
-    def __init__(self, logging='D', logName='ImageAImodel'):
+    def __init__(self, logging: str = 'D', logName: str = 'ImageAImodel'):
         super().__init__(logging=logging, logName=logName)
         
         self.execution_path = os.path.dirname(__file__)
         self.detector = CustomObjectDetection()
         self.detector.setModelTypeAsYOLOv3()
-        self.modelPath = os.path.join(self.execution_path , "Modelle/first/yolov3_DataSet_last.pt")
-        self.jsonPath = os.path.join(self.execution_path , "Modelle/first/DataSet_yolov3_detection_config.json")
+        self.modelPath = os.path.join(self.execution_path , "../Modelle/first/yolov3_DataSet_last.pt")
+        self.jsonPath = os.path.join(self.execution_path , "../Modelle/first/DataSet_yolov3_detection_config.json")
         self.detector.setModelPath(self.modelPath) # path to custom trained model
         self.detector.setJsonPath(self.jsonPath) # path to corresponding json
         self.detector.loadModel()
 
-    def getObjectsFromImage(self, image):
+    def getObjectsFromImage(self, image) -> list[dict[str,Any]]:
         
         detections = self.detector.detectObjectsFromImage(input_image=image, 
-                                                    output_image_path=os.path.join(self.execution_path ,'snapshot-detected.jpg'),
+                                                    output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
                                                     nms_treshold = 0.05,
                                                     objectness_treshold = 0.5,
                                                     minimum_percentage_probability = MINIMUM_PERCENTAGE_PROBABILITY)
@@ -69,7 +75,7 @@ def testModel():
     detector.setModelPath(modelPath) # path to custom trained model
     detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
-    detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path ,'snapshot.jpg'), output_image_path=os.path.join(execution_path ,'snapshot-detected.jpg'),
+    detections: list[dict[str,Any]] = detector.detectObjectsFromImage(input_image=os.path.join(execution_path, 'output' ,'snapshot.jpg'), output_image_path=os.path.join(execution_path , 'output' ,'snapshot-detected.jpg'),
     nms_treshold = 0.05,
     objectness_treshold = 0.5,
     minimum_percentage_probability = 90)
@@ -98,13 +104,13 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
     execution_path = os.path.dirname(__file__)
-    if(type=='train'):
-        dir = 'train'
     if(type=='validation'):
         dir = 'validation'
-    annotationPath = os.path.join(execution_path , "DataSet/"+dir+"/annotations/")
-    jsonPath = os.path.join(execution_path , "DataSet/"+dir+"/raw_data/")
-    imagePath = os.path.join(execution_path , "DataSet/"+dir+"/images/")
+    else:
+        dir = 'train'
+    annotationPath = os.path.join(execution_path , "DataSet", dir, "annotations/")
+    jsonPath = os.path.join(execution_path , "DataSet", dir, "raw_data/")
+    imagePath = os.path.join(execution_path , "DataSet", dir, "images/")
     if not os.path.exists(annotationPath):
         os.makedirs(annotationPath)
     if not os.path.exists(jsonPath):
