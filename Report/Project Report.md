@@ -112,7 +112,8 @@ red {
          1. [Transformation Matrix](#transformation-matrix)
       3. [Robot controller](#robot-controller)
          1. [Robot Kinematics](#robot-kinematics)
-         2. [Organization Routine](#organization-routine)
+         2. [Gripper Actuation](#gripper-actuation)
+         3. [Organization Routine](#organization-routine)
       4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
    4. [Implementation](#implementation)
       1. [Object detection](#object-detection-1)
@@ -121,9 +122,13 @@ red {
          3. [Training data](#training-data)
          4. [Conclusion](#conclusion)
          5. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-      2. [Coord transition](#coord-transition)
+      2. [Coordinate transformation](#coordinate-transformation)
       3. [Robot arm](#robot-arm)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+         1. [Robot Movement](#robot-movement)
+         2. [Gripper](#gripper)
+      4. [Movement Routine](#movement-routine)
+      5. [](#)
+      6. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
    5. [Results](#results)
    6. [Outlook](#outlook)
 5. [Sources](#sources)
@@ -308,27 +313,38 @@ These components will then be integrated into a single routine to detect objects
 
 #### Robot Kinematics
 
-    The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
-    Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
+Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
-    Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
+Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
 
 
 
-    To go around this problem, it is possible to use inverse kinematics
+To go around this problem, it is possible to use inverse kinematics
 
-    One option would be to use inverse kinematics to aproximate the required result.
+One option would be to use inverse kinematics to aproximate the required result.
 
-    <red>explain ik in depth</red>
+<red>explain ik in depth</red>
 
-    Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
 
-    The following figure shows the robot's coordinate system and the position of the objects in the simulation.
+The following figure shows the robot's coordinate system and the position of the objects in the simulation.
 
-    <red>Insert figure from presentation</red>
+<red>Insert figure from presentation</red>
 
-    The position of the first motor can obtained with $ arctan(\frac{y}{z}) $, where $y$ and $z$ are the y and z coordinates of the object in the simulation.
+The position of the first motor $\omega_0$ can obtained as the angle between the two dimensional position vector in the xy plane with $\omega_0=arctan(\frac{y}{x})$, where 
+$y$ and $z$ are the y and z coordinates of the object in the simulation.
 
+
+#### Gripper Actuation
+
+The gripper consists of three individual fingers, each of them having three joints. The closing action of the finger is achieved by rotating the first joint of each finger until the desired object is grabed or the maximum joint rotation is reached. This alone creates a claw like grip, since all finger sections rotate with the first joint relative to the global coordinates. While useful in some cases, its contact area with the object being grabbed is significantly reduced.
+
+In order to improve the contact area of the gripper, it is possible to rotate the third joint of each finger in the opposite direction by the same amount as the first one, compensating the rotation on the fingertips and creating a more stable grip.
+
+The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
+
+<red>insert figure of gripper open, closed claw and closed flat</red>
 
 
 #### Organization Routine
@@ -559,14 +575,52 @@ After the data was created and labeled, the training process could be started. T
     - Settings
 - detection results
 
-### Coord transition
+### Coordinate transformation
 
 - TODO: description of implementation Coord transition
+* the image is cropped to cintain only the table
+* the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
+  
 
+* the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
+* the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
+* with this, the transformation matrix is produced.
+
+* to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.
+
+* the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).
+
+* the transformation matrix is then multiplied with the position vector to obtain the position vector in the world coordinate system.
+* the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.
 ### Robot arm
 
 - TODO: description of implementation Robot arm
-  
+
+#### Robot Movement
+
+* Behavior of the robot using IK
+* Behavior of the robot using Deterministic procedure
+* <red>insert pictures of a point being reached with both solutions</red>
+
+#### Gripper
+* to gripper is closed in small increments until a final value is reached.....
+* in order to detect when an object has been grabbed, a force needs to be detected.....
+* preliminary tests showed the importance of the force detection to be very high, since the robot would otherwise not be able to detect when an object has been grabbed and would continue closing the fingers through the object. This caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
+* <red>insert images of grippers going through objects</red>
+* <red>insert force detection code</red>
+* the robot controller waits for the fingers to reach a closed state before continuing with the following movements.
+* <red>make reference to looper</red>
+
+### Movement Routine
+* start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task
+* loop and autoloop functions containing the actions to be performed by the robot
+  * loop function contains actions that are not performed in an autonomous way, but controlled by the user. This functions as a manual control loop. This includes the movement of the robot arm and the opening and closing of the gripper. 
+  * autoloop function contains actions that are performed autonomously by the robot. This includes the object detection routine followed by the movement of the robot itself to move the objects from one place to another.
+
+
+
+
+###
 ### Notes for this chapter (to be deleted later)
 - implementation of solutions -> going into detail at interesting places 
 
