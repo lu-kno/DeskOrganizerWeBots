@@ -198,3 +198,39 @@ DEF Cylinder MyCylinder {
 DEF Cube Cube {
   name "box2"
 }
+DEF MoverReference Transform {
+  translation -0.81 1.8 0.73
+  rotation 1 0 0 3.141592653589793
+  children [
+    DEF Mover Solid {
+      translation 0.87 0.42 -0.3
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.8 0 0
+          }
+          geometry Capsule {
+            height 0.1
+            radius 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+  ]
+}
+DEF Follower Solid {
+  translation 0.517137 1.12984 0.8
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.45098 0.823529 0.0862745
+      }
+      geometry Capsule {
+        height 0.1
+        radius 0.05
+      }
+    }
+  ]
+  name "solid(2)"
+}

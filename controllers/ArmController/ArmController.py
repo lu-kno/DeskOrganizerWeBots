@@ -29,7 +29,8 @@ Vec3 = tuple[float, float, float]
 
 DISABLE_FFB = False
 DISABLE_FINGER_TIP = False
-AUTO_LOOP = True
+AUTO_LOOP = False
+TABLE_TRANSFORM_TEST = True
 
 def _enableFB(self, sampling_period: int):
     '''Partial fix for Webots bug in R2023a to allow force feedback sampling period to be set'''
@@ -266,6 +267,16 @@ class RobotArm(logger):
         self.logVV('Known Object Info: \n',self.objectInfo)
         self.PhotoshootIndex=0
         self.lastScan=0
+        
+        self.testMover = self.supervisor.getFromDef('Mover')
+        self.testMoverReference = self.supervisor.getFromDef('MoverReference')
+        self.testFollower = self.supervisor.getFromDef('Follower')
+        if not TABLE_TRANSFORM_TEST:
+            self.testMover.getField('translation').setSFVec3f([0,0,0])
+            self.testMoverReference.getField('translation').setSFVec3f([0,0,0])
+            self.testFollower.getField('translation').setSFVec3f([0,0,0])
+
+            
 
     def sleep(self, _time: float = 1) -> None:
         time = _time
@@ -275,12 +286,43 @@ class RobotArm(logger):
             if time<0:
                 return
 
+    def stepOperations(self) -> None:
+        '''
+        Executes the operations that are scheduled for each simulation step.
+        Keystrokes are handled.
+        Datacam follows the viewpoint.
+        If self.collectData is True, a snapshot is taken if the viewpoint has moved.
+        '''
+        self.handleKeystroke()
+        vpPos = self.viewPoint.getField('position').getSFVec3f()
+        vpOri = self.viewPoint.getField('orientation').getSFRotation()
+        
+        self.arm.getField('dataCamTrans').setSFVec3f(vpPos)
+        self.arm.getField('dataCamRot').setSFRotation(vpOri)
+        
+        diffP = self.lastDCamPos - np.array(vpPos)
+        diffO = self.lastDCamOri - np.array(vpOri)
+        
+        self.lastDCamPos = np.array(vpPos)
+        self.lastDCamOri = np.array(vpOri)
+        
+        if TABLE_TRANSFORM_TEST:
+            self.testFollower.getField('translation').setSFVec3f(list(self.mainTable.local2world(self.testMover.getField('translation').getSFVec3f())))
+        if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
+            self.logV('Taking Snapshot')
+            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
+        
+        return
+    
     def start(self) -> None:
         '''Robot's entry point and setup routine.'''
         try:
             # self.drawCircle()
             self.moveTo(self.HOME_POSITION)
-            self.autoloop()
+            if AUTO_LOOP:
+                self.autoloop()
+            else:
+                self.loop()
         except Exception as e:
             self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_PAUSE)
             self.logE(e)
@@ -357,31 +399,6 @@ class RobotArm(logger):
         if self.dataCount>imagesPerPerspective*32: # amountPerspectives*amountObjects = 32 
             return -1
 
-    def stepOperations(self) -> None:
-        '''
-        Executes the operations that are scheduled for each simulation step.
-        Keystrokes are handled.
-        Datacam follows the viewpoint.
-        If self.collectData is True, a snapshot is taken if the viewpoint has moved.
-        '''
-        self.handleKeystroke()
-        vpPos = self.viewPoint.getField('position').getSFVec3f()
-        vpOri = self.viewPoint.getField('orientation').getSFRotation()
-        
-        self.arm.getField('dataCamTrans').setSFVec3f(vpPos)
-        self.arm.getField('dataCamRot').setSFRotation(vpOri)
-        
-        diffP = self.lastDCamPos - np.array(vpPos)
-        diffO = self.lastDCamOri - np.array(vpOri)
-        
-        self.lastDCamPos = np.array(vpPos)
-        self.lastDCamOri = np.array(vpOri)
-        
-        if ((max(diffP)>0.1) or (max(diffO)>0.17)) and self.collectData:
-            self.logV('Taking Snapshot')
-            TrainingsHelper.makeSnapshot(self.dataCam,type='train')
-        
-        return
         
         
     @looper 
@@ -757,7 +774,7 @@ class Table(logger):
         
         self.orientation = node.getOrientation()
         
-    def local2world(self, _pos: Vec3) -> Vec3:
+    def local2worldOld(self, _pos: Vec3) -> Vec3:
         ''' this function tranforms the coordinates from the table to world coordinates.
         if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
         
@@ -801,7 +818,37 @@ class Table(logger):
         #print(f'pos: {pos}')
         #print(f'result: {res}')
         return res
+            
+    def local2world(self, _pos: Vec3) -> Vec3:
+        ''' this function tranforms the coordinates from the table to world coordinates.
+        if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
         
+        # for i in range(3):
+        #     pos[i]=pos[i]*self.size[i]
+
+        TableT_unscaled=[[0,-1,0,0.5],
+                        [-1,0,0,0.5],
+                        [0,0,-1,1],
+                        [0,0,0,1]]
+        TableScaling=[[self.size[0],0,0,0],
+                       [0,self.size[1],0,0],
+                       [0,0,self.size[2],0],
+                       [0,0,0,1]]
+            
+        TableT=np.matmul(TableT_unscaled,TableScaling)
+        
+        WorldT=np.array([[math.cos(self.rotation[3]),-math.sin(self.rotation[3]),0,self.position[0]],
+                         [math.sin(self.rotation[3]),math.cos(self.rotation[3]),0,self.position[1]],
+                         [0,0,1,self.position[2]],
+                         [0,0,0,1]])
+        
+        tmp = np.matmul(TableScaling, np.matmul(TableT_unscaled, np.array([*_pos,1])))
+        
+        r = np.matmul(WorldT, tmp)[:3]
+        
+        self.logD(_pos, r)
+        return r
+          
         
         
 robot = RobotArm(logging='Very_verbose')
