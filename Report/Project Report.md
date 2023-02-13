@@ -116,18 +116,6 @@ red {
       - [Training data](#training-data)
       - [Training](#training)
       - [Result](#result)
-      - [Conclusion](#conclusion)
-      - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-    - [Coordinate transformation](#coordinate-transformation)
-    - [Robot arm](#robot-arm)
-      - [Robot Movement](#robot-movement)
-      - [Gripper](#gripper)
-      - [Movement Routine](#movement-routine)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-  - [Results](#results)
-  - [Outlook](#outlook)
-- [Sources](#sources)
-  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -422,9 +410,9 @@ The model was able to detect the beer can with an accuracy of 94 percent. Howeve
 
 #### Second approach / Solution
 
-The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. 
+The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]
 
-In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
+In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [2] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
 #### Training data 
 
@@ -511,16 +499,16 @@ Finally a loop needed to be developed to call the snapshot and object randomizat
 
 ```python
 @looper
-def randomPosSamplingLoop(self,sampleSize,type):
-    if self.loopCount % 10 == 0:
-        if self.loopCount % 20 == 0:
-            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-        else:
-            TrainingsHelper.makeSnapshot(self.camera,type)
-            self.dataCount +=1
-    self.loopCount += 1
-    if self.dataCount>sampleSize:
-        return -1
+1 def randomPosSamplingLoop(self,sampleSize,type):
+2     if self.loopCount % 10 == 0:
+3         if self.loopCount % 20 == 0:
+4             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+5         else:
+6             TrainingsHelper.makeSnapshot(self.camera,type)
+7             self.dataCount +=1
+8     self.loopCount += 1
+9     if self.dataCount>sampleSize:
+10        return -1
 ```
 The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the "moveTableNodes" function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
 
@@ -578,28 +566,48 @@ The training data can be generated using the same function as in the first confi
 11        return -1
 ```
 
-This loop operates in a similar fashion to the first configuration, alternately executing the "single_object_setup" and "makeSnapshot" methods with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
+This loop operates in a similar fashion to the first configuration, alternately executing the "single_object_setup" and "makeSnapshot" functions with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
 
 #### Training 
 
-After the data was created and labeled, the training process could be started. The training was done using the ImageAI library. 
-- amount of data in each config
-  - conf 1
-    - ..
-  - conf 2
-    - 8 images per object at different orientations at 4 viewpoints
-- hardware used
-- settings
-  - batch size
-  - epochs
-  - ..
-- trainings results
-- 
+A total of 1456 images were generated for training and 384 images for validation. The training was performed using the ImageAI library, which provides a pre-trained YOLOv3 model that was used as a starting point for transfer learning. The following code segments presents the implementation of the training function, using the ImageAI library. 
+
+```python
+1 def startTraining():
+2     execution_path = os.path.dirname(__file__)
+3     data_dir_path = os.path.join(execution_path , "DataSet")
+4     model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+5     createClassFiles(categories) 
+6     trainer = DetectionModelTrainer()
+7     trainer.setModelTypeAsYOLOv3()
+8     trainer.setDataDirectory(data_directory=data_dir_path)
+9     trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
+10    trainer.trainModel()
+```
+The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
+
+The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
+
+
 #### Result 
+
+The model achieved a mean Avarage Precision (mAP) of 77
+
+```prolog
+Epoch 127/200
+----------
+Train:
+92it [00:59,  1.54it/s]
+    box loss-> 0.01273, object loss-> 0.03202, class loss-> 0.00211
+Validation:
+46it [00:28,  1.59it/s]
+    recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
+```	
 
 
  - weakness
    - Fragments of objects are detected as the object with a high probability (99%+)
+   - Might be overfitted
 - Still convicing performance if the nms is tweaked right
 
 #### Conclusion
@@ -691,7 +699,9 @@ After the data was created and labeled, the training process could be started. T
 
 - TODO: presenting results
 
-## Outlook 
+## Outlook / Conclusion
+
+- Robot controller can be used to in real world applications
 
 - same content as in presentation silde
 
@@ -700,8 +710,11 @@ After the data was created and labeled, the training process could be started. T
 <div style="page-break-after: always"></div>
 
 # Sources
+[1] https://imageai.readthedocs.io/en/latest/index.html
 
-[1] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+[2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+
+
 
 
 <div style="page-break-after: always"></div>
