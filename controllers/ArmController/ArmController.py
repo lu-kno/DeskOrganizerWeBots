@@ -860,11 +860,11 @@ class Table(logger):
                          [math.sin(self.rotation[3]),math.cos(self.rotation[3]),0,self.position[1]],
                          [0,0,1,self.position[2]],
                          [0,0,0,1]])
+                
         
-        tmp = np.matmul(TableScaling, np.matmul(TableT_unscaled, np.array([*_pos,1])))
+        TMat = np.matmul(np.matmul(WorldT, TableScaling), TableT_unscaled)
         
-        r = np.matmul(WorldT, tmp)[:3]
-        
+        r = np.matmul(TMat, np.array([*_pos,1]))[:3]
         self.logD(_pos, r)
         return r
           
