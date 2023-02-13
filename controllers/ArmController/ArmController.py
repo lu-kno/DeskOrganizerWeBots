@@ -18,7 +18,7 @@ import controller
 from controller import Camera, Motor, Robot, Supervisor, Node, PositionSensor, Keyboard
 from controller.device import Device
 from controller.wb import wb
-from utils import logger, looper, looperTimeout
+from utils import logger, looper, looperTimeout, OUTPUT_DIR
 
 
 # import TrainingsHelper
@@ -29,7 +29,7 @@ Vec3 = tuple[float, float, float]
 
 DISABLE_FFB = False
 DISABLE_FINGER_TIP = False
-AUTO_LOOP = False
+AUTO_LOOP = True
 TABLE_TRANSFORM_TEST = True
 
 def _enableFB(self, sampling_period: int):

@@ -4,7 +4,10 @@ import datetime
 from controller import AnsiCodes
 import typing
 from typing import Optional, Iterable, Literal, Any, NewType
+import os
 
+OUTPUT_DIR = os.path.join(os.getcwd(), 'output') 
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 class logger():
     def __init__(self, logging: str = 'L', logName: str = 'Unnamed'):

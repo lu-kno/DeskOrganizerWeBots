@@ -20,7 +20,7 @@ from imageai.Detection import ObjectDetection
 from matplotlib import pyplot as plt
 matplotlib.use('TKAgg')
 from scipy.ndimage import zoom
-from utils import logger
+from utils import logger, OUTPUT_DIR
 
 from . import TrainingsHelper
 
@@ -45,9 +45,10 @@ class ImageScanner(logger):
         self.imageAImodel=TrainingsHelper.MyModel(logging=logging)
         
     def imageAIScan(self) -> Iterable[dict]:
+        snapshot_path = os.path.join(OUTPUT_DIR, 'snapshot.jpg')
         
-        self.camera.saveImage('snapshot.jpg',100)
-        img = cv2.imread('snapshot.jpg').astype('uint8')
+        self.camera.saveImage(snapshot_path,100)
+        img = cv2.imread(snapshot_path).astype('uint8')
         # plt.imshow(img)
         # plt.suptitle('using saveImage and imread')
         # plt.show()
@@ -106,7 +107,7 @@ class ImageScanner(logger):
                            orientation = self.getAngle(objImage, name=obj['name'], savefig=SAVEFIGS))
             objects.append(oValues)
 
-        with open('recognitionObject.yaml','w+') as f:
+        with open(os.path.join(OUTPUT_DIR,'recognitionObject.yaml'),'w+') as f:
             f.write(yaml.dump(objects))
         self.logV(yaml.dump(objects))
         return objects
@@ -152,7 +153,7 @@ class ImageScanner(logger):
             objects.append(oValues)
         
         # print(json.dumps(objects,indent=4))
-        with open('recognitionObject.yaml','w+') as f:
+        with open(os.path.join(OUTPUT_DIR,'recognitionObject.yaml'),'w+') as f:
             f.write(yaml.dump(objects))
         self.logV(yaml.dump(objects))
     
@@ -212,7 +213,8 @@ class ImageScanner(logger):
                 if not name:
                     name=str(random.randrange(999))
                     
-                imagePath=os.path.join(os.getcwd(),'output','savedImages')
+                imagePath=os.path.join(OUTPUT_DIR,'savedImages')
+                os.makedirs(imagePath, exist_ok=True)
                 pathPrefix=os.path.join(imagePath,name)
                 os.makedirs(imagePath, exist_ok=True)
                 
