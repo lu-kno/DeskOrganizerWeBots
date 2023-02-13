@@ -100,32 +100,34 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-- [Robot Desk Organizer](#robot-desk-organizer)
-- [Abstract](#abstract)
-- [Table of Content](#table-of-content)
-- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-  - [Introduction](#introduction)
-  - [Project introduction](#project-introduction)
-  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-    - [Object detection](#object-detection)
-    - [Coordinates transformation](#coordinates-transformation)
-      - [Transformation Matrix](#transformation-matrix)
-    - [Robot controller](#robot-controller)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-  - [Implementation](#implementation)
-    - [Object detection](#object-detection-1)
-      - [First approach](#first-approach)
-      - [Second approach / Solution](#second-approach--solution)
-      - [Training data](#training-data)
-      - [Conclusion](#conclusion)
-      - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-    - [Coord transition](#coord-transition)
-    - [Robot arm](#robot-arm)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-  - [Results](#results)
-  - [Outlook](#outlook)
-- [Sources](#sources)
-  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+1. [Robot Desk Organizer](#robot-desk-organizer)
+2. [Abstract](#abstract)
+3. [Table of Content](#table-of-content)
+4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+   1. [Introduction](#introduction)
+   2. [Project introduction](#project-introduction)
+   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+      1. [Object detection](#object-detection)
+      2. [Coordinates transformation](#coordinates-transformation)
+         1. [Transformation Matrix](#transformation-matrix)
+      3. [Robot controller](#robot-controller)
+         1. [Robot Kinematics](#robot-kinematics)
+         2. [Organization Routine](#organization-routine)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+   4. [Implementation](#implementation)
+      1. [Object detection](#object-detection-1)
+         1. [First approach](#first-approach)
+         2. [Second approach / Solution](#second-approach--solution)
+         3. [Training data](#training-data)
+         4. [Conclusion](#conclusion)
+         5. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+      2. [Coord transition](#coord-transition)
+      3. [Robot arm](#robot-arm)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+   5. [Results](#results)
+   6. [Outlook](#outlook)
+5. [Sources](#sources)
+   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -224,7 +226,7 @@ where:
 * $R$ is the rotation matrix with the dimensions $3\times 3$.  
 * $T$ is the translation vector with the dimensions $3\times 1$.  
 * $P$ is the perspective projection matrix with the dimensions $1\times 3$.  
-* $S$ is the scale factor with the dimensions $1\times 1$ (for uniform\isotropic scaling).
+* $S$ is the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).
 
 The rotation matrix for a rotation around any given axis given by the unit vector $\mathbf{\vec{u}(x,y,z)}$ by an angle $\theta$ is given by the following formula:
 
@@ -238,7 +240,8 @@ u_xu_z(1-\cos\theta) - u_y\sin\theta & u_yu_z(1-\cos\theta) + u_x\sin\theta & u_
 $$
 
 
-The translation vector is the position of the origin from image's coordinate system in the global simulation's coordinate system, i.e. the distance between both origins given as a three dimensional vector.
+
+The translation vector is the position of the origin from image's coordinate system in the global simulation's coordinate system, i.e. the distance between both origins given as a three dimensional vector. 
 
 $$
 T =
@@ -302,6 +305,88 @@ Additionally, a robot-controller needs to be developed to control the robotic ar
 - TODO: first / theoretical approach to solve problem(s)
   
 These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+
+#### Robot Kinematics
+
+    The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
+    Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+
+    Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
+
+
+
+    To go around this problem, it is possible to use inverse kinematics
+
+    One option would be to use inverse kinematics to aproximate the required result.
+
+    <red>explain ik in depth</red>
+
+    Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+
+    The following figure shows the robot's coordinate system and the position of the objects in the simulation.
+
+    <red>Insert figure from presentation</red>
+
+    The position of the first motor can obtained with $ arctan(\frac{y}{z}) $, where $y$ and $z$ are the y and z coordinates of the object in the simulation.
+
+
+
+#### Organization Routine
+
+With the information regarding the objects' position and orientation in the simulation, the following step is to control the robots movement to produce the desired behavior. The robot controller is implemented in Python and uses the Webots API to control the robot. The robot controller is responsible for the following tasks:
+
+Initialization of the robot instance and the devices attached to it: 
+* camera
+* gripper
+* internal variables
+* Motor sensors
+* Motor actuators
+
+Coordination of the robot's movement.
+Coornidation of the different steps required for the organization process.
+* Reding the camera's image and forwarding the data to the object detection module.
+* Reading the object detection module's output and forwarding the data to the coordinate transformation module.
+* Reading the coordinate transformation module's output and forwarding the data to the robotic arm control module.
+* Perform the movement as required for the detected objects positions
+  
+
+
+```plantuml
+@startuml
+
+
+:**Simulation Start**;
+repeat :Move Robot to HOME Position;
+    repeat :Take Picture;
+        :Perform Object Detection;
+    repeat while (objects found?) is (no) not (yes)
+
+    repeat :Coordinate Transformation;
+        :Move object;
+        :Remove from found objects;
+    repeat while (more objects?) is (yes)
+repeat while (Keep Watching?) is (yes)
+:stop;
+@enduml
+```
+
+```plantuml
+@startuml
+start
+    :Move Gripper above Object Position;
+    :Open Gripper;
+    :Move Gripper down to Object Position;
+    :Close Gripper;
+    :Move Gripper up;
+    :Move Gripper above Target Position;
+    :Move Gripper down to Target Position;
+    :Open Gripper;
+    :Move Gripper up;
+stop
+@enduml
+```
+
+
 
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
