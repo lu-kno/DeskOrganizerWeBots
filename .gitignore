@@ -8,3 +8,4 @@ __pycache__/**
 *.pth
 .vscode/*
 Report/Project Report.pdf
+controllers/ArmController/test.py

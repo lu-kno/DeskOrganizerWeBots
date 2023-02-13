@@ -94,38 +94,28 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
-      3. [Robot controller](#robot-controller)
-         1. [Robot Kinematics](#robot-kinematics)
-         2. [Gripper Actuation](#gripper-actuation)
-         3. [Organization Routine](#organization-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Training data](#training-data)
-         4. [Conclusion](#conclusion)
-         5. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-      2. [Coordinate transformation](#coordinate-transformation)
-      3. [Robot arm](#robot-arm)
-         1. [Robot Movement](#robot-movement)
-         2. [Gripper](#gripper)
-         3. [Movement Routine](#movement-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-   5. [Results](#results)
-   6. [Outlook](#outlook)
-5. [Sources](#sources)
-   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+      - [Transformation Matrix](#transformation-matrix)
+    - [Robot controller](#robot-controller)
+      - [Robot Kinematics](#robot-kinematics)
+      - [Gripper Actuation](#gripper-actuation)
+      - [Organization Routine](#organization-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+      - [First approach](#first-approach)
+      - [Second approach / Solution](#second-approach--solution)
+      - [Training data](#training-data)
+      - [Training](#training)
+      - [Result](#result)
 
 <div style="page-break-after: always"></div>
 
@@ -435,9 +425,9 @@ The model was able to detect the beer can with an accuracy of 94 percent. Howeve
 
 #### Second approach / Solution
 
-The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. 
+The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]
 
-In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
+In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [2] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
 #### Training data 
 
@@ -520,20 +510,20 @@ After a snapshot was taken the object's position and orientation on the table ne
 ```
 The function accepts two parameters: a reference to the supervisor object and a reference to the table object. The function begins by determining the boundaries of the table using coordinate transformation. Intervals for the x and y coordinates are determined for the random positioning of objects on the table and then adjusted to leave a margin of 0.1 meters around it. At line 9 a loop iterates the objects on the table and generates a random position and orientation for each object using the previously calculates intervals.
 
-Finally a loop needed to be developed to call the snapshot and object randomization routines a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop. 
+Finally a loop needed to be developed to call the snapshot and object randomization functions a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop. 
 
 ```python
 @looper
-def randomPosSamplingLoop(self,sampleSize,type):
-    if self.loopCount % 10 == 0:
-        if self.loopCount % 20 == 0:
-            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-        else:
-            TrainingsHelper.makeSnapshot(self.camera,type)
-            self.dataCount +=1
-    self.loopCount += 1
-    if self.dataCount>sampleSize:
-        return -1
+1 def randomPosSamplingLoop(self,sampleSize,type):
+2     if self.loopCount % 10 == 0:
+3         if self.loopCount % 20 == 0:
+4             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+5         else:
+6             TrainingsHelper.makeSnapshot(self.camera,type)
+7             self.dataCount +=1
+8     self.loopCount += 1
+9     if self.dataCount>sampleSize:
+10        return -1
 ```
 The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the "moveTableNodes" function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
 
@@ -549,79 +539,87 @@ The method must be invoked twice, once for the generation of training data and o
   <p class = "image-description">Figure 4: image_344.txt in path: ..\DataSet\train\annotations  </p>
 </div>
 
-In order to enhance the performance of the model, an alternative image configuration was also employed.
+We generated 1200 images for training and 300 images for validation using this configuration. In order to enhance the performance of the model, an alternative image configuration was also developed.
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
-The second configuration was designed to increase the amount of data available for training. The idea was to capture images of the objects from four different angles. 
-
+The second configuration was designed to provide single object images at four distinct viewpoints, serving as training data. To achieve this, a function was created to relocate the camera to a designated viewpoint. This function accepts two inputs: a reference to the supervisor object and an index specifying the desired viewpoint. The supervisor is used to alter the camera perspective while index is utilized to determine the camera's position based on a list of coordinates. Furthermore, a function was implemented to facilitate the exchange of objects on the table. This function takes three inputs as arguments: a reference to the supervisor object, a reference to the table object, and an index indicating the desired object. Finally, a function was created to randomly modify the orientation of the current node-object, resulting in a diverse set of images taken from the same viewpoint. After the completion of these steps, a routine was implemented that integrates the various functions. The code segment below presents the implementation of this function. 
 
 ```python
-def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
-    global count, currentNode, lastViewPointPos
-    amountViewpoints = 4
-  
-    if(count==0): # init viewpoint position for first run
-        moveViewPoint(supervisor,lastViewPointPos)
-        swapObj(currentNode,table,supervisor)
-    # change viewpoint if given imagesPerViewpoint is met
-    if((count % imagesPerViewpoint) == 0):
-        lastViewPointPos = (lastViewPointPos+1)%4
-        moveViewPoint(supervisor,lastViewPointPos)
-    # change object if limit is met
-    if((count % (imagesPerViewpoint*amountViewpoints))==0):
-        currentNode = (currentNode+1) % len(categories)
-        swapObj(currentNode,table,supervisor)
-    spinTableNode(supervisor,table,currentNode)
-    count += 1
+1 def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
+2     global count, currentNode, lastViewPointPos
+3     amountViewpoints = 4
+4     if(count==0): # init viewpoint position for first run
+5         moveViewPoint(supervisor,lastViewPointPos)
+6         swapObj(currentNode,table,supervisor)
+7     # change viewpoint if given imagesPerViewpoint is met
+8     if((count % imagesPerViewpoint) == 0):
+9         lastViewPointPos = (lastViewPointPos+1)%4
+10        moveViewPoint(supervisor,lastViewPointPos)
+11    # change object if limit is met
+12    if((count % (imagesPerViewpoint*amountViewpoints))==0):
+13        currentNode = (currentNode+1) % len(categories)
+14        swapObj(currentNode,table,supervisor)
+15    spinTableNode(supervisor,table,currentNode)
+16    count += 1
 ```
+The function is meant to be executed each time after an image has been created and prepares the next image to be captured. The number of image configurations provided by the function is determined by the value of "imagesPerViewpoint". A global variable is used to keep track of the number of function invocations. The first time this method is called, the viewpoint and the first object are initialized. The if statement at line 8 verifies whether the number of images taken from the current viewpoint has reached the predetermined limit. In the event that the limit has been met, the viewpoint is shifted to the next one in the designated list. At line 12, the function examines whether the number of images captured from the current object has reached its limit. If this is the case, the object is swapped for the next one in the list. Finally, the function rotates the current object to a random orientation with each invocation. 
 
-The execution of this configuration is analoge to the initial setup. The function "single_objectImage_setup" is called at regular intervals of 20 iterations, ensuring the repositioning, reorientation and occasionally changing of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
+The training data can be generated using the same function as in the first configuration. The loop to call these functions during the simulation closely mirrors the looper-function used before. The code segment below presents the implementation of this function. 
 
 ```python	
-    @looper
-    def singleObjectImageLoop(self,imagesPerPerspective,type):
-        if self.loopCount % 10 == 0:
-            if self.loopCount % 20 == 0:
-                TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
-            else:
-                TrainingsHelper.makeSnapshot(self.dataCam,type)
-                self.dataCount +=1
-        self.loopCount += 1
-        if self.dataCount>imagesPerPerspective*32: # amountPerspectives*amountObjects = 32 
-            return -1
+1 @looper
+2 def singleObjectImageLoop(self,imagesPerPerspective,type):
+3     if self.loopCount % 10 == 0:
+4         if self.loopCount % 20 == 0:
+5             TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
+6         else:
+7             TrainingsHelper.makeSnapshot(self.dataCam,type)
+8             self.dataCount +=1
+9     self.loopCount += 1
+10    if self.dataCount>imagesPerPerspective*amountPerspectives*len(categories): 
+11        return -1
 ```
 
-- automated data creation in yolo format
-  - labeling 
-    - code example
-  - Table and 4 angle single 
+This loop operates in a similar fashion to the first configuration, alternately executing the "single_object_setup" and "makeSnapshot" functions with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
 
-<p class = "sub-header">Training </p>
+#### Training 
 
-After the data was created and labeled, the training process could be started. The training was done using the ImageAI library. 
+A total of 1456 images were generated for training and 384 images for validation. The training was performed using the ImageAI library, which provides a pre-trained YOLOv3 model that was used as a starting point for transfer learning. The following code segments presents the implementation of the training function, using the ImageAI library. 
 
-- hardware used
-- settings
-  - batch size
-  - epochs
-  - ..
-- trainings results
-- 
+```python
+1 def startTraining():
+2     execution_path = os.path.dirname(__file__)
+3     data_dir_path = os.path.join(execution_path , "DataSet")
+4     model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+5     createClassFiles(categories) 
+6     trainer = DetectionModelTrainer()
+7     trainer.setModelTypeAsYOLOv3()
+8     trainer.setDataDirectory(data_directory=data_dir_path)
+9     trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
+10    trainer.trainModel()
+```
+The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
 
-<p class = "sub-header">Result </p>
+The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
 
- - weakness
-   - Fragments of objects are detected as the object with a high probability (99%+)
-- Still convicing performance if the nms is tweaked right
 
-#### Conclusion
+#### Result 
 
-- Framework created to automate the process of creating training data 
-  - Possibly transfarable to other projects
-    - Depending on the quality of the object animation. (Proto files)
-      - number of polygons
-      - textures  
+The results of the training process are presented in the following table. T
+
+```prolog
+    recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
+```	
+The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.
+
+Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.
+
+Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.
+
+The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.
+
+In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.
 
 #### Notes for this chapter (to be deleted later)
 
@@ -704,17 +702,26 @@ After the data was created and labeled, the training process could be started. T
 
 - TODO: presenting results
 
-## Outlook 
+## Outlook / Conclusion
+
+- Robot controller can be used to in real world applications
 
 - same content as in presentation silde
 
-
+- Framework created to automate the process of creating training data 
+  - Possibly transfarable to other projects
+    - Depending on the quality of the object animation. (Proto files)
+      - number of polygons
+      - textures  
 
 <div style="page-break-after: always"></div>
 
 # Sources
+[1] https://imageai.readthedocs.io/en/latest/index.html
 
-[1] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+[2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
+
+
 
 [2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021
 
