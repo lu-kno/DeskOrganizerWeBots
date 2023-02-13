@@ -768,11 +768,30 @@ class Table(logger):
     def __init__(self, node: Node, logging: str = 'D', logName: str = 'Table') -> None:
         super().__init__(logging=logging, logName=logName)
         self.node = node
-        self.size = node.getField('size').getSFVec3f()
-        self.rotation = node.getField('rotation').getSFRotation()
-        self.position = node.getPosition()
+        # self.size = node.getField('size').getSFVec3f()
+        # self.rotation = node.getField('rotation').getSFRotation()
+        # self.position = node.getPosition()
         
-        self.orientation = node.getOrientation()
+        # self.orientation = node.getOrientation()
+        
+    
+    # @position.setter
+    # def position(self,a):
+    #     self.logE(f'Can not set position of table to {a}. Property is read only. use Table.node.setPosition() instead.')
+        
+    @property
+    def position(self):
+        return self.node.getPosition()
+    @property
+    def rotation(self):
+        return self.node.getField('rotation').getSFRotation()
+    @property
+    def size(self):
+        return self.node.getField('size').getSFVec3f()
+    @property
+    def orientation(self):
+        return self.node.getOrientation()
+    
         
     def local2worldOld(self, _pos: Vec3) -> Vec3:
         ''' this function tranforms the coordinates from the table to world coordinates.
