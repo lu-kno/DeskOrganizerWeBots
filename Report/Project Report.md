@@ -61,12 +61,6 @@ red {
     color: rgb(255, 0, 0);
 }
 
-/* p, li, ul, code {
-    font-size: 12px;
-    line-height:200%;
-} */
-
-
 </style>
 
 
@@ -178,7 +172,7 @@ The objective of the project is to create a robotic system capable of tidying an
 - prove of concept for varios real world application
 - Solution transferable to other use cases
 
-In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications.
+In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications. Git was used to manage the project and to facilitate collaboration between the team members.
 
 
 <div class="center-div">
@@ -442,9 +436,9 @@ The file contains one line for each object in the image. The object class is an 
 
 <p class = "sub-header">Automatization</p>
 
-Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
+Instead of creating and labeling the images manually we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within Webots. 
 
-Two configurations were set up to generate training data. The first setup produced data with a top-down camera view and multiple objects arranged on the table. The second setup generated images with a side view, with individual objects positioned on the table and rotated at four distinct angles.
+Two configurations were set up to generate training data. The first setup produces data with a top-down camera view and multiple objects arranged on the table. The second setup generates images with individual objects positioned on the table at different orientations and rotated camera at four distinct viewpoints.
 
 <p class = "sub-header">Configuration 1: Top down</p>
 
@@ -456,10 +450,10 @@ The initial step in realizing the top-down configuration involved the definition
 3    while True: # get current fileName
 4       filename = f"image_{fileNamePostfix}.txt"
 5       filepath = os.path.join(annotationPath, filename)
-6       if not os.path.isfile(filepath):
-7           break
+6       if not os.path.isfile(filepath): 
+7           break # if file does not exist, use this name
 8       fileNamePostfix += 1
-9  fileName = f"image_{fileNamePostfix}"
+9   fileName = f"image_{fileNamePostfix}"
 10  for obj in recognizedObjectes:
 11      id = obj.getId()
 12      name = obj.getModel()
@@ -486,42 +480,65 @@ The initial step in realizing the top-down configuration involved the definition
 The function accepts two parameters, a reference to the camera object, and a "type". The purpose of the "type" parameter is to specify whether the function should generate training or validation data. The function starts by initializing various variables and generating file paths for the image, annotation, and JSON data. In addition to the required training data, all available information about an object was saved in a JSON file so that it can be used later. The JSON file shares the same name as the image file and is stored in the directory "raw_data". Lines 3-8 determine the current file name for the output files. The filename is generated by appending a postfix to the string "image". The postfix is generated by incrementing a counter until a file with the generated name does not exist. This ensures that the file name is unique and does not overwrite existing files.
 At line 10 a loop iterates over the objects that the camera recognizes, and collects information about each object, including its model name, position and size. These values are converted into the required format, by determining the object's relative position and size. Subsequently, in lines 22 and 23, Strings for the annotation and the JSON representation of the detected object are prepared so they can be appended to the corresponding lists for this image. Finally, the function saves the image, JSON data, and YOLO annotation data to their respective files using the file name generated earlier. The image is saved using the "camera.saveImage" function.
 
-After a snapshot was taken the objects on the table needed to be randomized.
+After a snapshot was taken the object's position and orientation on the table needed to be randomized. The corresponding function is shown below.
 
 ```python
-categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
-def moveTableNodes(master,table):
-    margin = 0.1
-    bottomLeft = table.local2world([0,1,0])
-    topRight = table.local2world([1,0,0])
-    x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
-    x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
-    y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
-    y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
-    for cat in categories:
-        obj = master.supervisor.getFromDef(cat)
-        x = random.uniform(x_min, x_max)
-        y = random.uniform(y_min, y_max)
-        z = bottomLeft[2] # any z coordinate
-        obj.getField('translation').setSFVec3f([x, y, z])
-        xRotation = random.uniform(1, 360)
-        yRotation = random.uniform(1, 360)
-        zRotation = random.uniform(1, 360)
-        angle = random.uniform(1, 360)
-        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+1 def moveTableNodes(supervisor,table):
+2    margin = 0.1
+3    bottomLeft = table.local2world([0,1,0])
+4    topRight = table.local2world([1,0,0])
+5    x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
+6    x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
+7    y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
+8    y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
+9   for cat in categories:
+10       obj = supervisor.getFromDef(cat)
+11       x = random.uniform(x_min, x_max)
+12       y = random.uniform(y_min, y_max)
+13       z = bottomLeft[2] # any z coordinate
+14       obj.getField('translation').setSFVec3f([x, y, z])
+15       xRotation = random.uniform(1, 360)
+16       yRotation = random.uniform(1, 360)
+17       zRotation = random.uniform(1, 360)
+18       angle = random.uniform(1, 360)
+19       obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
 
 ```
+The function accepts two parameters: a reference to the supervisor object and a reference to the table object. The function begins by determining the boundaries of the table using coordinate transformation. Intervals for the x and y coordinates are determined for the random positioning of objects on the table and then adjusted to leave a margin of 0.1 meters around it. At line 9 a loop iterates the objects on the table and generates a random position and orientation for each object using the previously calculates intervals.
 
+Finally a loop needed to be developed to call the snapshot and object randomization routines a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop. 
 
-1. Define a function to take a snapshot of the camera image and create the corresponding annotation files. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
-2. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
-3. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
-   
-- Show example of the top down configuration (image and annotation)
+```python
+@looper
+def randomPosSamplingLoop(self,sampleSize,type):
+    if self.loopCount % 10 == 0:
+        if self.loopCount % 20 == 0:
+            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+        else:
+            TrainingsHelper.makeSnapshot(self.camera,type)
+            self.dataCount +=1
+    self.loopCount += 1
+    if self.dataCount>sampleSize:
+        return -1
+```
+The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the "moveTableNodes" function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
+
+The method must be invoked twice, once for the generation of training data and once for the generation of validation data. Upon the completion of this process, a dataset is produced that is ready for the training of a custom model. Figures 3 and 4 present a demonstration of one of the generated images and its accompanying annotation file, respectively.
+
+<div class="center-div">
+  <img src="./image_344.jpg"  width="80%" height="80%" class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 3: image_344.jpg in path: ..\DataSet\train\images  </p>
+</div>
+
+<div class="center-div">
+  <img src="./image_344.txt.jpg"  width="80%" height="80%"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 4: image_344.txt in path: ..\DataSet\train\annotations  </p>
+</div>
+
+In order to enhance the performance of the model, an alternative image configuration was also employed.
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
-- 4 angled rotation object 
 
 (The following steps were taken to automate the process:)
 
