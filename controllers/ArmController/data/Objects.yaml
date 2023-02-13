@@ -1,0 +1,63 @@
+computer_mouse:
+  voffset: 0
+  category: tool
+  destination:
+  - -0.4767 
+  - 1.3825 
+  - 0.74
+
+hammer:
+  voffset: 0
+  category: tool
+  destination:
+  - -0.47254 
+  - 1.06959 
+  - 0.74
+
+Cylinder:
+  voffset: 0.05
+  category: shape
+  destination:
+  - -0.14 
+  - 1.38 
+  - 0.74
+
+Cube:
+  voffset: 0.05
+  category: shape
+  destination:
+  - -0.136 
+  - 1.07789 
+  - 0.74
+
+can:
+  voffset: 0
+  category: drink
+  destination:
+  - 0.40222 
+  - 1.38512 
+  - 0.74
+
+apple:
+  voffset: 0
+  category: fruit
+  destination:
+  - 0.75223 
+  - 1.07095 
+  - 0.74
+
+beer_bottle:
+  voffset: 0
+  category: drink
+  destination:
+  - 0.40406 
+  - 1.01947 
+  - 0.74
+
+orange:
+  voffset: 0
+  category: fruit
+  destination:
+  - 0.74459 
+  - 1.38628 
+  - 0.74

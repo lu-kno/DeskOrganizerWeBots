@@ -34,11 +34,11 @@ Movement directions make sense when "standing" in front of the robot
  - [X] only one finger seems to be closing properly, check why (solved itself, idk, maybe by restarting webots)
 
 
- - [ ] integrate helper function to move robot to XY coordinates from table to world
- - [ ] (Optional) Get optimal angle to grab object
+ - [x] integrate helper function to move robot to XY coordinates from table to world
+ - [x] (Optional) Get optimal angle to grab object
   
- - [ ] Integrate Image detection with arm controller
- - [ ] Create scan and move routine
+ - [x] Integrate Image detection with arm controller
+ - [x] Create scan and move routine
     1. Move Arm Away 
     2. Scan Table (Take picture and identify objects)
     3. Get list of objects with [category, position, angle]
@@ -47,10 +47,21 @@ Movement directions make sense when "standing" in front of the robot
        2. pickNplace(position, destination)
 
  - [X] choose image recognition toolkit
- - [ ] Get position of object in image as ratio to table size (from 0 to 1)
- - [ ] Detect more than one object on the table
- - [ ] Detect different shapes
+ - [x] Get position of object in image as ratio to table size (from 0 to 1)
+ - [x] Detect more than one object on the table
+ - [x] Detect different shapes
 
+
+
+## Report To Do
+  - [ ] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
+    - [ ] include webots version and python version used
+  - [ ] find solution for model download (maybe use git lfs) 
+  - [ ] write abstract 
+  - [ ] export final pdf (attempt in latex)
+  - [ ] record video of robot in action (already recorded by Lu)
+  - [ ] complete source code comments and docstrings
+  - [ ] fix indexing of table of contents in pdf
 
 
 ## used to avoid tracking of some world files
