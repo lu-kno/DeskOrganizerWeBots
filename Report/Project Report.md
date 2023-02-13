@@ -523,10 +523,44 @@ In order to enhance the performance of the model, an alternative image configura
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
+The second configuration was designed to increase the amount of data available for training. The idea was to capture images of the objects from four different angles. 
 
-(The following steps were taken to automate the process:)
 
+```python
+def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
+    global count, currentNode, lastViewPointPos
+    amountViewpoints = 4
+  
+    if(count==0): # init viewpoint position for first run
+        moveViewPoint(supervisor,lastViewPointPos)
+        swapObj(currentNode,table,supervisor)
+    # change viewpoint if given imagesPerViewpoint is met
+    if((count % imagesPerViewpoint) == 0):
+        lastViewPointPos = (lastViewPointPos+1)%4
+        moveViewPoint(supervisor,lastViewPointPos)
+    # change object if limit is met
+    if((count % (imagesPerViewpoint*amountViewpoints))==0):
+        currentNode = (currentNode+1) % len(categories)
+        swapObj(currentNode,table,supervisor)
+    spinTableNode(supervisor,table,currentNode)
+    count += 1
+```
 
+The execution of this configuration is analoge to the initial setup. The function "single_objectImage_setup" is called at regular intervals of 20 iterations, ensuring the repositioning, reorientation and occasionally changing of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
+
+```python	
+    @looper
+    def singleObjectImageLoop(self,imagesPerPerspective,type):
+        if self.loopCount % 10 == 0:
+            if self.loopCount % 20 == 0:
+                TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
+            else:
+                TrainingsHelper.makeSnapshot(self.dataCam,type)
+                self.dataCount +=1
+        self.loopCount += 1
+        if self.dataCount>imagesPerPerspective*32: # amountPerspectives*amountObjects = 32 
+            return -1
+```
 
 - automated data creation in yolo format
   - labeling 
