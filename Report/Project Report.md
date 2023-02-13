@@ -94,38 +94,40 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
-      3. [Robot controller](#robot-controller)
-         1. [Robot Kinematics](#robot-kinematics)
-         2. [Gripper Actuation](#gripper-actuation)
-         3. [Organization Routine](#organization-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Training data](#training-data)
-         4. [Conclusion](#conclusion)
-         5. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-      2. [Coordinate transformation](#coordinate-transformation)
-      3. [Robot arm](#robot-arm)
-         1. [Robot Movement](#robot-movement)
-         2. [Gripper](#gripper)
-         3. [Movement Routine](#movement-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-   5. [Results](#results)
-   6. [Outlook](#outlook)
-5. [Sources](#sources)
-   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+      - [Transformation Matrix](#transformation-matrix)
+    - [Robot controller](#robot-controller)
+      - [Robot Kinematics](#robot-kinematics)
+      - [Gripper Actuation](#gripper-actuation)
+      - [Organization Routine](#organization-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+      - [First approach](#first-approach)
+      - [Second approach / Solution](#second-approach--solution)
+      - [Training data](#training-data)
+      - [Training](#training)
+      - [Result](#result)
+      - [Conclusion](#conclusion)
+      - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+    - [Coordinate transformation](#coordinate-transformation)
+    - [Robot arm](#robot-arm)
+      - [Robot Movement](#robot-movement)
+      - [Gripper](#gripper)
+      - [Movement Routine](#movement-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+  - [Results](#results)
+  - [Outlook](#outlook)
+- [Sources](#sources)
+  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -505,7 +507,7 @@ After a snapshot was taken the object's position and orientation on the table ne
 ```
 The function accepts two parameters: a reference to the supervisor object and a reference to the table object. The function begins by determining the boundaries of the table using coordinate transformation. Intervals for the x and y coordinates are determined for the random positioning of objects on the table and then adjusted to leave a margin of 0.1 meters around it. At line 9 a loop iterates the objects on the table and generates a random position and orientation for each object using the previously calculates intervals.
 
-Finally a loop needed to be developed to call the snapshot and object randomization routines a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop. 
+Finally a loop needed to be developed to call the snapshot and object randomization functions a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop. 
 
 ```python
 @looper
@@ -534,14 +536,11 @@ The method must be invoked twice, once for the generation of training data and o
   <p class = "image-description">Figure 4: image_344.txt in path: ..\DataSet\train\annotations  </p>
 </div>
 
-In order to enhance the performance of the model, an alternative image configuration was also employed.
+We generated 1200 images for training and 300 images for validation using this configuration. In order to enhance the performance of the model, an alternative image configuration was also developed.
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
-The second configuration was designed to provide single object images at four different viewpoints for training. First a function to move the camera to a specified viewpoint was developed. The function accepts two parameters: a reference to the supervisor object and the index of the viewpoint to be moved to. 
-
-
-
+The second configuration was designed to provide single object images at four distinct viewpoints, serving as training data. To achieve this, a function was created to relocate the camera to a designated viewpoint. This function accepts two inputs: a reference to the supervisor object and an index specifying the desired viewpoint. The supervisor is used to alter the camera perspective while index is utilized to determine the camera's position based on a list of coordinates. Furthermore, a function was implemented to facilitate the exchange of objects on the table. This function takes three inputs as arguments: a reference to the supervisor object, a reference to the table object, and an index indicating the desired object. Finally, a function was created to randomly modify the orientation of the current node-object, resulting in a diverse set of images taken from the same viewpoint. After the completion of these steps, a routine was implemented that integrates the various functions. The code segment below presents the implementation of this function. 
 
 ```python
 1 def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
@@ -550,8 +549,8 @@ The second configuration was designed to provide single object images at four di
 4     if(count==0): # init viewpoint position for first run
 5         moveViewPoint(supervisor,lastViewPointPos)
 6         swapObj(currentNode,table,supervisor)
-7    # change viewpoint if given imagesPerViewpoint is met
-8    if((count % imagesPerViewpoint) == 0):
+7     # change viewpoint if given imagesPerViewpoint is met
+8     if((count % imagesPerViewpoint) == 0):
 9         lastViewPointPos = (lastViewPointPos+1)%4
 10        moveViewPoint(supervisor,lastViewPointPos)
 11    # change object if limit is met
@@ -561,8 +560,9 @@ The second configuration was designed to provide single object images at four di
 15    spinTableNode(supervisor,table,currentNode)
 16    count += 1
 ```
+The function is meant to be executed each time after an image has been created and prepares the next image to be captured. The number of image configurations provided by the function is determined by the value of "imagesPerViewpoint". A global variable is used to keep track of the number of function invocations. The first time this method is called, the viewpoint and the first object are initialized. The if statement at line 8 verifies whether the number of images taken from the current viewpoint has reached the predetermined limit. In the event that the limit has been met, the viewpoint is shifted to the next one in the designated list. At line 12, the function examines whether the number of images captured from the current object has reached its limit. If this is the case, the object is swapped for the next one in the list. Finally, the function rotates the current object to a random orientation with each invocation. 
 
-The execution of this configuration is analoge to the initial setup. The function "single_objectImage_setup" is called at regular intervals of 20 iterations, ensuring the repositioning, reorientation and occasionally changing of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
+The training data can be generated using the same function as in the first configuration. The loop to call these functions during the simulation closely mirrors the looper-function used before. The code segment below presents the implementation of this function. 
 
 ```python	
 1 @looper
@@ -574,19 +574,20 @@ The execution of this configuration is analoge to the initial setup. The functio
 7             TrainingsHelper.makeSnapshot(self.dataCam,type)
 8             self.dataCount +=1
 9     self.loopCount += 1
-10    if self.dataCount>imagesPerPerspective*32: # amountPerspectives*amountObjects = 32 
+10    if self.dataCount>imagesPerPerspective*amountPerspectives*len(categories): 
 11        return -1
 ```
 
-- automated data creation in yolo format
-  - labeling 
-    - code example
-  - Table and 4 angle single 
+This loop operates in a similar fashion to the first configuration, alternately executing the "single_object_setup" and "makeSnapshot" methods with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
 
-<p class = "sub-header">Training </p>
+#### Training 
 
 After the data was created and labeled, the training process could be started. The training was done using the ImageAI library. 
-
+- amount of data in each config
+  - conf 1
+    - ..
+  - conf 2
+    - 8 images per object at different orientations at 4 viewpoints
 - hardware used
 - settings
   - batch size
@@ -594,8 +595,8 @@ After the data was created and labeled, the training process could be started. T
   - ..
 - trainings results
 - 
+#### Result 
 
-<p class = "sub-header">Result </p>
 
  - weakness
    - Fragments of objects are detected as the object with a high probability (99%+)
