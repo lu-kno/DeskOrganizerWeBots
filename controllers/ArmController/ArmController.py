@@ -793,58 +793,58 @@ class Table(logger):
         return self.node.getOrientation()
     
         
-    def local2worldOld(self, _pos: Vec3) -> Vec3:
-        ''' this function tranforms the coordinates from the table to world coordinates.
-        if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
+    # def local2worldOld(self, _pos: Vec3) -> Vec3:
+    #     ''' this function tranforms the coordinates from the table to world coordinates.
+    #     if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
         
-        # for i in range(3):
-        #     pos[i]=pos[i]*self.size[i]
+    #     # for i in range(3):
+    #     #     pos[i]=pos[i]*self.size[i]
 
-        Sx, Sy, Sz = 1,1,1
-        tx,ty,tz = self.position
-        tx+=self.size[0]/2
-        ty+=self.size[1]/2
+    #     Sx, Sy, Sz = 1,1,1
+    #     tx,ty,tz = self.position
+    #     tx+=self.size[0]/2
+    #     ty+=self.size[1]/2
             
-        if self.size is not None:
-            tz=tz+self.size[2]
-            # Sx, Sy, Sz = self.size[0]/2, self.size[1]/2, 1
+    #     if self.size is not None:
+    #         tz=tz+self.size[2]
+    #         # Sx, Sy, Sz = self.size[0]/2, self.size[1]/2, 1
         
-        if self.rotation is None:
-            self.rotation[0,0,1,0]
-        a = self.rotation[2]*self.rotation[3]
+    #     if self.rotation is None:
+    #         self.rotation[0,0,1,0]
+    #     a = self.rotation[2]*self.rotation[3]
         
-        # tMat = [
-        #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
-        #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
-        #     [0,               0,              Sz,   tz],
-        #     [0,               0,              0,    1]
-        # ]
-        tMat = [
-            [0,  -self.size[0],   0,    tx],
-            [-self.size[1],  0,    0,    ty],
-            [0,   0,    1,   tz],
-            [0,   0,    0,    1]
-        ]
+    #     # tMat = [
+    #     #     [Sx*math.cos(a), -Sy*math.sin(a), 0,    tx],
+    #     #     [Sx*math.sin(a),  Sy*math.cos(a), 0,    ty],
+    #     #     [0,               0,              Sz,   tz],
+    #     #     [0,               0,              0,    1]
+    #     # ]
+    #     tMat = [
+    #         [0,  -self.size[0],   0,    tx],
+    #         [-self.size[1],  0,    0,    ty],
+    #         [0,   0,    1,   tz],
+    #         [0,   0,    0,    1]
+    #     ]
         
-        if len(_pos)==3:
-            pos = np.array([*_pos,1])
-        else:
-            pos = np.array(_pos)
-        if not (np.shape(pos) == (4,)):
-            self.logW(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
+    #     if len(_pos)==3:
+    #         pos = np.array([*_pos,1])
+    #     else:
+    #         pos = np.array(_pos)
+    #     if not (np.shape(pos) == (4,)):
+    #         self.logW(f'tMat.shape: {np.shape(tMat)}\n pos.shape: {np.shape(pos)}')
         
-        res = tuple(np.matmul(tMat,pos)[:3])
-        #print(f'pos: {pos}')
-        #print(f'result: {res}')
-        return res
+    #     res = tuple(np.matmul(tMat,pos)[:3])
+    #     #print(f'pos: {pos}')
+    #     #print(f'result: {res}')
+    #     return res
             
     def local2world(self, _pos: Vec3) -> Vec3:
         ''' this function tranforms the coordinates from the table to world coordinates.
         if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
-        
-        # for i in range(3):
-        #     pos[i]=pos[i]*self.size[i]
+        if len(_pos)!=3:
+            self.logE(f'local2world: pos must have 3 dimensions: len={len(_pos)}')
 
+        # Transform from table corner in image to table center
         TableT_unscaled=[[0,-1,0,0.5],
                         [-1,0,0,0.5],
                         [0,0,-1,1],
@@ -853,9 +853,8 @@ class Table(logger):
                        [0,self.size[1],0,0],
                        [0,0,self.size[2],0],
                        [0,0,0,1]]
-            
-        TableT=np.matmul(TableT_unscaled,TableScaling)
-        
+                    
+        # Transform from table center to world
         WorldT=np.array([[math.cos(self.rotation[3]),-math.sin(self.rotation[3]),0,self.position[0]],
                          [math.sin(self.rotation[3]),math.cos(self.rotation[3]),0,self.position[1]],
                          [0,0,1,self.position[2]],
