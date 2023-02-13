@@ -53,6 +53,9 @@ h6:before {
     font-weight: bold;
 }
 
+pre code {
+  font-size: 12px;
+}
 
 red {
     color: rgb(255, 0, 0);
@@ -97,29 +100,34 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
-      3. [Robot controller](#robot-controller)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Custom detection](#custom-detection)
-      2. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-   5. [Implementation](#implementation-1)
-      1. [Object detection](#object-detection-2)
-         1. [First approach](#first-approach-1)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Trainings data](#trainings-data)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+      - [Transformation Matrix](#transformation-matrix)
+    - [Robot controller](#robot-controller)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+      - [First approach](#first-approach)
+      - [Second approach / Solution](#second-approach--solution)
+      - [Training data](#training-data)
+      - [Conclusion](#conclusion)
+      - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+    - [Coord transition](#coord-transition)
+    - [Robot arm](#robot-arm)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+  - [Results](#results)
+  - [Outlook](#outlook)
+- [Sources](#sources)
+  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
+<div style="page-break-after: always"></div>
 
 <!-- ## [Introduction](#introduction)
 ## [Project introduction](#project-introduction)
@@ -298,44 +306,6 @@ These components will then be integrated into a single routine to detect objects
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
 - We define which problems we needed to solve and our first approaches to solve these problems
-## Implementation 
-In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
-### Object detection
-
-#### First approach
-
-The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
-
-Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
-
-<div class="center-div">
-  <img src="./cvResultExistingModel.jpg"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
-  <p class = "image-description">Figure 2: Object detection results YOLOv3 model </p>
-</div>
-
-
-The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. 
-
-Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed. 
-
-#### Custom detection
-
-The second approach to solve the problem of object detection was to train a custom object detection model. In the project plan, it was not initially planned to train a custom model. However, to streamline the process, the decision was made to utilize the ImageAI library. ImageAI is a Python library that offers a convenient framework for training and utilizing object detection models. In order to reduce the effort needed to train the model, we decided to use transfer learning. 
-
-<p class = "sub-header">Trainings data</p>
-
-- automated data creation in yolo format
-  - labeling 
-    - code example
-  - 
-
-<p class = "sub-header">Training </p>
-
-<p class = "sub-header">Result </p>
-
-### Notes for this chapter (to be deleted later)
-- Milestones or steps needed in project development
-- We define which problems we needed to solve and our first approaches to solve these problems
 
 ## Implementation 
 In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
@@ -377,13 +347,76 @@ Two configurations were set up to generate training data. The first setup produc
 
 <p class = "sub-header">Configuration 1: Top down</p>
 
-To realize the top down configuration the following steps needed to be taken:
+The initial step in realizing the top-down configuration involved the definition of a function for capturing camera images and generating the corresponding annotation files. This function utilizes a reference of the camera object to obtain the objects currently detected, determine the values needed for annotation and store the images and annotation files in their designated directories. The following code segment demonstrates a shortened version of the implementation of this function.
 
-1. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
-2. Define a function to take a snapshot of the camera image and create the corresponding annotation files. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
-3. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
+```python
+1 def createTrainingFiles(camera,type = "train"):
+2    ... # initialize variables and generate pathes
+3    while True: # get current fileName
+4       filename = f"image_{fileNamePostfix}.txt"
+5       filepath = os.path.join(annotationPath, filename)
+6       if not os.path.isfile(filepath):
+7           break
+8       fileNamePostfix += 1
+9  fileName = f"image_{fileNamePostfix}"
+10  for obj in recognizedObjectes:
+11      id = obj.getId()
+12      name = obj.getModel()
+13      if name not in categories:
+14          continue
+15      position = list(obj.getPosition())
+16      positionOnImage = list(obj.getPositionOnImage())
+17      orientation = list(obj.getOrientation())
+18      size = list(obj.getSize())
+19      sizeOnImage = list(obj.getSizeOnImage())
+20      relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
+21      relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
+22      yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+23      jsonData.append({
+24          "id": id,
+25          ... # adding the remaining properties to json data
+26      })
+27  camera.saveImage(imagePath+fileName+".jpg",100) # save image
+28  with open(jsonPath+fileName+".json", 'w') as file: # save json data
+29      json.dump(jsonData, file, indent=4)   
+30  with open(annotationPath+fileName+".txt", 'w') as file: # save yolo annotation
+31      file.writelines(yoloData)
+```
+The function accepts two parameters, a reference to the camera object, and a "type". The purpose of the "type" parameter is to specify whether the function should generate training or validation data. The function starts by initializing various variables and generating file paths for the image, annotation, and JSON data. In addition to the required training data, all available information about an object was saved in a JSON file so that it can be used later. The JSON file shares the same name as the image file and is stored in the directory "raw_data". Lines 3-8 determine the current file name for the output files. The filename is generated by appending a postfix to the string "image". The postfix is generated by incrementing a counter until a file with the generated name does not exist. This ensures that the file name is unique and does not overwrite existing files.
+At line 10 a loop iterates over the objects that the camera recognizes, and collects information about each object, including its model name, position and size. These values are converted into the required format, by determining the object's relative position and size. Subsequently, in lines 22 and 23, Strings for the annotation and the JSON representation of the detected object are prepared so they can be appended to the corresponding lists for this image. Finally, the function saves the image, JSON data, and YOLO annotation data to their respective files using the file name generated earlier. The image is saved using the "camera.saveImage" function.
 
-- Top down
+After a snapshot was taken the objects on the table needed to be randomized.
+
+```python
+categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
+def moveTableNodes(master,table):
+    margin = 0.1
+    bottomLeft = table.local2world([0,1,0])
+    topRight = table.local2world([1,0,0])
+    x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
+    x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
+    y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
+    y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
+    for cat in categories:
+        obj = master.supervisor.getFromDef(cat)
+        x = random.uniform(x_min, x_max)
+        y = random.uniform(y_min, y_max)
+        z = bottomLeft[2] # any z coordinate
+        obj.getField('translation').setSFVec3f([x, y, z])
+        xRotation = random.uniform(1, 360)
+        yRotation = random.uniform(1, 360)
+        zRotation = random.uniform(1, 360)
+        angle = random.uniform(1, 360)
+        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+
+```
+
+
+1. Define a function to take a snapshot of the camera image and create the corresponding annotation files. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
+2. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
+3. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
+   
+- Show example of the top down configuration (image and annotation)
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
