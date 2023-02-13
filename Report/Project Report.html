@@ -1580,7 +1580,6 @@ red {
 <li><a href="#movement-routine">Movement Routine</a></li>
 </ol>
 </li>
-<li><a href="#"></a></li>
 <li><a href="#notes-for-this-chapter-to-be-deleted-later-2">Notes for this chapter (to be deleted later)</a></li>
 </ol>
 </li>
@@ -1885,7 +1884,38 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 </div>
 <p>In order to enhance the performance of the model, an alternative image configuration was also employed.</p>
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
-<p>(The following steps were taken to automate the process:)</p>
+<p>The second configuration was designed to increase the amount of data available for training. The idea was to capture images of the objects from four different angles.</p>
+<pre><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">single_objectImage_setup</span>(<span class="hljs-params">supervisor,table,imagesPerViewpoint</span>):
+    <span class="hljs-keyword">global</span> count, currentNode, lastViewPointPos
+    amountViewpoints = <span class="hljs-number">4</span>
+  
+    <span class="hljs-keyword">if</span>(count==<span class="hljs-number">0</span>): <span class="hljs-comment"># init viewpoint position for first run</span>
+        moveViewPoint(supervisor,lastViewPointPos)
+        swapObj(currentNode,table,supervisor)
+    <span class="hljs-comment"># change viewpoint if given imagesPerViewpoint is met</span>
+    <span class="hljs-keyword">if</span>((count % imagesPerViewpoint) == <span class="hljs-number">0</span>):
+        lastViewPointPos = (lastViewPointPos+<span class="hljs-number">1</span>)%<span class="hljs-number">4</span>
+        moveViewPoint(supervisor,lastViewPointPos)
+    <span class="hljs-comment"># change object if limit is met</span>
+    <span class="hljs-keyword">if</span>((count % (imagesPerViewpoint*amountViewpoints))==<span class="hljs-number">0</span>):
+        currentNode = (currentNode+<span class="hljs-number">1</span>) % <span class="hljs-built_in">len</span>(categories)
+        swapObj(currentNode,table,supervisor)
+    spinTableNode(supervisor,table,currentNode)
+    count += <span class="hljs-number">1</span>
+</code></pre>
+<p>The execution of this configuration is analoge to the initial setup. The function &quot;single_objectImage_setup&quot; is called at regular intervals of 20 iterations, ensuring the repositioning, reorientation and occasionally changing of the objects every 2 seconds. Additionally, the &quot;makeSnapshot&quot; function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.</p>
+<pre><code class="language-python"><span class="hljs-meta">    @looper</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">singleObjectImageLoop</span>(<span class="hljs-params">self,imagesPerPerspective,<span class="hljs-built_in">type</span></span>):
+        <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:
+            <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
+                TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
+            <span class="hljs-keyword">else</span>:
+                TrainingsHelper.makeSnapshot(self.dataCam,<span class="hljs-built_in">type</span>)
+                self.dataCount +=<span class="hljs-number">1</span>
+        self.loopCount += <span class="hljs-number">1</span>
+        <span class="hljs-keyword">if</span> self.dataCount&gt;imagesPerPerspective*<span class="hljs-number">32</span>: <span class="hljs-comment"># amountPerspectives*amountObjects = 32 </span>
+            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
+</code></pre>
 <ul>
 <li>automated data creation in yolo format
 <ul>
@@ -2034,7 +2064,6 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 </ul>
 </li>
 </ul>
-<h3 id=""></h3>
 <h3 id="notes-for-this-chapter-to-be-deleted-later">Notes for this chapter (to be deleted later)</h3>
 <ul>
 <li>
