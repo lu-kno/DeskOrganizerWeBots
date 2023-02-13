@@ -61,12 +61,6 @@ red {
     color: rgb(255, 0, 0);
 }
 
-/* p, li, ul, code {
-    font-size: 12px;
-    line-height:200%;
-} */
-
-
 </style>
 
 
@@ -100,34 +94,34 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
-      3. [Robot controller](#robot-controller)
-         1. [Robot Kinematics](#robot-kinematics)
-         2. [Organization Routine](#organization-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Training data](#training-data)
-         4. [Conclusion](#conclusion)
-         5. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-      2. [Coord transition](#coord-transition)
-      3. [Robot arm](#robot-arm)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
-   5. [Results](#results)
-   6. [Outlook](#outlook)
-5. [Sources](#sources)
-   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+      - [Transformation Matrix](#transformation-matrix)
+    - [Robot controller](#robot-controller)
+      - [Robot Kinematics](#robot-kinematics)
+      - [Organization Routine](#organization-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+      - [First approach](#first-approach)
+      - [Second approach / Solution](#second-approach--solution)
+      - [Training data](#training-data)
+      - [Conclusion](#conclusion)
+      - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+    - [Coord transition](#coord-transition)
+    - [Robot arm](#robot-arm)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+  - [Results](#results)
+  - [Outlook](#outlook)
+- [Sources](#sources)
+  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -308,26 +302,26 @@ These components will then be integrated into a single routine to detect objects
 
 #### Robot Kinematics
 
-    The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
-    Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+The Robot chosen for this task consists of a robotic arm with a gripper on the end of the arm. Without the gripper, the robot has 6 degrees of freedom.
+Calculating the position of the gripper (the end effector) while knowing the position of each individual motor can be done using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
-    Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
+Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain given the (desired) position of the end effector presents a more challenging problem. Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters, meaning there can be more than one solution for a given point.
 
 
 
-    To go around this problem, it is possible to use inverse kinematics
+To go around this problem, it is possible to use inverse kinematics
 
-    One option would be to use inverse kinematics to aproximate the required result.
+One option would be to use inverse kinematics to aproximate the required result.
 
-    <red>explain ik in depth</red>
+<red>explain ik in depth</red>
 
-    Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
 
-    The following figure shows the robot's coordinate system and the position of the objects in the simulation.
+The following figure shows the robot's coordinate system and the position of the objects in the simulation.
 
-    <red>Insert figure from presentation</red>
+<red>Insert figure from presentation</red>
 
-    The position of the first motor can obtained with $ arctan(\frac{y}{z}) $, where $y$ and $z$ are the y and z coordinates of the object in the simulation.
+The position of the first motor can obtained with $ arctan(\frac{y}{z}) $, where $y$ and $z$ are the y and z coordinates of the object in the simulation.
 
 
 
@@ -426,9 +420,9 @@ The file contains one line for each object in the image. The object class is an 
 
 <p class = "sub-header">Automatization</p>
 
-Instead of creating and labeling the images ourselves we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within webots. 
+Instead of creating and labeling the images manually we decided to automate the process. The plan was to utilize the object detection feature integrated in Webots to automatically generate the image and annotation files within their respective directories. We only utilized this detection method to create training data, as the detection is not based on image recognition but hard coded within Webots. 
 
-Two configurations were set up to generate training data. The first setup produced data with a top-down camera view and multiple objects arranged on the table. The second setup generated images with a side view, with individual objects positioned on the table and rotated at four distinct angles.
+Two configurations were set up to generate training data. The first setup produces data with a top-down camera view and multiple objects arranged on the table. The second setup generates images with individual objects positioned on the table at different orientations and rotated camera at four distinct viewpoints.
 
 <p class = "sub-header">Configuration 1: Top down</p>
 
@@ -511,18 +505,24 @@ def randomPosSamplingLoop(self,sampleSize,type):
     if self.dataCount>sampleSize:
         return -1
 ```
+The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the "moveTableNodes" function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the "makeSnapshot" function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
 
+The method must be invoked twice, once for the generation of training data and once for the generation of validation data. Upon the completion of this process, a dataset is produced that is ready for the training of a custom model. Figures 3 and 4 present a demonstration of one of the generated images and its accompanying annotation file, respectively.
 
+<div class="center-div">
+  <img src="./image_344.jpg"  width="80%" height="80%" class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 3: image_344.jpg in path: ..\DataSet\train\images  </p>
+</div>
 
-1. Define a function to take a snapshot of the camera image and create the corresponding annotation files. The function takes a reference to the camera object and a type as parameters and saves the image and annotation file in the respective directories. 
-2. Design a function to randomize the position and orientation of the objects in the simulation. The function takes a reference to the robot object as a parameter and randomizes the position and orientation of the objects in the simulation.
-3. Create a loop in the robot controller to call the snapshot and object randomization routine a specified number of times.
-   
-- Show example of the top down configuration (image and annotation)
+<div class="center-div">
+  <img src="./image_344.txt.jpg"  width="80%" height="80%"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
+  <p class = "image-description">Figure 4: image_344.txt in path: ..\DataSet\train\annotations  </p>
+</div>
+
+In order to enhance the performance of the model, an alternative image configuration was also employed.
 
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
 
-- 4 angled rotation object 
 
 (The following steps were taken to automate the process:)
 
