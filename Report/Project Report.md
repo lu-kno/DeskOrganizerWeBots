@@ -120,9 +120,8 @@ red {
       3. [Robot arm](#robot-arm)
          1. [Robot Movement](#robot-movement)
          2. [Gripper](#gripper)
-      4. [Movement Routine](#movement-routine)
-      5. [](#)
-      6. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
+         3. [Movement Routine](#movement-routine)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-2)
    5. [Results](#results)
    6. [Outlook](#outlook)
 5. [Sources](#sources)
@@ -576,6 +575,7 @@ After the data was created and labeled, the training process could be started. T
       - textures  
 
 #### Notes for this chapter (to be deleted later)
+
 - How the first approach turned out
   - bad accuracy 
   - not enough useable object classes 
@@ -585,9 +585,9 @@ After the data was created and labeled, the training process could be started. T
 - custom training
   - transfer learning
   - trainings data
-      - randomized objects
-      - labeling
-      - automatization of data creation
+    - randomized objects
+    - labeling
+    - automatization of data creation
   - training itself
     - Settings
 - detection results
@@ -595,49 +595,53 @@ After the data was created and labeled, the training process could be started. T
 ### Coordinate transformation
 
 - TODO: description of implementation Coord transition
-* the image is cropped to cintain only the table
-* the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
+  
+- the image is cropped to cintain only the table
+- the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
   
 
-* the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
-* the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
-* with this, the transformation matrix is produced.
+- the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
+- the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
+- with this, the transformation matrix is produced.
 
-* to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.
+- to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.
 
-* the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).
+- the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).
 
-* the transformation matrix is then multiplied with the position vector to obtain the position vector in the world coordinate system.
-* the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.
+- the transformation matrix is then multiplied with the position vector to obtain the position vector in the world coordinate system.
+- the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.
+
 ### Robot arm
 
 - TODO: description of implementation Robot arm
 
 #### Robot Movement
 
-* Behavior of the robot using IK
-* Behavior of the robot using Deterministic procedure
-* <red>insert pictures of a point being reached with both solutions</red>
+- Behavior of the robot using IK
+- Behavior of the robot using Deterministic procedure
+- <red>insert pictures of a point being reached with both solutions</red>
 
 #### Gripper
-* to gripper is closed in small increments until a final value is reached.....
-* in order to detect when an object has been grabbed, a force needs to be detected.....
-* preliminary tests showed the importance of the force detection to be very high, since the robot would otherwise not be able to detect when an object has been grabbed and would continue closing the fingers through the object. This caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
-* <red>insert images of grippers going through objects</red>
-* <red>insert force detection code</red>
-* the robot controller waits for the fingers to reach a closed state before continuing with the following movements.
-* <red>make reference to looper</red>
 
-### Movement Routine
-* start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task
-* loop and autoloop functions containing the actions to be performed by the robot
-  * loop function contains actions that are not performed in an autonomous way, but controlled by the user. This functions as a manual control loop. This includes the movement of the robot arm and the opening and closing of the gripper. 
-  * autoloop function contains actions that are performed autonomously by the robot. This includes the object detection routine followed by the movement of the robot itself to move the objects from one place to another.
+- to gripper is closed in small increments until a final value is reached.....
+- in order to detect when an object has been grabbed, a force needs to be detected.....
+- preliminary tests showed the importance of the force detection to be very high, since the robot would otherwise not be able to detect when an object has been grabbed and would continue closing the fingers through the object. This caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
+- <red>insert images of grippers going through objects</red>
+- <red>insert force detection code</red>
+- the robot controller waits for the fingers to reach a closed state before continuing with the following movements.
+- <red>make reference to looper</red>
+
+#### Movement Routine
+
+- start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task
+- loop and autoloop functions containing the actions to be performed by the robot
+  - loop function contains actions that are not performed in an autonomous way, but controlled by the user. This functions as a manual control loop. This includes the movement of the robot arm and the opening and closing of the gripper. 
+  - autoloop function contains actions that are performed autonomously by the robot. This includes the object detection routine followed by the movement of the robot itself to move the objects from one place to another.
 
 
 
 
-###
+
 ### Notes for this chapter (to be deleted later)
 - implementation of solutions -> going into detail at interesting places 
 
