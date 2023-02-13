@@ -591,32 +591,20 @@ The batch size was set to 32 and the number of training experiments to 100. The 
 
 #### Result 
 
-The model achieved a mean Avarage Precision (mAP) of 77
+The results of the training process are presented in the following table. T
 
 ```prolog
-Epoch 127/200
-----------
-Train:
-92it [00:59,  1.54it/s]
-    box loss-> 0.01273, object loss-> 0.03202, class loss-> 0.00211
-Validation:
-46it [00:28,  1.59it/s]
     recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
 ```	
+The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.
 
+Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.
 
- - weakness
-   - Fragments of objects are detected as the object with a high probability (99%+)
-   - Might be overfitted
-- Still convicing performance if the nms is tweaked right
+Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.
 
-#### Conclusion
+The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.
 
-- Framework created to automate the process of creating training data 
-  - Possibly transfarable to other projects
-    - Depending on the quality of the object animation. (Proto files)
-      - number of polygons
-      - textures  
+In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.
 
 #### Notes for this chapter (to be deleted later)
 
@@ -705,7 +693,11 @@ Validation:
 
 - same content as in presentation silde
 
-
+- Framework created to automate the process of creating training data 
+  - Possibly transfarable to other projects
+    - Depending on the quality of the object animation. (Proto files)
+      - number of polygons
+      - textures  
 
 <div style="page-break-after: always"></div>
 
