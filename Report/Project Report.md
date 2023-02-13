@@ -591,7 +591,7 @@ The batch size was set to 32 and the number of training experiments to 100. The 
 
 #### Result 
 
-The results of the training process are presented in the following table. T
+The results of the training process are presented in the following table.
 
 ```prolog
     recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
