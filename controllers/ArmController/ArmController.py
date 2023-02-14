@@ -367,13 +367,17 @@ class RobotArm(logger):
                 voffset = self.objectInfo[obj['name']]['voffset'] 
                 destination = self.objectInfo[obj['name']]['destination']
                 
-            destination = tuple(np.array(destination)+np.array((0,0,voffset)))
-            # destination[2] = destination[2] + voffset
-            worldpos = self.mainTable.local2world(obj['position']+[voffset])
+            worldpos = self.mainTable.local2world(obj['position'])
+            
+            placePosition = tuple(np.array(destination)+np.array((0,0,voffset)))
+            pickPosition = tuple(np.array(worldpos)+np.array((0,0,voffset)))
+            
             self.logV(f"{obj['name']} Pos in Table: {obj['position']}")
             self.logV(f"{obj['name']} Pos in World: {worldpos}")
+            self.logV(f"{obj['name']} PickPosition: {pickPosition}")
+            self.logV(f"{obj['name']} PlacePosition: {placePosition}")
             
-            self.pickNplace(worldpos, destination , rotation=-obj['orientation'])#-np.pi/2
+            self.pickNplace(pickPosition, placePosition , rotation=-obj['orientation'])#-np.pi/2
     
     @looper
     def randomPosSamplingLoop(self,sampleSize,type):
@@ -841,9 +845,11 @@ class Table(logger):
     def local2world(self, _pos: Vec3) -> Vec3:
         ''' this function tranforms the coordinates from the table to world coordinates.
         if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
-        if len(_pos)!=3:
+        if len(_pos)!=3 or len(_pos)!=2:
             self.logE(f'local2world: pos must have 3 dimensions: len={len(_pos)}')
-
+            
+        _pos = np.array([*_pos[:2],0])
+            
         # Transform from table corner in image to table center
         TableT_unscaled=[[0,-1,0,0.5],
                         [-1,0,0,0.5],
