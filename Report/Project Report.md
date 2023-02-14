@@ -654,9 +654,9 @@ The effect is that the model is more likely to detect multiple bounding boxes fo
 
 Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
-The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
+The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
-The results of the object detection process using The NMS algorithm with a treshold of 0.05 are presented in figure 6.
+The results of the object detection process using The NMS algorithm with a threshold of 0.05 are presented in figure 6.
 
 <div class="center-div">
   <img src="./snapshot-detected.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
@@ -715,7 +715,7 @@ def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None
             return orientation
 ```	
 
-The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks, which were created using the object's boundary. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
+The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks that select from each direction the pixels that are not contained within the objects area. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
 
 ```python
 1 def getOrientationPCA(self, edges):
@@ -737,7 +737,7 @@ A graphical representation of these steps is shown in Figure 7, which highlights
 
 The annotations below the images correspond to the respective steps in the "getAngle" function and are referred to in the comments of the function.
 
-The original image of the object is shown in the first image and is cropped using the bounding box coordinates. The second image displays the result of converting the image to the HSV color space. The application of the Canny algorithm to the HSV image is shown in the third image. The fourth image presents the edges of the object after the inner edges have been removed using a mask. The edges of the object are smoothed using a Gaussian blur and displayed in the fifth image. The sixth image displays the result of detecting the edges using the Canny algorithm a second time. The final image presents the result of performing PCA on the edges, where the arrows represents the eigenvectors of the object's contours.
+The first image corresponds to the original cropped section containing the object of interest. The second image displays the result obtained by performing a conversion to the HSV color space. This was performed to improve the distinction of edges between areas with different hues. Applying the Canny algorithm to this produces the third image as a result. The fourth image shows the area obtained by selecting all the pixels not encased by the detected edges. Applying a gaussian blur to this results in smoother edges as can be seen in the fifth image. Performing a second pass of the Canny algorithm results in what can be seen in the sixth image. Lastly, the seventh image shows the original cropped section of the object with an overlay displaying the direction of the eigenvectors, which determines the rotation of the object in relation to the fixed coordinate system of the image.
 
 ### Coordinate transformation
 
@@ -992,16 +992,29 @@ After this, the process of getting the pick and place positions and calling the 
 
 ## Results
 
-The results achieved correspond to the requirements that were set in advance for the project.
+This chapter provides an overview of the results achieved during the development of the project. The objective of the project was to develop an autonomous system that can detect objects in a specific environment and relocate them to a designated location. In order to achieve this, a robot arm was programmed to perform a series of tasks. 
 
+The first task was to detect the objects present in the environment using computer vision algorithms. This involved using a camera mounted on the robot arm to capture images of the workspace and then processing these images to identify the objects present. Once the objects were detected, the robot arm used its gripper to pick up each object and relocate it to a designated location. The gripper features force feedback to prevent object damage and avoid simulation glitches.
 
-- image table unorganized
+The results of the project are demonstrated by the before and after images shown below. The first image shows a cluttered table containing objects with randomized positions, while the second image shows the same table after the robot arm has organized the objects.
 
-- table organized 
+<div class="center-div">
+  <img src="./workspace-cluttered.jpg" width = "80%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
+  <p class = "image-description">Figure 8: Cluttered workspace at the start of the simulation </p>
+</div>
 
-- TODO: presenting results
+Figure 8 shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
 
+<div class="center-div">
+  <img src="./workplace-organized.jpg" width = "80%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
+  <p class = "image-description">Figure 9: Organized workspace at the end of the routine </p>
+</div>
+
+Figure 9 presents the organized workspace at the end of the simulation. The robot arm has successfully detected and relocated all objects to their designated locations within the workspace.
+
+Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained through a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
 ## Outlook / Conclusion
+
 
 - what we discovered
 - what we achieved
@@ -1023,6 +1036,7 @@ The results achieved correspond to the requirements that were set in advance for
 
 - System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs
 
+- further use
 
 - Room for improvement
   - improve data
