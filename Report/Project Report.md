@@ -836,7 +836,8 @@ The first transormation matrix is used to transform the position vector from the
 
 #### Robot Movement
 
-For the current implementation of the robot controller, some key decisions were made to prevent collisions with other objects in the scene during the robot's movement:
+For the current implementation of the robot controller, some key decisions were made with the goal of preventing collisions with other objects in the scene during the robot's movement and increasing the predictability of the robot's behaviour:
+
 - objects are to be approached from above
 - the gripper has to be pointing downwards while picking up or laying down an object, so as to provide a predictable hold of the object.
 - the movement of the robot needs be deterministic, so as to avoid unexpected erratic movements
@@ -918,19 +919,55 @@ $$\omega_5 = \omega_0 + \theta$$
 
 #### Gripper
 
+The gripper consists of three fingers, two of which are on one side and the third being on the oppossite side. similarly to the robot arm, the gripper is controlled by setting the position of the individual motors. Since all the fingers have the same geometry, the same procedure can be used for all of them. 
+
+One important distinction between the gripper and the robot arm is that the gripper can not be set to move to a predefined position in order to grab an object. Instead, the position in which the object is grabbed needs to be found by closing the gripper fingers in small increments. This is done while continously comparing the feedback force measured by the motors' sensors to a predefined threshold value defined as `GRIP_FORCE`. When the force on a finger exceeds the threshold value, or its position has reached the maximum angle of the joints, the finger is identified as closed and any further closing movements are stopped. The gripper is considered to have grabbed the object when all three fingers have been closed. During this procedure, all other movements of the robot are halted.
+This is done in order to prevent the gripper from closing through the object, which would cause the object to be thrown out of the gripper or get stuck to it as can be seen in figure ASDA, which would prevent subsequent objects to be grabbed correctly.
+
+<red> insert picture of gripper closing through can and getting stuck</red>
+
+The implementation of this procedure is shown below:
+
+<red>add Gripper.close code </red>
+
+The `@looper` decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of `-1` to indicate that the function should no longer be called and the loop must be finished.
+
+
+
+
+
 <draft>
 
-- to gripper is closed in small increments until a final value is reached.....
-- in order to detect when an object has been grabbed, a force needs to be detected.....
-- preliminary tests showed the importance of the force detection to be very high, since the robot would otherwise not be able to detect when an object has been grabbed and would continue closing the fingers through the object. This caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
-- <red>insert images of grippers going through objects</red>
-- <red>insert force detection code</red>
-- the robot controller waits for the fingers to reach a closed state before continuing with the following movements.
-- <red>make reference to looper</red>
+- closing the fingers through the object caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
   
 </draft>
 
 #### Movement Routine
+
+The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function `moveTo`, directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the `imageScan` module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
+
+Afterwards, the `organizeObjects` function is called which iterates through the found objects. For each object the procedure is as follows: 
+
+A check is perfomed to see if the `stopOrganization` variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the `HOME` position and the imageScan module is called again to update the list of objects. 
+
+If the `stopOrganization` variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset `voffset`required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object. 
+
+The position of the object within the image is then transformed to the global coordinates with the use of the function `local2world`, which was implemented as described in the previous section.
+
+The vertical offset in the `z` dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it. 
+
+Together with the objects orientation from the `image Detection` module, the resulting `pickPosition` and `placePosition` are then passed  to the `pickNplace` function,  which passes the positions to the functions `pickUpObject` and `placeObject` respectively and calls them one after the other.
+
+
+The `pickUpObject` begins by calling the function `moveTo`, moving the arm and gripper to a position above the object to be picked up and rotating the gripper according to the objects orientation. The distance to this object defined by the variable `SAFE_HEIGHT`.
+The gripper is open by a call to `Gripper.open` and the robot lowers the gripper to reach the object at `pickPosition` through a second call to the `moveTo` function.
+This is followed by the `Gripper.close` function, which closes the grippers fingers like previously described to grab the object, and a last call to the `moveTo` function to move the robot back to the safe position above the object above the object.
+
+The implementation of the `placeObject` function is very similar to the `pickUpObject` function, with the only difference being that the gripper is kept closed holding the object until the `placePosition` is reached. Once the robot has reached the `placePosition`, the gripper is opened and the robot moves back to a safe height above the objects position.
+
+After this, the process of getting the pick and place positions and calling the `pickNplace` function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
+
+
 
 <draft>
 

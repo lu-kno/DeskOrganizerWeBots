@@ -30,7 +30,9 @@ Vec3 = tuple[float, float, float]
 DISABLE_FFB = False
 DISABLE_FINGER_TIP = False
 AUTO_LOOP = True
-TABLE_TRANSFORM_TEST = True
+TABLE_TRANSFORM_TEST = False
+START_WITH_RANDOMIZED_TABLE = False
+ENDLESS_TABLE_RANDOMIZATION = False
 
 def _enableFB(self, sampling_period: int):
     '''Partial fix for Webots bug in R2023a to allow force feedback sampling period to be set'''
@@ -517,7 +519,7 @@ class RobotArm(logger):
             self.pickUpObject((x,y,z))
         if (key==ord('3')):
             self.log('Releasing object')   
-            self.deliverObject((x,y,z))     
+            self.placeObject((x,y,z))     
     
     
         #reset starting position
@@ -698,7 +700,7 @@ class RobotArm(logger):
         self.gripper.close()
         self.moveTo(posSafe)
         
-    def deliverObject(self, _pos: Vec3, method: Literal['drop']|Any = 'place', safeHeight: float|None = None) -> None:   
+    def placeObject(self, _pos: Vec3, method: Literal['drop']|Any = 'place', safeHeight: float|None = None) -> None:   
         '''
         Inputs: 
             pos (List/iterable of length 3):
@@ -745,7 +747,7 @@ class RobotArm(logger):
         Moves an object from one position to another with the gripper.
         '''
         self.pickUpObject(position, rotation=rotation)
-        self.deliverObject(destination, method=place_method)
+        self.placeObject(destination, method=place_method)
         
 
         
@@ -845,8 +847,8 @@ class Table(logger):
     def local2world(self, _pos: Vec3) -> Vec3:
         ''' this function tranforms the coordinates from the table to world coordinates.
         if no tablesize is given, pos is assumed to be in absolute values. otherwise its a value relative to the table size, from 0 to +1'''
-        if len(_pos)!=3 or len(_pos)!=2:
-            self.logE(f'local2world: pos must have 3 dimensions: len={len(_pos)}')
+        if len(_pos)!=3 and len(_pos)!=2:
+            self.logE(f'local2world: pos must have 2 or 3 dimensions: len={len(_pos)}')
             
         _pos = np.array([*_pos[:2],0])
             

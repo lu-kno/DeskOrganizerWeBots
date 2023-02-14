@@ -1540,6 +1540,7 @@ draft {
 <li><a href="#result">Result</a></li>
 </ol>
 </li>
+<li><a href="#coordinate-transformation">Coordinate transformation</a></li>
 <li><a href="#robot-arm">Robot arm</a>
 <ol>
 <li><a href="#robot-movement">Robot Movement</a></li>
@@ -1952,51 +1953,88 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 <span class="hljs-number">10</span>    trainer.trainModel()
 </code></pre>
 <p>The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified.</p>
-<p>The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.</p>
+<p>The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.</p>
 <h4 id="result">Result</h4>
-<p>The results of the training process are presented in the following table. T</p>
-<pre><code class="language-prolog">    recall: <span class="hljs-number">0.748433</span> precision: <span class="hljs-number">0.683522</span> mAP@<span class="hljs-number">0.5</span>: <span class="hljs-number">0.736085</span>, mAP@<span class="hljs-number">0.5</span><span class="hljs-number">-0.95</span>: <span class="hljs-number">0.340358</span>
+<p>The results of the training after the 100th iteration are presented below.</p>
+<pre><code class="language-python">    recall: <span class="hljs-number">0.748433</span> precision: <span class="hljs-number">0.683522</span> mAP@<span class="hljs-number">0.5</span>: <span class="hljs-number">0.736085</span>, mAP@<span class="hljs-number">0.5</span>-<span class="hljs-number">0.95</span>: <span class="hljs-number">0.340358</span>
 </code></pre>
 <p>The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.</p>
-<p>Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.</p>
-<p>Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.</p>
-<p>The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.</p>
-<p>In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.</p>
-<h4 id="notes-for-this-chapter-to-be-deleted-later">Notes for this chapter (to be deleted later)</h4>
-<ul>
-<li>How the first approach turned out
-<ul>
-<li>bad accuracy</li>
-<li>not enough useable object classes</li>
-<li>no Proto files for existing object classes</li>
-</ul>
-</li>
-<li>custom detection
-<ul>
-<li>use of imageAI library</li>
-</ul>
-</li>
-<li>custom training
-<ul>
-<li>transfer learning</li>
-<li>trainings data
-<ul>
-<li>randomized objects</li>
-<li>labeling</li>
-<li>automatization of data creation</li>
-</ul>
-</li>
-<li>training itself
-<ul>
-<li>Settings</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>detection results</li>
-<li><red> TODO: add results as given out by the trained model, i.e. scaling the objects positions to be zero at one corner and 1 at the other</li>
-<li>Orientation of the object </red></li>
-</ul>
+<p>The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.</p>
+<p>The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem.</p>
+<div class="center-div">
+  <img src="file:////home/lu/Documents/0_MasterDocs/AMS/CubeGrabberExample/Webots/DeskOrganizer/Report/snapshot-detected-nms0.5.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 5: Object detection results self trained model </p>
+</div>
+<p>Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.</p>
+<p>The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the &quot;nms_threshold&quot; parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output.</p>
+<p>The results of the object detection process using The NMS algorithm with a treshold of 0.05 are presented in figure 6.</p>
+<div class="center-div">
+  <img src="file:////home/lu/Documents/0_MasterDocs/AMS/CubeGrabberExample/Webots/DeskOrganizer/Report/snapshot-detected.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 6: Object detection results self trained model </p>
+</div>
+<p>The test results indicate that the model has a satisfactory level of performance for the intended application, as it was capable to correctly determine the position and class of each object on the table in multiple test cases.</p>
+<p>To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.</p>
+<h3 id="orientation-of-the-object">Orientation of the object</h3>
+<p>To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The function used to prepare the image for the orientation analysis is presented below.</p>
+<pre><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">getAngle</span>(<span class="hljs-params">self, objectImage, name: <span class="hljs-built_in">str</span>|<span class="hljs-literal">None</span> = <span class="hljs-literal">None</span>, savefig: <span class="hljs-built_in">bool</span>|<span class="hljs-literal">None</span> = <span class="hljs-literal">None</span></span>) -&gt; <span class="hljs-built_in">float</span>:
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-comment"># (1) Image of object is cropped using the bounding box and passed as a parameter</span>
+            <span class="hljs-comment"># (2) Convert the image to the HSV color space</span>
+            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+            <span class="hljs-comment"># (3) Apply Canny edge detection</span>
+            edges = cv2.Canny(hsv_image, <span class="hljs-number">50</span>, <span class="hljs-number">150</span>)
+            <span class="hljs-comment"># Init masks</span>
+            leftEdgeMask=np.full(np.shape(edges),<span class="hljs-number">0</span>)
+            rightEdgeMask=np.full(np.shape(edges),<span class="hljs-number">0</span>)
+            topEdgeMask=np.full(np.shape(edges),<span class="hljs-number">0</span>)
+            bottomEdgeMask=np.full(np.shape(edges),<span class="hljs-number">0</span>)
+            <span class="hljs-comment"># Init Boundary</span>
+            leftEdge=[<span class="hljs-number">1000</span> <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(np.shape(edges)[<span class="hljs-number">0</span>])]
+            rightEdge=[<span class="hljs-number">0</span> <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(np.shape(edges)[<span class="hljs-number">0</span>])]
+            topEdge=[<span class="hljs-number">1000</span> <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(np.shape(edges)[<span class="hljs-number">1</span>])]
+            bottomEdge=[<span class="hljs-number">0</span> <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(np.shape(edges)[<span class="hljs-number">1</span>])]
+            <span class="hljs-comment"># Position Boundary</span>
+            <span class="hljs-keyword">for</span> y,x <span class="hljs-keyword">in</span> pos:
+                leftEdge[y] = <span class="hljs-built_in">min</span>(leftEdge[y],x)
+                rightEdge[y] = <span class="hljs-built_in">max</span>(rightEdge[y],x)
+                topEdge[x] = <span class="hljs-built_in">min</span>(topEdge[x],y)
+                bottomEdge[x] = <span class="hljs-built_in">max</span>(bottomEdge[x],y)
+            <span class="hljs-comment"># Make Masks from Boundary</span>
+            <span class="hljs-keyword">for</span> y,x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(leftEdge):
+                leftEdgeMask[y,x:] = <span class="hljs-number">255</span>
+            <span class="hljs-keyword">for</span> y,x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(rightEdge):
+                rightEdgeMask[y,:x] = <span class="hljs-number">255</span>
+            <span class="hljs-keyword">for</span> x,y <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(topEdge):
+                topEdgeMask[y:,x] = <span class="hljs-number">255</span>
+            <span class="hljs-keyword">for</span> x,y <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(bottomEdge):
+                bottomEdgeMask[:y,x] = <span class="hljs-number">255</span>
+            <span class="hljs-comment"># (4) Remove inner edges by applying a mask to the image</span>
+            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/<span class="hljs-number">255</span>**<span class="hljs-number">3</span>)
+            <span class="hljs-comment"># (5) Applying gaussian blur to smoothen edges</span>
+            blur = cv2.GaussianBlur(combined_mask, (<span class="hljs-number">11</span>,<span class="hljs-number">11</span>), <span class="hljs-number">0</span>)
+            <span class="hljs-comment"># (6) Using canny algorithm again to detect contours</span>
+            cleanEdges = cv2.Canny(blur.astype(<span class="hljs-string">&#x27;uint8&#x27;</span>),<span class="hljs-number">50</span>,<span class="hljs-number">150</span>)
+            <span class="hljs-comment"># (7) Using PCA (Principal Component Analysis) to compute the main orientation of the object</span>
+            orientation, contourNangle = self.getOrientationPCA(cleanEdges,objectImage)
+            <span class="hljs-keyword">return</span> orientation
+</code></pre>
+<p>The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks, which were created using the object's boundary. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function &quot;getOrientationPCA&quot;, presented in the following code segment.</p>
+<pre><code class="language-python"><span class="hljs-number">1</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">getOrientationPCA</span>(<span class="hljs-params">self, edges</span>):
+<span class="hljs-number">2</span>     pts = np.transpose(np.where(edges&gt;<span class="hljs-number">1</span>),[<span class="hljs-number">1</span>,<span class="hljs-number">0</span>]).astype(np.float64)
+<span class="hljs-number">3</span>     <span class="hljs-comment"># Perform PCA analysis</span>
+<span class="hljs-number">4</span>     mean = np.empty((<span class="hljs-number">0</span>))
+<span class="hljs-number">5</span>     mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+<span class="hljs-number">6</span>     angle = math.atan2(eigenvectors[<span class="hljs-number">0</span>,<span class="hljs-number">1</span>], eigenvectors[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]) <span class="hljs-comment"># orientation in radians</span>
+<span class="hljs-number">7</span>     <span class="hljs-keyword">return</span> angle
+</code></pre>
+<p>This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]</p>
+<p>A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process.</p>
+<div class="center-div">
+  <img src="file:////home/lu/Documents/0_MasterDocs/AMS/CubeGrabberExample/Webots/DeskOrganizer/Report/hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
+  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
+</div>
+<p>The annotations below the images correspond to the respective steps in the &quot;getAngle&quot; function and are referred to in the comments of the function.</p>
+<p>The original image of the object is shown in the first image and is cropped using the bounding box coordinates. The second image displays the result of converting the image to the HSV color space. The application of the Canny algorithm to the HSV image is shown in the third image. The fourth image presents the edges of the object after the inner edges have been removed using a mask. The edges of the object are smoothed using a Gaussian blur and displayed in the fifth image. The sixth image displays the result of detecting the edges using the Canny algorithm a second time. The final image presents the result of performing PCA on the edges, where the arrows represents the eigenvectors of the object's contours.</p>
 <h3 id="coordinate-transformation">Coordinate transformation</h3>
 <p>With relative position of the objects within the image, this position vectors need to be transformed to the world coordinate system to know their position in the simulation relative to the robot.
 This task was achieved by creating and combining two transformation matrices. The general procedure was implemented as follows:</p>
@@ -2071,56 +2109,49 @@ The first transormation matrix is used to transform the position vector from the
 </ul>
 </draft>
 <h4 id="robot-movement">Robot Movement</h4>
-<p>For the current implementation of the robot controller, some key decisions were made to prevent collisions with other objects in the scene during the robot's movement:</p>
+<p>For the current implementation of the robot controller, some key decisions were made with the goal of preventing collisions with other objects in the scene during the robot's movement and increasing the predictability of the robot's behaviour:</p>
 <ul>
 <li>objects are to be approached from above</li>
 <li>the gripper has to be pointing downwards while picking up or laying down an object, so as to provide a predictable hold of the object.</li>
 <li>the movement of the robot needs be deterministic, so as to avoid unexpected erratic movements</li>
 </ul>
-<p>Taking these requirements into account, the robot's movement</p>
+<p>Taking these requirements into account, preliminary implementations to solve the inverse kinematics problem were made. The first of themused the full chain of the robot's joints and the python module &quot;ikpy&quot; to iteratively find the robot configuration required to reach a point in space.</p>
+<p>The second implementation made use of the restrictions to the robots movement previously mentioned to utilize a reduced kinematic chain of only the joints that are relevant to the movement of the gripper.
+Since the gripper is required be pointing down, the rotation of the fourth joint is restricted to the a value of zero, and therefore reduces the degrees of freedom of the kinematic chain by one. Likewise the fifth and sixth joints are constrained by a value defined only by the configuration of the first three joints, further reducing the degrees of freedom of the kinematic chain by two.</p>
+<p>The following section describes the implementation of the second solution, which was chosen for the final implementation due to its deterministic nature and pretictable outcomes fullfilling the criteria previously mentioned. Furthermore, having a deterministic computation time results in an implementation that could be used with more reliability in other applications in which critical timing constraints are present.</p>
+<!-- 
+the reduced degrees of freedom allow for a more efficient implementation of the solution, as well as a more efficient computation time.
+
+
 <draft>
-<ul>
-<li>
-<p>Behavior of the robot using IK</p>
-</li>
-<li>
-<p>Behavior of the robot using Deterministic procedure</p>
-</li>
-<li>
-<p><red>insert pictures of a point being reached with both solutions</red></p>
-</li>
-<li>
-<p>decisions taken</p>
-<ul>
-<li>objects are approached from above</li>
-<li>robot movements should not produce collisions with other objects in the scene, other than the contact with the object to be picked up
-<ul>
-<li>this requires some degree of predictability forthe robots movements while moving between two points and the pose taken when reaching a point</li>
-</ul>
-</li>
-<li>IK with full chain requires an iterative procedure to find the correct joint angles due to the number of degrees of freedom
-<ul>
-<li>reduced performance and increased complexity</li>
-<li>non deterministic behaviour can cause unexpected erratic movements which could lead to a collision with other objects</li>
-<li></li>
-</ul>
-</li>
-<li>the chosen requirements allows the  degrees of freedom to be reduced to 3
-<ul>
-<li>explain why having 3 degrees of freedom allows the implementation of an algebraic solution whit reduced complexity, deterministic results leading to an increased preditability in the robots movements, as well as deterministic computation time, which allows this method to be used in other applications where critical time constraints are present with increased reliability.</li>
-<li></li>
-</ul>
-</li>
-<li></li>
-</ul>
-</li>
-</ul>
+
+- Behavior of the robot using IK
+- Behavior of the robot using Deterministic procedure
+- <red>insert pictures of a point being reached with both solutions</red>
+
+- decisions taken
+  - objects are approached from above
+  - robot movements should not produce collisions with other objects in the scene, other than the contact with the object to be picked up
+    - this requires some degree of predictability forthe robots movements while moving between two points and the pose taken when reaching a point
+  - IK with full chain requires an iterative procedure to find the correct joint angles due to the number of degrees of freedom
+    - reduced performance and increased complexity
+    - non deterministic behaviour can cause unexpected erratic movements which could lead to a collision with other objects
+    - 
+  - the chosen requirements allows the  degrees of freedom to be reduced to 3
+    - explain why having 3 degrees of freedom allows the implementation of an algebraic solution whit reduced complexity, deterministic results leading to an increased preditability in the robots movements, as well as deterministic computation time, which allows this method to be used in other applications where critical time constraints are present with increased reliability.
+    -  
+  - 
+
 </draft>
-<p><red>following is probably better in implementation</red></p>
+<red>following is probably better in implementation</red>  
+
 <draft>
-<p>Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.</p>
-<p>The following figure shows the robot's kinematic chain with the resulting geometry used in the calculation of the required motor positions.</p>
-</draft>
+
+Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+</draft> 
+
+-->
+<p>The following figure shows the robot's simplified kinematic chain with the resulting geometry used in the calculation of the required motor positions.</p>
 <p><red>Insert figure from presentation</red></p>
 <p>The position of the first motor <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\omega_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> can be calculated by removing the z component of the position vector <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><msub><mi>p</mi><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow></msub><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p_{xyz}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.000108em;vertical-align:-0.286108em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">yz</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
@@ -2183,69 +2214,32 @@ c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-
 <section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ω</mi><mn>4</mn></msub><mo>=</mo><mfrac><mi>π</mi><mn>2</mn></mfrac><mo>−</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>1</mn></msub><mo>+</mo><msub><mi>ω</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\omega_4 = \frac{\pi}{2} - (\omega_1 + \omega_2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.7935600000000003em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.10756em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></eqn></section></math>
 <p>The rotation of the sixth joint <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>5</mn></msub></mrow><annotation encoding="application/x-tex">\omega_5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> corresponding to the rotation of the gripper is set to have a default value, such that the gripper's grabbing orientation is pointing parallel to the x-axis. This is done by setting its rotation <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>5</mn></msub></mrow><annotation encoding="application/x-tex">\omega_5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> to compensate the rotation <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\omega_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> of the first joint. Since the first and sixth joint are pointing in opossite directions, these two can take the exact same value. An angle <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span></span></span></eq> with a default value of <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span></eq> is added to the rotation of the sixth joint to allow for different orientations of the gripper.</p>
 <section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ω</mi><mn>5</mn></msub><mo>=</mo><msub><mi>ω</mi><mn>0</mn></msub><mo>+</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\omega_5 = \omega_0 + \theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.73333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span></span></span></span></eqn></section></math>
-<draft>
-<p>The distance over the xy plane between the point of interest <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><msub><mi>p</mi><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow></msub><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p_{xyz}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.000108em;vertical-align:-0.286108em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">yz</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></eq> and the origin of the coordinate system <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>O</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{O}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9663299999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span></span></eq> can be calculated with the following formula:
-magnitude <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">h</span></span></span></span></eq> of the position vector <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><msub><mi>p</mi><mrow><mi>x</mi><mi>y</mi></mrow></msub><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p_{xy}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.000108em;vertical-align:-0.286108em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></eq> gives us its distance to the origin of the coordinate system as follows:</p>
-<section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>h</mi><mo>=</mo><mi mathvariant="normal">∣</mi><mover accent="true"><msub><mi>p</mi><mrow><mi>x</mi><mi>y</mi></mrow></msub><mo>⃗</mo></mover><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">h=|\vec{p_{xy}}|</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord">∣</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span><span class="mord">∣</span></span></span></span></span></eqn></section></math>
-<p>and the point <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><msub><mi>p</mi><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow></msub><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p_{xyz}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.000108em;vertical-align:-0.286108em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">yz</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></eq> over the xy plane
-and can be calculated with the following formula:</p>
-<p>where:</p>
-<ul>
-<li>
-<p><eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span></span></span></span></eq> is the origin of the coordinate system</p>
-<p>as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:
-The position of the first motor <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\omega_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> can be calculated as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:</p>
-</li>
-</ul>
-<section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mi>arctan</mi><mo>⁡</mo><mfrac><mi>y</mi><mi>x</mi></mfrac></mrow><annotation encoding="application/x-tex">\omega_0=\arctan{\frac{y}{x}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.7935599999999998em;vertical-align:-0.686em;"></span><span class="mop">arctan</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1075599999999999em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span></eqn></section></math>
-<p>where:</p>
-<ul>
-<li><eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></eq> and <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi></mrow><annotation encoding="application/x-tex">z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span></span></span></span></eq> are the y and z coordinates of the object in the simulation.</li>
-</ul>
-</draft>
 <h4 id="gripper">Gripper</h4>
+<p>The gripper consists of three fingers, two of which are on one side and the third being on the oppossite side. similarly to the robot arm, the gripper is controlled by setting the position of the individual motors. Since all the fingers have the same geometry, the same procedure can be used for all of them.</p>
+<p>One important distinction between the gripper and the robot arm is that the gripper can not be set to move to a predefined position in order to grab an object. Instead, the position in which the object is grabbed needs to be found by closing the gripper fingers in small increments. This is done while continously comparing the feedback force measured by the motors' sensors to a predefined threshold value defined as <code>GRIP_FORCE</code>. When the force on a finger exceeds the threshold value, or its position has reached the maximum angle of the joints, the finger is identified as closed and any further closing movements are stopped. The gripper is considered to have grabbed the object when all three fingers have been closed. During this procedure, all other movements of the robot are halted.
+This is done in order to prevent the gripper from closing through the object, which would cause the object to be thrown out of the gripper or get stuck to it as can be seen in figure ASDA, which would prevent subsequent objects to be grabbed correctly.</p>
+<p><red> insert picture of gripper closing through can and getting stuck</red></p>
+<p>The implementation of this procedure is shown below:</p>
+<p><red>add Gripper.close code </red></p>
+<p>The <code>@looper</code> decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of <code>-1</code> to indicate that the function should no longer be called and the loop must be finished.</p>
 <draft>
 <ul>
-<li>to gripper is closed in small increments until a final value is reached.....</li>
-<li>in order to detect when an object has been grabbed, a force needs to be detected.....</li>
-<li>preliminary tests showed the importance of the force detection to be very high, since the robot would otherwise not be able to detect when an object has been grabbed and would continue closing the fingers through the object. This caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.</li>
-<li><red>insert images of grippers going through objects</red></li>
-<li><red>insert force detection code</red></li>
-<li>the robot controller waits for the fingers to reach a closed state before continuing with the following movements.</li>
-<li><red>make reference to looper</red></li>
+<li>closing the fingers through the object caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.</li>
 </ul>
 </draft>
 <h4 id="movement-routine">Movement Routine</h4>
+<p>The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function <code>moveTo</code>, directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the <code>imageScan</code> module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.</p>
+<p>Afterwards, the <code>organizeObjects</code> function is called which iterates through the found objects. For each object the procedure is as follows:</p>
+<p>A check is perfomed to see if the <code>stopOrganization</code> variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the <code>HOME</code> position and the imageScan module is called again to update the list of objects.</p>
+<p>If the <code>stopOrganization</code> variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset <code>voffset</code>required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object.</p>
+<p>The position of the object within the image is then transformed to the global coordinates with the use of the function <code>local2world</code>, which was implemented as described in the previous section.</p>
+<p>The vertical offset in the <code>z</code> dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it.</p>
+<p>Together with the objects orientation from the <code>image Detection</code> module, the resulting <code>pickPosition</code> and <code>placePosition</code> are then passed  to the <code>pickNplace</code> function,  which passes the positions to the functions <code>pickUpObject</code> and <code>placeObject</code> respectively and calls them one after the other.</p>
+<p>The <code>pickUpObject</code> begins by calling the function <code>moveTo</code>, moving the arm and gripper to a position above the object to be picked up and rotating the gripper according to the objects orientation. The distance to this object defined by the variable <code>SAFE_HEIGHT</code>.
+The gripper is open by a call to <code>Gripper.open</code> and the robot lowers the gripper to reach the object at <code>pickPosition</code> through a second call to the <code>moveTo</code> function.
+This is followed by the <code>Gripper.close</code> function, which closes the grippers fingers like previously described to grab the object, and a last call to the <code>moveTo</code> function to move the robot back to the safe position above the object above the object.</p>
+<p>The implementation of the <code>placeObject</code> function is very similar to the <code>pickUpObject</code> function, with the only difference being that the gripper is kept closed holding the object until the <code>placePosition</code> is reached. Once the robot has reached the <code>placePosition</code>, the gripper is opened and the robot moves back to a safe height above the objects position.</p>
+<p>After this, the process of getting the pick and place positions and calling the <code>pickNplace</code> function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.</p>
 <draft>
 <ul>
 <li>start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task</li>
@@ -2273,13 +2267,40 @@ The position of the first motor <eq><span class="katex"><span class="katex-mathm
 </li>
 </ul>
 <h2 id="results">Results</h2>
+<p>The results achieved correspond to the requirements that were set in advance for the project.</p>
 <ul>
-<li>TODO: presenting results</li>
+<li>
+<p>image table unorganized</p>
+</li>
+<li>
+<p>table organized</p>
+</li>
+<li>
+<p>TODO: presenting results</p>
+</li>
 </ul>
 <h2 id="outlook--conclusion">Outlook / Conclusion</h2>
 <ul>
 <li>
+<p>what we discovered</p>
+</li>
+<li>
+<p>what we achieved</p>
+<ul>
+<li>successful</li>
+<li></li>
+</ul>
+</li>
+<li>
+<p>milestones in development</p>
+</li>
+<li></li>
+<li>
 <p>Robot controller can be used to in real world applications</p>
+<ul>
+<li>flexibility regarding the organization/Enviroment setups</li>
+<li></li>
+</ul>
 </li>
 <li>
 <p>same content as in presentation silde</p>
@@ -2299,11 +2320,30 @@ The position of the first motor <eq><span class="katex"><span class="katex-mathm
 </li>
 </ul>
 </li>
+<li>
+<p>System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs</p>
+</li>
+<li>
+<p>Room for improvement</p>
+<ul>
+<li>improve data
+<ul>
+<li>only one model usedm per type</li>
+</ul>
+</li>
+<li>improve training
+<ul>
+<li>maybe overfitted</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <div style="page-break-after: always"></div>
 <h1 id="sources">Sources</h1>
 <p>[1] <a href="https://imageai.readthedocs.io/en/latest/index.html">https://imageai.readthedocs.io/en/latest/index.html</a></p>
 <p>[2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.</p>
+<p>[3] <a href="https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/">https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/</a></p>
 <p>[2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021</p>
 <div style="page-break-after: always"></div>
 <h2 id="references-for-markdown-to-be-deleted-later">References for Markdown (to be deleted later)</h2>
