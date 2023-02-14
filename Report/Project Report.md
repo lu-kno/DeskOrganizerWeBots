@@ -634,7 +634,7 @@ The effect is that the model is more likely to detect multiple bounding boxes fo
 
 Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
-The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
+The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the IoU, is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
 The results of the object detection process using The NMS algorithm with a threshold of 0.05 are presented in figure 6.
 
@@ -787,14 +787,14 @@ The first task was to detect the objects present in the environment using comput
 The results of the project are demonstrated by the before and after images shown below. The first image shows a cluttered table containing objects with randomized positions, while the second image shows the same table after the robot arm has organized the objects.
 
 <div class="center-div">
-  <img src="./workspace-cluttered.jpg" width = "80%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
+  <img src="./workspace-cluttered.jpg" width = "70%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
   <p class = "image-description">Figure 8: Cluttered workspace at the start of the simulation </p>
 </div>
 
 Figure 8 shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
 
 <div class="center-div">
-  <img src="./workplace-organized.jpg" width = "80%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
+  <img src="./workplace-organized.jpg" width = "70%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
   <p class = "image-description">Figure 9: Organized workspace at the end of the routine </p>
 </div>
 
@@ -803,34 +803,38 @@ Figure 9 presents the organized workspace at the end of the simulation. The robo
 Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained through a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
 ## Outlook / Conclusion
 
+In this project, we successfully developed a robot controller for a robot arm that can be used in real-world applications, with flexibility regarding the organization and environment setups. The milestones achieved in the development process included the successful implementation of computer vision techniques, the creation of a framework to automate the process of creating training data and robot arm as well as gripper movement routines.
 
-- what we discovered
+Our project demonstrates the potential for the system to be applied in other use cases by simulating the environment first and then configuring the robot arm to fit the needs. Additionally, the framework created to automate the process of creating training data is possibly transferable to other projects, depending on the quality of the object animation, including the number of polygons and textures used.
+
+While our project achieved several milestones, there is still room for improvement. Improving the training data, including using multiple models per type, and improving the training process to prevent overfitting are key areas for future development.
+
+In conclusion, our project has contributed to the field of robotics by demonstrating the feasibility of using a robot controller for a robot arm in real-world applications. While our project focused on the specific use case of tidying up a cluttered workspace, the potential applications of this technology are vast, and we look forward to seeing how this technology can be further developed and applied in the future.
+
+In conclusion, the project has been successfully completed and the objectives and requirements have been fulfilled. 
+
 - what we achieved
-  - successful
-  - 
-- milestones in development
-- 
-
+  -  milestones in development
+  
+- Obstacles we faced and what we discovered / learned 
+  
 - Robot controller can be used to in real world applications
   - flexibility regarding the organization/Enviroment setups
-  - 
-- same content as in presentation silde
+
+ - System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs 
 
 - Framework created to automate the process of creating training data 
   - Possibly transfarable to other projects
     - Depending on the quality of the object animation. (Proto files)
       - number of polygons
       - textures  
-
-- System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs
-
-- further use
-
+  
 - Room for improvement
   - improve data
     - only one model usedm per type
   - improve training
     - maybe overfitted
+
 
 <div style="page-break-after: always"></div>
 
