@@ -116,6 +116,16 @@ red {
       - [Training data](#training-data)
       - [Training](#training)
       - [Result](#result)
+    - [Coordinate transformation](#coordinate-transformation)
+    - [Robot arm](#robot-arm)
+      - [Robot Movement](#robot-movement)
+      - [Gripper](#gripper)
+      - [Movement Routine](#movement-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+  - [Results](#results)
+  - [Outlook / Conclusion](#outlook--conclusion)
+- [Sources](#sources)
+  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -633,39 +643,18 @@ The results of the object detection process using The NMS algorithm with a tresh
   <p class = "image-description">Figure 6: Object detection results self trained model </p>
 </div>
 
-The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly determine the position and class of each object on the table in multiple test cases. 
+The test results indicate that the model has a satisfactory level of performance for the intended application, as it was capable to correctly determine the position and class of each object on the table in multiple test cases. 
 
 To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
 
 ### Orientation of the object
 
-To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The following steps were implemented to determine the orientation: 
-
-The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the Principal Component Analysis (PCA) algorithm. 
-
-A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
-
-<div class="center-div">
-  <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
-  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
-</div>
-
-image of object is generated using the bounding box
-Image converted to HSV color space
-Using cv2’s canny algorithm to detect edges
-Mask image to remove inner edges
-Applying gaussian blur to smoothen edges
-Using canny algorithm again to detect contours
-Using PCA (Principal Component Analysis) to compute the main orientation of the object
-
-
-
-The function used to determine the orientation of the object is shown below:
+To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The function used to prepare the image for the orientation analysis is presented below.
 
 ```python
 def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None) -> float:
         try:
-            # (1) An image of object is generated using the bounding box and passed as a parameter
+            # (1) Image of object is cropped using the bounding box and passed as a parameter
             # (2) Convert the image to the HSV color space
             hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
             # (3) Apply Canny edge detection
@@ -705,6 +694,47 @@ def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None
             orientation, contourNangle = self.getOrientationPCA(cleanEdges,objectImage)
             return orientation
 ```	
+
+The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks, which were created using the object's boundary. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
+
+```python
+1 def getOrientationPCA(self, edges):
+2     pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
+3     # Perform PCA analysis
+4     mean = np.empty((0))
+5     mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+6     angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+7     return angle
+```
+This function is used to determine the main orientation of an object by performing PCA on the edges of an image.  
+
+This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]
+
+The function first extracts the edge's coordinates from the input image and converts them to a format that can be used for PCA analysis. At line 5 the principal component analysis is performed on the edge points using OpenCV's "PCACompute2" function, to find the eigenvectors of the dataset. Finally, the angle to the x-axis of the eigenvector with the highest variance is calculated, using a trigonometric function, which is then returned.
+
+A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
+
+<div class="center-div">
+  <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
+  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
+</div>
+
+The annotations below the images correlate to the respective steps in the "getAngle" function and are refered to in the comments of the function. 
+
+The first image shows the original image of the object, which is cropped using the bounding box coordinates. 
+The second image shows the image after it has been converted to the HSV color space.
+The third image shows the results of the Canny algorithm applied to the HSV image. 
+The fourth image shows the edges of the object after the inner edges have been removed using a mask. 
+The fifth image shows the edges of the object after they have been smoothed using a Gaussian blur.
+The sixth image shows the edges of the object after they have been detected using the Canny algorithm a second time. The final image shows the edges of the object after PCA has been performed on them. The yellow line in the image shows the major axis of the object, while the blue arrow represents the table's orientation.
+
+
+which is used to determine the orientation of the object.
+
+A orientation parallel to the vertical dimension of the image is interpreted as a rotation of 0 degrees.
+
+The object's rotation relative to the table 
+
 
 ### Coordinate transformation
 
@@ -812,9 +842,10 @@ The results achieved correspond to the requirements that were set in advance for
 
 [2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
 
-
+[3] https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/
 
 [2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021
+
 
 
 <div style="page-break-after: always"></div>
