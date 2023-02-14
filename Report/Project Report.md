@@ -622,7 +622,11 @@ Figure 5 shows the results of the object detection process using the custom mode
   <p class = "image-description">Figure 5: Object detection results self trained model </p>
 </div>
 
-Multiple bounding boxes with high probabilities were respectively created for each object. This is a common problem in object detection tasks. 
+Multiple bounding boxes with high probabilities were respectively created for each object, destorting the result. This is a common problem in object detection tasks. A possible cause of this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Additionally, the dataset used for training may not be diverse enough, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
+
+
+
+Due to time constrains we decided to use the model as is and not retrain it.
 
 The problem can be addressed by using non-maximum suppression (NMS) to apply an algorithm to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library.
 
@@ -635,11 +639,15 @@ Figure 5 shows the results of the object detection process using the custom mode
   <p class = "image-description">Figure 6: Object detection results self trained model </p>
 </div>
 
- The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly detect and indentify each object on the table.  
+ The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly detect and indentify each object on the table. 
+ 
+ Another possible explanation could be an inadequate training dataset, which lacks diversity in its data. 
 
 - relevent data will be transmitted upon return 
 
 ### Orientation of the object
+
+To determine the orientation of the object, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The following steps were implemented to prepare the image for analysis:
 
 1. image of object is generated using the bounding box
 2. Image converted to HSV color space
@@ -654,6 +662,12 @@ Figure 5 shows the results of the object detection process using the custom mode
   <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
   <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
 </div>
+
+The function used to determine the orientation of the object is shown below:
+
+```python
+    recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
+```	
 
 ### Coordinate transformation
 
