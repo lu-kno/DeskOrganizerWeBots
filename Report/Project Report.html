@@ -1568,28 +1568,12 @@ red {
 <li><a href="#first-approach">First approach</a></li>
 <li><a href="#second-approach--solution">Second approach / Solution</a></li>
 <li><a href="#training-data">Training data</a></li>
-<li><a href="#conclusion">Conclusion</a></li>
-<li><a href="#notes-for-this-chapter-to-be-deleted-later-1">Notes for this chapter (to be deleted later)</a></li>
+<li><a href="#training">Training</a></li>
+<li><a href="#result">Result</a></li>
 </ol>
 </li>
-<li><a href="#coordinate-transformation">Coordinate transformation</a></li>
-<li><a href="#robot-arm">Robot arm</a>
-<ol>
-<li><a href="#robot-movement">Robot Movement</a></li>
-<li><a href="#gripper">Gripper</a></li>
-<li><a href="#movement-routine">Movement Routine</a></li>
 </ol>
 </li>
-<li><a href="#notes-for-this-chapter-to-be-deleted-later-2">Notes for this chapter (to be deleted later)</a></li>
-</ol>
-</li>
-<li><a href="#results">Results</a></li>
-<li><a href="#outlook">Outlook</a></li>
-</ol>
-</li>
-<li><a href="#sources">Sources</a>
-<ol>
-<li><a href="#references-for-markdown-to-be-deleted-later">References for Markdown (to be deleted later)</a></li>
 </ol>
 </li>
 </ol>
@@ -1780,12 +1764,7 @@ Calculating the position of the gripper (the end effector) from the known positi
 <p>This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.</p>
 <p>The analytical methods are based on the use of trigonometric formulas, which can be used to calculate the required position values for the motors. However, these methods are limited to a specific number of degrees of freedom, and can only be used for a limited number of cases.</p>
 <p>The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and is a non-deterministic procedure, meaning there can be more than one solution for a given point.</p>
-<p><red>following is probably better in implementation</red><br>
-Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.</p>
-<p>The following figure shows the robot's coordinate system and the position of the objects in the simulation.</p>
-<p><red>Insert figure from presentation</red></p>
-<p>The position of the first motor <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\omega_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> can obtained as the angle between the two dimensional position vector in the xy plane with <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mi>a</mi><mi>r</mi><mi>c</mi><mi>t</mi><mi>a</mi><mi>n</mi><mo stretchy="false">(</mo><mfrac><mi>y</mi><mi>x</mi></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\omega_0=arctan(\frac{y}{x})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.095em;vertical-align:-0.345em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">rc</span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7475em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.446108em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span></eq>, where
-<eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></eq> and <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi></mrow><annotation encoding="application/x-tex">z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span></span></span></span></eq> are the y and z coordinates of the object in the simulation.</p>
+<p><red>Insert image showing forward and inverse kinematics from Folien</red></p>
 <h4 id="gripper-actuation">Gripper Actuation</h4>
 <p>The gripper consists of three individual fingers, each of them having three joints. The closing action of the finger is achieved by rotating the first joint of each finger until the desired object is grabed or the maximum joint rotation is reached. This alone creates a claw like grip, since all finger sections rotate with the first joint relative to the global coordinates. While useful in some cases, its contact area with the object being grabbed is significantly reduced.</p>
 <p>In order to improve the contact area of the gripper, it is possible to rotate the third joint of each finger in the opposite direction by the same amount as the first one, compensating the rotation on the fingertips and creating a more stable grip.</p>
@@ -1828,8 +1807,8 @@ Coornidation of the different steps required for the organization process.</p>
 </div>
 <p>The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed.</p>
 <h4 id="second-approach--solution">Second approach / Solution</h4>
-<p>The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models.</p>
-<p>In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [1] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning.</p>
+<p>The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]</p>
+<p>In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [2] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning.</p>
 <h4 id="training-data">Training data</h4>
 <p>The first step to train a custom model is to gather and arrange the training data in the YOLO annotation format. In this format the data is divided into two main directories: &quot;train&quot; and &quot;validation&quot;. Each of these directories contains two sub-directories: &quot;images&quot; and &quot;annotations&quot;. It's recommended to use 80% of the data for training and 20% for validation. The data consists of both images of objects we want to detect and accompanying annotation files. Each image is linked with a corresponding annotation file that shares the same name as the image file and provides information about the objects in the image. The general structure of the object annotation is shown below.</p>
 <pre><code class="language-prolog">&lt;object-class&gt;&lt;x-pos&gt;&lt;y-pos&gt;&lt;width&gt;&lt;height&gt;
@@ -1897,18 +1876,18 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 
 </code></pre>
 <p>The function accepts two parameters: a reference to the supervisor object and a reference to the table object. The function begins by determining the boundaries of the table using coordinate transformation. Intervals for the x and y coordinates are determined for the random positioning of objects on the table and then adjusted to leave a margin of 0.1 meters around it. At line 9 a loop iterates the objects on the table and generates a random position and orientation for each object using the previously calculates intervals.</p>
-<p>Finally a loop needed to be developed to call the snapshot and object randomization routines a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop.</p>
+<p>Finally a loop needed to be developed to call the snapshot and object randomization functions a specified number of times with a certain delay between each iteration. A decorator was used to extend the function to be repeatedly called until a specified condition is met while advancing the simulation. The following code segment demonstrates the implementation of this loop.</p>
 <pre><code class="language-python"><span class="hljs-meta">@looper</span>
-<span class="hljs-keyword">def</span> <span class="hljs-title function_">randomPosSamplingLoop</span>(<span class="hljs-params">self,sampleSize,<span class="hljs-built_in">type</span></span>):
-    <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:
-        <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
-            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-        <span class="hljs-keyword">else</span>:
-            TrainingsHelper.makeSnapshot(self.camera,<span class="hljs-built_in">type</span>)
-            self.dataCount +=<span class="hljs-number">1</span>
-    self.loopCount += <span class="hljs-number">1</span>
-    <span class="hljs-keyword">if</span> self.dataCount&gt;sampleSize:
-        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
+<span class="hljs-number">1</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">randomPosSamplingLoop</span>(<span class="hljs-params">self,sampleSize,<span class="hljs-built_in">type</span></span>):
+<span class="hljs-number">2</span>     <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:
+<span class="hljs-number">3</span>         <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
+<span class="hljs-number">4</span>             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+<span class="hljs-number">5</span>         <span class="hljs-keyword">else</span>:
+<span class="hljs-number">6</span>             TrainingsHelper.makeSnapshot(self.camera,<span class="hljs-built_in">type</span>)
+<span class="hljs-number">7</span>             self.dataCount +=<span class="hljs-number">1</span>
+<span class="hljs-number">8</span>     self.loopCount += <span class="hljs-number">1</span>
+<span class="hljs-number">9</span>     <span class="hljs-keyword">if</span> self.dataCount&gt;sampleSize:
+<span class="hljs-number">10</span>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
 </code></pre>
 <p>The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the &quot;moveTableNodes&quot; function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the &quot;makeSnapshot&quot; function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.</p>
 <p>The method must be invoked twice, once for the generation of training data and once for the generation of validation data. Upon the completion of this process, a dataset is produced that is ready for the training of a custom model. Figures 3 and 4 present a demonstration of one of the generated images and its accompanying annotation file, respectively.</p>
@@ -1920,92 +1899,65 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
   <img src="file:////home/lu/Documents/0_MasterDocs/AMS/CubeGrabberExample/Webots/DeskOrganizer/Report/image_344.txt.jpg"  width="80%" height="80%"  class = "center-image" alt="Object detection results existing YOLOv3 model" >
   <p class = "image-description">Figure 4: image_344.txt in path: ..\DataSet\train\annotations  </p>
 </div>
-<p>In order to enhance the performance of the model, an alternative image configuration was also employed.</p>
+<p>We generated 1200 images for training and 300 images for validation using this configuration. In order to enhance the performance of the model, an alternative image configuration was also developed.</p>
 <p class = "sub-header">Configuration 2: Four-angled rotation </p>
-<p>The second configuration was designed to increase the amount of data available for training. The idea was to capture images of the objects from four different angles.</p>
-<pre><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">single_objectImage_setup</span>(<span class="hljs-params">supervisor,table,imagesPerViewpoint</span>):
-    <span class="hljs-keyword">global</span> count, currentNode, lastViewPointPos
-    amountViewpoints = <span class="hljs-number">4</span>
-  
-    <span class="hljs-keyword">if</span>(count==<span class="hljs-number">0</span>): <span class="hljs-comment"># init viewpoint position for first run</span>
-        moveViewPoint(supervisor,lastViewPointPos)
-        swapObj(currentNode,table,supervisor)
-    <span class="hljs-comment"># change viewpoint if given imagesPerViewpoint is met</span>
-    <span class="hljs-keyword">if</span>((count % imagesPerViewpoint) == <span class="hljs-number">0</span>):
-        lastViewPointPos = (lastViewPointPos+<span class="hljs-number">1</span>)%<span class="hljs-number">4</span>
-        moveViewPoint(supervisor,lastViewPointPos)
-    <span class="hljs-comment"># change object if limit is met</span>
-    <span class="hljs-keyword">if</span>((count % (imagesPerViewpoint*amountViewpoints))==<span class="hljs-number">0</span>):
-        currentNode = (currentNode+<span class="hljs-number">1</span>) % <span class="hljs-built_in">len</span>(categories)
-        swapObj(currentNode,table,supervisor)
-    spinTableNode(supervisor,table,currentNode)
-    count += <span class="hljs-number">1</span>
+<p>The second configuration was designed to provide single object images at four distinct viewpoints, serving as training data. To achieve this, a function was created to relocate the camera to a designated viewpoint. This function accepts two inputs: a reference to the supervisor object and an index specifying the desired viewpoint. The supervisor is used to alter the camera perspective while index is utilized to determine the camera's position based on a list of coordinates. Furthermore, a function was implemented to facilitate the exchange of objects on the table. This function takes three inputs as arguments: a reference to the supervisor object, a reference to the table object, and an index indicating the desired object. Finally, a function was created to randomly modify the orientation of the current node-object, resulting in a diverse set of images taken from the same viewpoint. After the completion of these steps, a routine was implemented that integrates the various functions. The code segment below presents the implementation of this function.</p>
+<pre><code class="language-python"><span class="hljs-number">1</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">single_objectImage_setup</span>(<span class="hljs-params">supervisor,table,imagesPerViewpoint</span>):
+<span class="hljs-number">2</span>     <span class="hljs-keyword">global</span> count, currentNode, lastViewPointPos
+<span class="hljs-number">3</span>     amountViewpoints = <span class="hljs-number">4</span>
+<span class="hljs-number">4</span>     <span class="hljs-keyword">if</span>(count==<span class="hljs-number">0</span>): <span class="hljs-comment"># init viewpoint position for first run</span>
+<span class="hljs-number">5</span>         moveViewPoint(supervisor,lastViewPointPos)
+<span class="hljs-number">6</span>         swapObj(currentNode,table,supervisor)
+<span class="hljs-number">7</span>     <span class="hljs-comment"># change viewpoint if given imagesPerViewpoint is met</span>
+<span class="hljs-number">8</span>     <span class="hljs-keyword">if</span>((count % imagesPerViewpoint) == <span class="hljs-number">0</span>):
+<span class="hljs-number">9</span>         lastViewPointPos = (lastViewPointPos+<span class="hljs-number">1</span>)%<span class="hljs-number">4</span>
+<span class="hljs-number">10</span>        moveViewPoint(supervisor,lastViewPointPos)
+<span class="hljs-number">11</span>    <span class="hljs-comment"># change object if limit is met</span>
+<span class="hljs-number">12</span>    <span class="hljs-keyword">if</span>((count % (imagesPerViewpoint*amountViewpoints))==<span class="hljs-number">0</span>):
+<span class="hljs-number">13</span>        currentNode = (currentNode+<span class="hljs-number">1</span>) % <span class="hljs-built_in">len</span>(categories)
+<span class="hljs-number">14</span>        swapObj(currentNode,table,supervisor)
+<span class="hljs-number">15</span>    spinTableNode(supervisor,table,currentNode)
+<span class="hljs-number">16</span>    count += <span class="hljs-number">1</span>
 </code></pre>
-<p>The execution of this configuration is analoge to the initial setup. The function &quot;single_objectImage_setup&quot; is called at regular intervals of 20 iterations, ensuring the repositioning, reorientation and occasionally changing of the objects every 2 seconds. Additionally, the &quot;makeSnapshot&quot; function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.</p>
-<pre><code class="language-python"><span class="hljs-meta">    @looper</span>
-    <span class="hljs-keyword">def</span> <span class="hljs-title function_">singleObjectImageLoop</span>(<span class="hljs-params">self,imagesPerPerspective,<span class="hljs-built_in">type</span></span>):
-        <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:
-            <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
-                TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
-            <span class="hljs-keyword">else</span>:
-                TrainingsHelper.makeSnapshot(self.dataCam,<span class="hljs-built_in">type</span>)
-                self.dataCount +=<span class="hljs-number">1</span>
-        self.loopCount += <span class="hljs-number">1</span>
-        <span class="hljs-keyword">if</span> self.dataCount&gt;imagesPerPerspective*<span class="hljs-number">32</span>: <span class="hljs-comment"># amountPerspectives*amountObjects = 32 </span>
-            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
+<p>The function is meant to be executed each time after an image has been created and prepares the next image to be captured. The number of image configurations provided by the function is determined by the value of &quot;imagesPerViewpoint&quot;. A global variable is used to keep track of the number of function invocations. The first time this method is called, the viewpoint and the first object are initialized. The if statement at line 8 verifies whether the number of images taken from the current viewpoint has reached the predetermined limit. In the event that the limit has been met, the viewpoint is shifted to the next one in the designated list. At line 12, the function examines whether the number of images captured from the current object has reached its limit. If this is the case, the object is swapped for the next one in the list. Finally, the function rotates the current object to a random orientation with each invocation.</p>
+<p>The training data can be generated using the same function as in the first configuration. The loop to call these functions during the simulation closely mirrors the looper-function used before. The code segment below presents the implementation of this function.</p>
+<pre><code class="language-python"><span class="hljs-number">1</span> @looper
+<span class="hljs-number">2</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">singleObjectImageLoop</span>(<span class="hljs-params">self,imagesPerPerspective,<span class="hljs-built_in">type</span></span>):
+<span class="hljs-number">3</span>     <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:
+<span class="hljs-number">4</span>         <span class="hljs-keyword">if</span> self.loopCount % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
+<span class="hljs-number">5</span>             TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
+<span class="hljs-number">6</span>         <span class="hljs-keyword">else</span>:
+<span class="hljs-number">7</span>             TrainingsHelper.makeSnapshot(self.dataCam,<span class="hljs-built_in">type</span>)
+<span class="hljs-number">8</span>             self.dataCount +=<span class="hljs-number">1</span>
+<span class="hljs-number">9</span>     self.loopCount += <span class="hljs-number">1</span>
+<span class="hljs-number">10</span>    <span class="hljs-keyword">if</span> self.dataCount&gt;imagesPerPerspective*amountPerspectives*<span class="hljs-built_in">len</span>(categories): 
+<span class="hljs-number">11</span>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
 </code></pre>
-<ul>
-<li>automated data creation in yolo format
-<ul>
-<li>labeling
-<ul>
-<li>code example</li>
-</ul>
-</li>
-<li>Table and 4 angle single</li>
-</ul>
-</li>
-</ul>
-<p class = "sub-header">Training </p>
-<p>After the data was created and labeled, the training process could be started. The training was done using the ImageAI library.</p>
-<ul>
-<li>hardware used</li>
-<li>settings
-<ul>
-<li>batch size</li>
-<li>epochs</li>
-<li>..</li>
-</ul>
-</li>
-<li>trainings results</li>
-<li></li>
-</ul>
-<p class = "sub-header">Result </p>
-<ul>
-<li>weakness
-<ul>
-<li>Fragments of objects are detected as the object with a high probability (99%+)</li>
-</ul>
-</li>
-<li>Still convicing performance if the nms is tweaked right</li>
-</ul>
-<h4 id="conclusion">Conclusion</h4>
-<ul>
-<li>Framework created to automate the process of creating training data
-<ul>
-<li>Possibly transfarable to other projects
-<ul>
-<li>Depending on the quality of the object animation. (Proto files)
-<ul>
-<li>number of polygons</li>
-<li>textures</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<p>This loop operates in a similar fashion to the first configuration, alternately executing the &quot;single_object_setup&quot; and &quot;makeSnapshot&quot; functions with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.</p>
+<h4 id="training">Training</h4>
+<p>A total of 1456 images were generated for training and 384 images for validation. The training was performed using the ImageAI library, which provides a pre-trained YOLOv3 model that was used as a starting point for transfer learning. The following code segments presents the implementation of the training function, using the ImageAI library.</p>
+<pre><code class="language-python"><span class="hljs-number">1</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">startTraining</span>():
+<span class="hljs-number">2</span>     execution_path = os.path.dirname(__file__)
+<span class="hljs-number">3</span>     data_dir_path = os.path.join(execution_path , <span class="hljs-string">&quot;DataSet&quot;</span>)
+<span class="hljs-number">4</span>     model_path = os.path.join(execution_path , <span class="hljs-string">&quot;Modelle/yolov3.pt&quot;</span>)
+<span class="hljs-number">5</span>     createClassFiles(categories) 
+<span class="hljs-number">6</span>     trainer = DetectionModelTrainer()
+<span class="hljs-number">7</span>     trainer.setModelTypeAsYOLOv3()
+<span class="hljs-number">8</span>     trainer.setDataDirectory(data_directory=data_dir_path)
+<span class="hljs-number">9</span>     trainer.setTrainConfig(object_names_array=categories, batch_size=<span class="hljs-number">32</span>, num_experiments=<span class="hljs-number">100</span>, train_from_pretrained_model=model_path)
+<span class="hljs-number">10</span>    trainer.trainModel()
+</code></pre>
+<p>The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified.</p>
+<p>The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.</p>
+<h4 id="result">Result</h4>
+<p>The results of the training process are presented in the following table. T</p>
+<pre><code class="language-prolog">    recall: <span class="hljs-number">0.748433</span> precision: <span class="hljs-number">0.683522</span> mAP@<span class="hljs-number">0.5</span>: <span class="hljs-number">0.736085</span>, mAP@<span class="hljs-number">0.5</span><span class="hljs-number">-0.95</span>: <span class="hljs-number">0.340358</span>
+</code></pre>
+<p>The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.</p>
+<p>Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.</p>
+<p>Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.</p>
+<p>The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.</p>
+<p>In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.</p>
 <h4 id="notes-for-this-chapter-to-be-deleted-later">Notes for this chapter (to be deleted later)</h4>
 <ul>
 <li>How the first approach turned out
@@ -2082,6 +2034,12 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 <li>Behavior of the robot using Deterministic procedure</li>
 <li><red>insert pictures of a point being reached with both solutions</red></li>
 </ul>
+<p><red>following is probably better in implementation</red></p>
+<p>Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.</p>
+<p>The following figure shows the robot's coordinate system and the position of the objects in the simulation.</p>
+<p><red>Insert figure from presentation</red></p>
+<p>The position of the first motor <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\omega_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> can obtained as the angle between the two dimensional position vector in the xy plane with <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mi>a</mi><mi>r</mi><mi>c</mi><mi>t</mi><mi>a</mi><mi>n</mi><mo stretchy="false">(</mo><mfrac><mi>y</mi><mi>x</mi></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\omega_0=arctan(\frac{y}{x})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.095em;vertical-align:-0.345em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">rc</span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7475em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.446108em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span></eq>, where
+<eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></eq> and <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi></mrow><annotation encoding="application/x-tex">z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span></span></span></span></eq> are the y and z coordinates of the object in the simulation.</p>
 <h4 id="gripper">Gripper</h4>
 <ul>
 <li>to gripper is closed in small increments until a final value is reached.....</li>
@@ -2121,13 +2079,34 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 <ul>
 <li>TODO: presenting results</li>
 </ul>
-<h2 id="outlook">Outlook</h2>
+<h2 id="outlook--conclusion">Outlook / Conclusion</h2>
 <ul>
-<li>same content as in presentation silde</li>
+<li>
+<p>Robot controller can be used to in real world applications</p>
+</li>
+<li>
+<p>same content as in presentation silde</p>
+</li>
+<li>
+<p>Framework created to automate the process of creating training data</p>
+<ul>
+<li>Possibly transfarable to other projects
+<ul>
+<li>Depending on the quality of the object animation. (Proto files)
+<ul>
+<li>number of polygons</li>
+<li>textures</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <div style="page-break-after: always"></div>
 <h1 id="sources">Sources</h1>
-<p>[1] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.</p>
+<p>[1] <a href="https://imageai.readthedocs.io/en/latest/index.html">https://imageai.readthedocs.io/en/latest/index.html</a></p>
+<p>[2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.</p>
 <p>[2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021</p>
 <div style="page-break-after: always"></div>
 <h2 id="references-for-markdown-to-be-deleted-later">References for Markdown (to be deleted later)</h2>

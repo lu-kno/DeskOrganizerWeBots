@@ -94,28 +94,28 @@ red {
 <div style="page-break-after: always"></div>
 
 # Table of Content
-- [Robot Desk Organizer](#robot-desk-organizer)
-- [Abstract](#abstract)
-- [Table of Content](#table-of-content)
-- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-  - [Introduction](#introduction)
-  - [Project introduction](#project-introduction)
-  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-    - [Object detection](#object-detection)
-    - [Coordinates transformation](#coordinates-transformation)
-      - [Transformation Matrix](#transformation-matrix)
-    - [Robot controller](#robot-controller)
-      - [Robot Kinematics](#robot-kinematics)
-      - [Gripper Actuation](#gripper-actuation)
-      - [Organization Routine](#organization-routine)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-  - [Implementation](#implementation)
-    - [Object detection](#object-detection-1)
-      - [First approach](#first-approach)
-      - [Second approach / Solution](#second-approach--solution)
-      - [Training data](#training-data)
-      - [Training](#training)
-      - [Result](#result)
+1. [Robot Desk Organizer](#robot-desk-organizer)
+2. [Abstract](#abstract)
+3. [Table of Content](#table-of-content)
+4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+   1. [Introduction](#introduction)
+   2. [Project introduction](#project-introduction)
+   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+      1. [Object detection](#object-detection)
+      2. [Coordinates transformation](#coordinates-transformation)
+         1. [Transformation Matrix](#transformation-matrix)
+      3. [Robot controller](#robot-controller)
+         1. [Robot Kinematics](#robot-kinematics)
+         2. [Gripper Actuation](#gripper-actuation)
+         3. [Organization Routine](#organization-routine)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+   4. [Implementation](#implementation)
+      1. [Object detection](#object-detection-1)
+         1. [First approach](#first-approach)
+         2. [Second approach / Solution](#second-approach--solution)
+         3. [Training data](#training-data)
+         4. [Training](#training)
+         5. [Result](#result)
 
 <div style="page-break-after: always"></div>
 
@@ -313,25 +313,16 @@ The Robot chosen for this task consists of a robotic arm with a gripper attached
 Calculating the position of the gripper (the end effector) from the known position of each individual motor can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
 Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain for a given position of the end effector presents a more challenging problem. 
+This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
 
 <red>Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters. DOES IT REALLY?</red>
 
-This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
 
 The analytical methods are based on the use of trigonometric formulas, which can be used to calculate the required position values for the motors. However, these methods are limited to a specific number of degrees of freedom, and can only be used for a limited number of cases.
 
-The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and is a non-deterministic procedure, meaning there can be more than one solution for a given point.
+The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and are non-deterministic procedures, meaning there can be more than one solution for a given point. Likewise, the time required to find a solution is also non-deterministic, which poses a problem when critical computations need to be performed in real time.
 
-
-<red>following is probably better in implementation</red>  
-Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
-
-The following figure shows the robot's coordinate system and the position of the objects in the simulation.
-
-<red>Insert figure from presentation</red>
-
-The position of the first motor $\omega_0$ can obtained as the angle between the two dimensional position vector in the xy plane with $\omega_0=arctan(\frac{y}{x})$, where 
-$y$ and $z$ are the y and z coordinates of the object in the simulation.
+<red>Insert image showing forward and inverse kinematics from Folien</red>
 
 
 #### Gripper Actuation
@@ -638,14 +629,25 @@ In conclusion, the results suggest that the model performed well in terms of rec
   - training itself
     - Settings
 - detection results
+- <red> TODO: add results as given out by the trained model, i.e. scaling the objects positions to be zero at one corner and 1 at the other
+- Orientation of the object </red>
 
 ### Coordinate transformation
+
+With relative position of the objects within the image, this position vectors need to be transformed to the world coordinate system to know their position in the simulation relative to the robot. 
+This task was achieved by creating and combining two transformation matrices.
+
+The first transormation matrix is used to transform the position vector from the image coordinate system to the table coordinate system. This was created as follows:
+
+```python
+
 
 - TODO: description of implementation Coord transition
   
 - the image is cropped to cintain only the table
 - the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
   
+
 
 - the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
 - the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
@@ -667,6 +669,20 @@ In conclusion, the results suggest that the model performed well in terms of rec
 - Behavior of the robot using IK
 - Behavior of the robot using Deterministic procedure
 - <red>insert pictures of a point being reached with both solutions</red>
+
+
+
+
+<red>following is probably better in implementation</red>  
+
+Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+
+The following figure shows the robot's coordinate system and the position of the objects in the simulation.
+
+<red>Insert figure from presentation</red>
+
+The position of the first motor $\omega_0$ can obtained as the angle between the two dimensional position vector in the xy plane with $\omega_0=arctan(\frac{y}{x})$, where 
+$y$ and $z$ are the y and z coordinates of the object in the simulation.
 
 #### Gripper
 
