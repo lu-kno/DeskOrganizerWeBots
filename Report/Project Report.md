@@ -608,7 +608,7 @@ The batch size was set to 32, while the number of training iterations through th
 
 The results of the training after the 100th iteration are presented below.
 
-```prolog
+```python
     recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
 ```	
 The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358. 
@@ -639,26 +639,71 @@ To use the model during simulation a class was implemented to handle the object 
 
 ### Orientation of the object
 
-To determine the orientation of the object, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The following steps were implemented to prepare the image for analysis:
+To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The following steps were implemented to determine the orientation: 
 
-1. image of object is generated using the bounding box
-2. Image converted to HSV color space
-3. Using cv2’s canny algorithm to detect edges
-4. Mask image to remove inner edges
-5. Applying gaussian blur to smoothen edges
-6. Using canny algorithm again to detect contours
-7. Using PCA (Principal Component Analysis) to compute the main orientation of the object
-   
+The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the Principal Component Analysis (PCA) algorithm. 
+
+A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
 
 <div class="center-div">
   <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
   <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
 </div>
 
+image of object is generated using the bounding box
+Image converted to HSV color space
+Using cv2’s canny algorithm to detect edges
+Mask image to remove inner edges
+Applying gaussian blur to smoothen edges
+Using canny algorithm again to detect contours
+Using PCA (Principal Component Analysis) to compute the main orientation of the object
+
+
+
 The function used to determine the orientation of the object is shown below:
 
 ```python
-    ..
+def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None) -> float:
+        try:
+            # (1) An image of object is generated using the bounding box and passed as a parameter
+            # (2) Convert the image to the HSV color space
+            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+            # (3) Apply Canny edge detection
+            edges = cv2.Canny(hsv_image, 50, 150)
+            # Init masks
+            leftEdgeMask=np.full(np.shape(edges),0)
+            rightEdgeMask=np.full(np.shape(edges),0)
+            topEdgeMask=np.full(np.shape(edges),0)
+            bottomEdgeMask=np.full(np.shape(edges),0)
+            # Init Boundary
+            leftEdge=[1000 for i in range(np.shape(edges)[0])]
+            rightEdge=[0 for i in range(np.shape(edges)[0])]
+            topEdge=[1000 for i in range(np.shape(edges)[1])]
+            bottomEdge=[0 for i in range(np.shape(edges)[1])]
+            # Position Boundary
+            for y,x in pos:
+                leftEdge[y] = min(leftEdge[y],x)
+                rightEdge[y] = max(rightEdge[y],x)
+                topEdge[x] = min(topEdge[x],y)
+                bottomEdge[x] = max(bottomEdge[x],y)
+            # Make Masks from Boundary
+            for y,x in enumerate(leftEdge):
+                leftEdgeMask[y,x:] = 255
+            for y,x in enumerate(rightEdge):
+                rightEdgeMask[y,:x] = 255
+            for x,y in enumerate(topEdge):
+                topEdgeMask[y:,x] = 255
+            for x,y in enumerate(bottomEdge):
+                bottomEdgeMask[:y,x] = 255
+            # (4) Remove inner edges by applying a mask to the image
+            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+            # (5) Applying gaussian blur to smoothen edges
+            blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
+            # (6) Using canny algorithm again to detect contours
+            cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+            # (7) Using PCA (Principal Component Analysis) to compute the main orientation of the object
+            orientation, contourNangle = self.getOrientationPCA(cleanEdges,objectImage)
+            return orientation
 ```	
 
 ### Coordinate transformation
@@ -721,6 +766,9 @@ The function used to determine the orientation of the object is shown below:
 - Describe how it actually works
 
 ## Results
+
+The results achieved correspond to the requirements that were set in advance for the project.
+
 
 - image table unorganized
 
