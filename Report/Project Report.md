@@ -60,6 +60,9 @@ pre code {
 red {
     color: rgb(255, 0, 0);
 }
+draft {
+    color: rgb(255, 100, 0);
+}
 
 </style>
 
@@ -107,7 +110,7 @@ red {
       3. [Robot controller](#robot-controller)
          1. [Robot Kinematics](#robot-kinematics)
          2. [Gripper Actuation](#gripper-actuation)
-         3. [Organization Routine](#organization-routine)
+         3. [Movement coordination](#movement-coordination)
       4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
    4. [Implementation](#implementation)
       1. [Object detection](#object-detection-1)
@@ -212,24 +215,24 @@ A transformation matrix can be represented as a matrix frame, built from a combi
 $$
 \mathbf{T} = \left[
 \begin{array}{ccc|c}
-\ast&\ast&\ast&\ast\\
-\ast&R   &\ast& \vec{t}  \\
-\ast&\ast&\ast&\ast\\
+\ast&\ast       &\ast&\ast\\
+\ast&\mathbf{R} &\ast&\vec{t}  \\
+\ast&\ast       &\ast&\ast\\
 \hline
-\ast&P   &\ast& S
+\ast&\mathbf{P} &\ast&\mathbf{S}
 \end{array}
 \right]
 $$
 where:  
-* $R$ is the rotation matrix with the dimensions $3\times 3$.  
+* $\mathbf{R}$ is the rotation matrix with the dimensions $3\times 3$.  
 * $\vec{t}$ is the translation vector with the dimensions $3\times 1$.  
-* $P$ is the perspective projection matrix with the dimensions $1\times 3$.  
-* $S$ is the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).
+* $\mathbf{P}$ is the perspective projection matrix with the dimensions $1\times 3$.  
+* $\mathbf{S}$ is the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).
 
 The rotation matrix for a rotation around any given axis given by the unit vector $\mathbf{\vec{u}(x,y,z)}$ by an angle $\theta$ is given by the following formula:
 
 $$
-R =
+\mathbf{R} =
 \begin{bmatrix}
 u_x^2(1-\cos\theta) + \cos\theta & u_xu_y(1-\cos\theta) - u_z\sin\theta & u_xu_z(1-\cos\theta) + u_y\sin\theta \\
 u_xu_y(1-\cos\theta) + u_z\sin\theta & u_y^2(1-\cos\theta) + \cos\theta & u_yu_z(1-\cos\theta) - u_x\sin\theta \\
@@ -239,7 +242,7 @@ $$
 
 If the rotation is performed around the z axis, the rotation matrix can be simplified to the following form:
 $$
-R =
+\mathbf{R} =
 \begin{bmatrix}
 \cos\theta & -\sin\theta & 0 \\
 \sin\theta & \cos\theta & 0 \\
@@ -278,8 +281,8 @@ $$
 
 where $S_x$, $S_y$ and $S_z$ are the scaling factors in the x, y and z directions respectively.
 
-With the rotation and translation matrices a primary Transformation matrix $T_{0}$ is built with the previously described frame using the unit 1 as a scaling factor and a null matrix as the perspective matrix. 
-This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the complete transformation matrix $T$ as follows. 
+With the rotation and translation matrices a primary Transformation matrix $\mathbf{T_{0}}$ is built with the previously described frame using the unit 1 as a scaling factor and a null matrix as the perspective matrix. 
+This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the complete transformation matrix $\mathbf{T}$ as follows. 
 
 $$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
@@ -310,22 +313,42 @@ where `width`, `height`, and `depth` are the dimensions of the table in the simu
 
 ### Robot controller
 
+The robot controller is the main program where the behaviour of the robot is defined. It is responsible for the different actions that take place in the simulation. By marking the crobot as a supervisor in webots, it can access and modify the properties of other elements in the scene and the environment. 
+
+The main tasks of the robot controller are the following:
+
+- Initialization of the different modules and devices
+- calling of the image processing and object detection modules
+- performing the required movements of the robotic arm
+- controlling the movement of the gripper and its fingers
+- coordinating the actions of the different modules
+
+
+<!-- 
+It manages and accesses the robot's motors and sensors, and by using the supervisor class from the webots API, it can also have access to the other devices and elements in the simulation. This class allows it to modify the simulation environment and the nodes that are present in the scene, It also provides the capability of accessing and modifying the properties of other elements in the simulation, as well as controlling how the simulation is run.
+
+ that controlls the robotic arm and accesses the different modules and devices in the simulation. The webots environment provides a supervisor class which provides the capability of accessing and modifyng the properties of other elements in the simulation, as well as controlling how the simulation is run. -->
+
+
+
+<!-- is responsible for the different actions that take place in the simulation. It manages and accesses the robot's motors and sensors of the actions and the access to the other devices in the simulation. It 
+
 Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
 
 - TODO: first / theoretical approach to solve problem(s)
   
-These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location.
+These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location. -->
 
 #### Robot Kinematics
 
+
 The Robot chosen for this task consists of a robotic arm with a gripper attached to the end of the arm. The robot by itself can be represented as a kinematic chain with 6 joints, resulting in 6 degrees of freedom.
-Calculating the position of the gripper (the end effector) from the known position of each individual motor can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+In order to move the robot, the target angle of each individual joint in the kinematic chain needs to be set. Nevertheless, the position of the objects and target locations for the robot's movement are defined in a three dimensional coordinate system, so a transformation between the joint angles and the position of the end effector (last chain element) in space needs to be achieved in order to control its movements.
+
+Calculating the position of the gripper (the end effector) from the known position of the individual motor can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
 Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain for a given position of the end effector presents a more challenging problem. 
 This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
-
-<red>Since the point to which the robot needs to move is defined as a three dimensional vector, it leaves 3 independent parameters. DOES IT REALLY?</red>
-
 
 The analytical methods are based on the use of trigonometric formulas, which can be used to calculate the required position values for the motors. However, these methods are limited to a specific number of degrees of freedom, and can only be used for a limited number of cases.
 
@@ -338,15 +361,39 @@ The numerical methods are based on the use of iterative algorithms, which can be
 
 The gripper consists of three individual fingers, each of them having three joints. The closing action of the finger is achieved by rotating the first joint of each finger until the desired object is grabed or the maximum joint rotation is reached. This alone creates a claw like grip, since all finger sections rotate with the first joint relative to the global coordinates. While useful in some cases, its contact area with the object being grabbed is significantly reduced.
 
-In order to improve the contact area of the gripper, it is possible to rotate the third joint of each finger in the opposite direction by the same amount as the first one, compensating the rotation on the fingertips and creating a more stable grip.
+A different approach that aims to improve the contact area of the gripper, is possible rotate the last joint of each finger in the opposite direction by the same amount as the first one, compensating the rotation on the fingertips and creating a more stable grip.
 
 The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
 
 <red>insert figure of gripper open, closed claw and closed flat</red>
 
 
-#### Organization Routine
+#### Movement coordination
 
+The main loop of actions that need to be taken to complete the task of organizing the desk can be defined as seen in figure ASD. 
+
+The process starts by moving the robot to a HOME position where it wont interfere with the camera's view of the desk. A picture is taken and any objects present are detected. If objects were detected, the robot iterates through the found objects, picking them up and placing them on the a second table on their corresponding position, until all the detected objects have been moved. The robot then moves back to the HOME position. If no object is detected, no movement of the robot takes place. This process is repeated until the user decides to stop the simulation.
+
+```plantuml
+@startuml
+:**Simulation Start**;
+repeat :Move Robot to HOME Position;
+    repeat :Take Picture;
+        :Perform Object Detection;
+    repeat while (objects found?) is (no) not (yes)
+
+    repeat :Coordinate Transformation;
+        :Move object;
+        :Remove from found objects;
+    repeat while (more objects?) is (yes)
+repeat while (Keep Watching?) is (yes)
+:stop;
+@enduml
+```
+
+<draft>
+. moves to pick up the object and places  
+Being able to detect the objects position and orientation, and moving 
 With the information regarding the objects' position and orientation in the simulation, the following step is to control the robots movement to produce the desired behavior. The robot controller is implemented in Python and uses the Webots API to control the robot. The robot controller is responsible for the following tasks:
 
 Initialization of the robot instance and the devices attached to it: 
@@ -363,26 +410,10 @@ Coornidation of the different steps required for the organization process.
 * Reading the coordinate transformation module's output and forwarding the data to the robotic arm control module.
 * Perform the movement as required for the detected objects positions
   
+</draft>
 
 
-```plantuml
-@startuml
 
-
-:**Simulation Start**;
-repeat :Move Robot to HOME Position;
-    repeat :Take Picture;
-        :Perform Object Detection;
-    repeat while (objects found?) is (no) not (yes)
-
-    repeat :Coordinate Transformation;
-        :Move object;
-        :Remove from found objects;
-    repeat while (more objects?) is (yes)
-repeat while (Keep Watching?) is (yes)
-:stop;
-@enduml
-```
 
 ```plantuml
 @startuml
@@ -399,8 +430,6 @@ start
 stop
 @enduml
 ```
-
-
 
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
@@ -678,18 +707,18 @@ Since the origin of the table's coordinate system is in the center of the table 
 
 A second matrix is then used to scale the position vector to the dimensions of the table with the help of the Table's properties supplied by the webots API.
 
-The rotation and translation matrix $M_rt$ is then multiplied with the scaling matrix $M_s$ to produce the transformation matrix $M_{img2table}$ from the image coordinate system to the table coordinate system.
+The rotation and translation matrix $\mathbf{M_{rt}}$ is then multiplied with the scaling matrix $\mathbf{M_s}$ to produce the transformation matrix $\mathbf{M_{img2table}}$ from the image coordinate system to the table coordinate system.
 
-$$M_{img2table} = M_s \cdot M_{rt}$$
+$$\mathbf{M_{img2table}} = \mathbf{M_s} \cdot \mathbf{M_{rt}}$$
 
 <red>Figure X shows the coordinate systems of the image and table relative to eachother the vectors for a point in each of them. Shows the result of applying the first Transformation matrix to a point in the image</red>
 
 
-A second transformation matrix is then responsible of transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $M_{table2world}$.
+A second transformation matrix is then responsible of transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $\mathbf{M_{table2world}}$.
 
-These two transformation matrices are then multiplied with one another to produce a final transformation matrix $M_{img2world}$ in order to directly transform the position vector from the image coordinate system to the world coordinate system.
+These two transformation matrices are then multiplied with one another to produce a final transformation matrix $\mathbf{M_{img2world}}$ in order to directly transform the position vector from the image coordinate system to the world coordinate system.
 
-$$M_{img2world} = M_{table2world} \cdot M_{img2table}$$
+$$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}$$
 
 
 
@@ -719,22 +748,45 @@ The first transormation matrix is used to transform the position vector from the
 - the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
 - with this, the transformation matrix is produced. -->
 
-- to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.
 
-- the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).
+<draft>
 
-- the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.
+- to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.  
+- the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).  
+- the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.  
+  
+</draft>
 
 ### Robot arm
 
+<draft>
+
 - TODO: description of implementation Robot arm
+  
+</draft>
 
 #### Robot Movement
+
+For the current implementation of the robot controller, some key decisions were made to prevent collisions with other objects in the scene during the robot's movement:
+- objects are to be approached from above
+- the gripper has to be pointing downwards while picking up or laying down an object, so as to provide a predictable hold of the object.
+- the movement of the robot needs be deterministic, so as to avoid unexpected erratic movements
+
+Taking these requirements into account, preliminary implementations to solve the inverse kinematics problem were made. The first of themused the full chain of the robot's joints and the python module "ikpy" to iteratively find the robot configuration required to reach a point in space.
+
+The second implementation made use of the restrictions to the robots movement previously mentioned to utilize a reduced kinematic chain of only the joints that are relevant to the movement of the gripper.
+Since the gripper is required be pointing down, the rotation of the fourth joint is restricted to the a value of zero, and therefore reduces the degrees of freedom of the kinematic chain by one. Likewise the fifth and sixth joints are constrained by a value defined only by the configuration of the first three joints, further reducing the degrees of freedom of the kinematic chain by two.
+
+The following section describes the implementation of the second solution, which was chosen for the final implementation due to its deterministic nature and pretictable outcomes fullfilling the criteria previously mentioned. Furthermore, having a deterministic computation time results in an implementation that could be used with more reliability in other applications in which critical timing constraints are present.
+<!-- 
+the reduced degrees of freedom allow for a more efficient implementation of the solution, as well as a more efficient computation time.
+
+
+<draft>
 
 - Behavior of the robot using IK
 - Behavior of the robot using Deterministic procedure
 - <red>insert pictures of a point being reached with both solutions</red>
-
 
 - decisions taken
   - objects are approached from above
@@ -749,6 +801,19 @@ The first transormation matrix is used to transform the position vector from the
     -  
   - 
 
+</draft>
+<red>following is probably better in implementation</red>  
+
+<draft>
+
+Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+</draft> 
+
+-->
+
+The following figure shows the robot's simplified kinematic chain with the resulting geometry used in the calculation of the required motor positions.
+
+
 <red>Insert figure from presentation</red>
 
 The position of the first motor $\omega_0$ can be calculated by removing the z component of the position vector $\vec{p_{xyz}}$, resulting in the vector $\vec{p_{xy}}$ and finding the angle $\omega_0$ produced between $\vec{p_{xy}}$ and the x axis $\vec{e_x}$ of the coordinate system with the following formula:
@@ -762,40 +827,29 @@ The position of the second and third motors $\omega_1$ and $\omega_2$ can be rep
 $$\omega_1=\frac{\pi}{2} - (\arctan{\frac{z}{h}} + \arccos{\frac{a^2-b^2+c^2}{2ac}})$$
 $$\omega_2 = \frac{pi}{2} - \arccos{\frac{a^2+b^2-c^2}{2ab}} + r_{\omega_2}$$
 
+
 where:
-- $a$ is the length of the first arm
-- $b$ is the length of the second arm
+- $a$ is the length of the first link in the kinematic chain
+- $b$ is the effective length of the second link in the kinematic chain
 - $c$ is the distance between the origin of the coordinate system and the point of interest $\vec{p_{xyz}}$
-- $r_{\omega_2}$ is the angle created between the vector $\vec{p_{xy}}$ and the vector $\vec{p_{xy}}$ rotated by $\theta_0$ around the z axis of the coordinate system
+- $r_{\omega_2}$ is the angle correction for $\omega_2$, required due to the second link's geometry.
 
+Since the end effector is required to be pointing downwards, the angle $\omega_3$ corresponding to the fourth joint needs to be kept at 0.
 
- cancalculated by finding the angle $\theta_1$ produced between the vector $\vec{p_{xy}}$ and the vector $\vec{p_{xy}}$ rotated by $\theta_0$ around the z axis of the coordinate system with the following formula:
+$$\omega_3 = 0$$
 
-The distance over the xy plane between the point of interest $\vec{p_{xyz}}$ and the origin of the coordinate system $\vec{O}$ can be calculated with the following formula:
-magnitude $h$ of the position vector $\vec{p_{xy}}$ gives us its distance to the origin of the coordinate system as follows:
-$$h=|\vec{p_{xy}}|$$
+The angle $\omega_4$ corresponding to the fifth joint is also required to be set so that the endeffector is pointing downwards. This is achieved by rotating the joint by compensating the rotation from the angles $\omega_1$ and $\omega_2$ while also offsetting the rotation by 90 degrees to point downward instead of forward.
 
- and the point $\vec{p_{xyz}}$ over the xy plane
-and can be calculated with the following formula:
+$$\omega_4 = \frac{\pi}{2} - (\omega_1 + \omega_2)$$
 
-where:
-- $O$ is the origin of the coordinate system
+The rotation of the sixth joint $\omega_5$ corresponding to the rotation of the gripper is set to have a default value, such that the gripper's grabbing orientation is pointing parallel to the x-axis. This is done by setting its rotation $\omega_5$ to compensate the rotation $\omega_0$ of the first joint. Since the first and sixth joint are pointing in opossite directions, these two can take the exact same value. An angle $\theta$ with a default value of $0$ is added to the rotation of the sixth joint to allow for different orientations of the gripper.
 
-  as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:
-The position of the first motor $\omega_0$ can be calculated as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:
-
-$$\omega_0=\arctan{\frac{y}{x}}$$ 
-where: 
-- $y$ and $z$ are the y and z coordinates of the object in the simulation.
-
-<red>following is probably better in implementation</red>  
-
-Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
-
-The following figure shows the robot's coordinate system and the position of the objects in the simulation.
+$$\omega_5 = \omega_0 + \theta$$
 
 
 #### Gripper
+
+<draft>
 
 - to gripper is closed in small increments until a final value is reached.....
 - in order to detect when an object has been grabbed, a force needs to be detected.....
@@ -804,14 +858,19 @@ The following figure shows the robot's coordinate system and the position of the
 - <red>insert force detection code</red>
 - the robot controller waits for the fingers to reach a closed state before continuing with the following movements.
 - <red>make reference to looper</red>
+  
+</draft>
 
 #### Movement Routine
+
+<draft>
 
 - start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task
 - loop and autoloop functions containing the actions to be performed by the robot
   - loop function contains actions that are not performed in an autonomous way, but controlled by the user. This functions as a manual control loop. This includes the movement of the robot arm and the opening and closing of the gripper. 
   - autoloop function contains actions that are performed autonomously by the robot. This includes the object detection routine followed by the movement of the robot itself to move the objects from one place to another.
 
+</draft>
 
 
 
