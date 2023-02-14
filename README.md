@@ -62,7 +62,9 @@ Movement directions make sense when "standing" in front of the robot
   - [ ] record video of robot in action (already recorded by Lu)
   - [ ] complete source code comments and docstrings
   - [ ] fix indexing of table of contents in pdf
-
+  - [ ] (optional) config.yaml file to change global flags and maybe set parameters
+  - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
+  - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
 
 ## used to avoid tracking of some world files
 
