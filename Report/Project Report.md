@@ -119,11 +119,12 @@ draft {
          3. [Training data](#training-data)
          4. [Training](#training)
          5. [Result](#result)
-      2. [Robot arm](#robot-arm)
+      2. [Coordinate transformation](#coordinate-transformation)
+      3. [Robot arm](#robot-arm)
          1. [Robot Movement](#robot-movement)
          2. [Gripper](#gripper)
          3. [Movement Routine](#movement-routine)
-      3. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
    5. [Results](#results)
    6. [Outlook / Conclusion](#outlook--conclusion)
 5. [Sources](#sources)
@@ -630,45 +631,113 @@ A total of 1456 images were generated for training and 384 images for validation
 ```
 The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
 
-The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
+The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
 
 
 #### Result 
 
-The results of the training process are presented in the following table. T
+The results of the training after the 100th iteration are presented below.
 
-```prolog
+```python
     recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
 ```	
-The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.
+The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358. 
 
-Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.
+The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
-Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.
+The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem. 
 
-The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.
+<div class="center-div">
+  <img src="./snapshot-detected-nms0.5.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 5: Object detection results self trained model </p>
+</div>
 
-In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.
+Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
-#### Notes for this chapter (to be deleted later)
+The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
-- How the first approach turned out
-  - bad accuracy 
-  - not enough useable object classes 
-  - no Proto files for existing object classes 
-- custom detection
-  - use of imageAI library 
-- custom training
-  - transfer learning
-  - trainings data
-    - randomized objects
-    - labeling
-    - automatization of data creation
-  - training itself
-    - Settings
-- detection results
-- <red> TODO: add results as given out by the trained model, i.e. scaling the objects positions to be zero at one corner and 1 at the other
-- Orientation of the object </red>
+The results of the object detection process using The NMS algorithm with a treshold of 0.05 are presented in figure 6.
+
+<div class="center-div">
+  <img src="./snapshot-detected.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 6: Object detection results self trained model </p>
+</div>
+
+The test results indicate that the model has a satisfactory level of performance for the intended application, as it was capable to correctly determine the position and class of each object on the table in multiple test cases. 
+
+To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
+
+### Orientation of the object
+
+To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The function used to prepare the image for the orientation analysis is presented below.
+
+```python
+def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None) -> float:
+        try:
+            # (1) Image of object is cropped using the bounding box and passed as a parameter
+            # (2) Convert the image to the HSV color space
+            hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
+            # (3) Apply Canny edge detection
+            edges = cv2.Canny(hsv_image, 50, 150)
+            # Init masks
+            leftEdgeMask=np.full(np.shape(edges),0)
+            rightEdgeMask=np.full(np.shape(edges),0)
+            topEdgeMask=np.full(np.shape(edges),0)
+            bottomEdgeMask=np.full(np.shape(edges),0)
+            # Init Boundary
+            leftEdge=[1000 for i in range(np.shape(edges)[0])]
+            rightEdge=[0 for i in range(np.shape(edges)[0])]
+            topEdge=[1000 for i in range(np.shape(edges)[1])]
+            bottomEdge=[0 for i in range(np.shape(edges)[1])]
+            # Position Boundary
+            for y,x in pos:
+                leftEdge[y] = min(leftEdge[y],x)
+                rightEdge[y] = max(rightEdge[y],x)
+                topEdge[x] = min(topEdge[x],y)
+                bottomEdge[x] = max(bottomEdge[x],y)
+            # Make Masks from Boundary
+            for y,x in enumerate(leftEdge):
+                leftEdgeMask[y,x:] = 255
+            for y,x in enumerate(rightEdge):
+                rightEdgeMask[y,:x] = 255
+            for x,y in enumerate(topEdge):
+                topEdgeMask[y:,x] = 255
+            for x,y in enumerate(bottomEdge):
+                bottomEdgeMask[:y,x] = 255
+            # (4) Remove inner edges by applying a mask to the image
+            combined_mask = (leftEdgeMask*rightEdgeMask*bottomEdgeMask*topEdgeMask/255**3)
+            # (5) Applying gaussian blur to smoothen edges
+            blur = cv2.GaussianBlur(combined_mask, (11,11), 0)
+            # (6) Using canny algorithm again to detect contours
+            cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
+            # (7) Using PCA (Principal Component Analysis) to compute the main orientation of the object
+            orientation, contourNangle = self.getOrientationPCA(cleanEdges,objectImage)
+            return orientation
+```	
+
+The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks, which were created using the object's boundary. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
+
+```python
+1 def getOrientationPCA(self, edges):
+2     pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
+3     # Perform PCA analysis
+4     mean = np.empty((0))
+5     mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+6     angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+7     return angle
+```
+This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]
+
+A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
+
+<div class="center-div">
+  <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
+  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
+</div>
+
+The annotations below the images correspond to the respective steps in the "getAngle" function and are referred to in the comments of the function.
+
+The original image of the object is shown in the first image and is cropped using the bounding box coordinates. The second image displays the result of converting the image to the HSV color space. The application of the Canny algorithm to the HSV image is shown in the third image. The fourth image presents the edges of the object after the inner edges have been removed using a mask. The edges of the object are smoothed using a Gaussian blur and displayed in the fifth image. The sixth image displays the result of detecting the edges using the Canny algorithm a second time. The final image presents the result of performing PCA on the edges, where the arrows represents the eigenvectors of the object's contours.
 
 ### Coordinate transformation
 
@@ -886,12 +955,27 @@ $$\omega_5 = \omega_0 + \theta$$
 
 ## Results
 
+The results achieved correspond to the requirements that were set in advance for the project.
+
+
+- image table unorganized
+
+- table organized 
+
 - TODO: presenting results
 
 ## Outlook / Conclusion
 
-- Robot controller can be used to in real world applications
+- what we discovered
+- what we achieved
+  - successful
+  - 
+- milestones in development
+- 
 
+- Robot controller can be used to in real world applications
+  - flexibility regarding the organization/Enviroment setups
+  - 
 - same content as in presentation silde
 
 - Framework created to automate the process of creating training data 
@@ -900,6 +984,15 @@ $$\omega_5 = \omega_0 + \theta$$
       - number of polygons
       - textures  
 
+- System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs
+
+
+- Room for improvement
+  - improve data
+    - only one model usedm per type
+  - improve training
+    - maybe overfitted
+
 <div style="page-break-after: always"></div>
 
 # Sources
@@ -907,9 +1000,10 @@ $$\omega_5 = \omega_0 + \theta$$
 
 [2] Sara Robinson et al., Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps. Sebastopol: O’Reilly, 	2022. S. 186.
 
-
+[3] https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/
 
 [2] Prof. Dr.-Ing Dirk Jacob, Vorlesung Robotik - Koordinatentransformation. Fakultät Elektrotechnik. Hochschule Kempten, 2021
+
 
 
 <div style="page-break-after: always"></div>
