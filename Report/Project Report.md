@@ -706,11 +706,7 @@ The first step is to crop an image of the object using the bounding box coordina
 6     angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
 7     return angle
 ```
-This function is used to determine the main orientation of an object by performing PCA on the edges of an image.  
-
 This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]
-
-The function first extracts the edge's coordinates from the input image and converts them to a format that can be used for PCA analysis. At line 5 the principal component analysis is performed on the edge points using OpenCV's "PCACompute2" function, to find the eigenvectors of the dataset. Finally, the angle to the x-axis of the eigenvector with the highest variance is calculated, using a trigonometric function, which is then returned.
 
 A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
 
@@ -719,22 +715,9 @@ A graphical representation of these steps is shown in Figure 7, which highlights
   <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
 </div>
 
-The annotations below the images correlate to the respective steps in the "getAngle" function and are refered to in the comments of the function. 
+The annotations below the images correspond to the respective steps in the "getAngle" function and are referred to in the comments of the function.
 
-The first image shows the original image of the object, which is cropped using the bounding box coordinates. 
-The second image shows the image after it has been converted to the HSV color space.
-The third image shows the results of the Canny algorithm applied to the HSV image. 
-The fourth image shows the edges of the object after the inner edges have been removed using a mask. 
-The fifth image shows the edges of the object after they have been smoothed using a Gaussian blur.
-The sixth image shows the edges of the object after they have been detected using the Canny algorithm a second time. The final image shows the edges of the object after PCA has been performed on them. The yellow line in the image shows the major axis of the object, while the blue arrow represents the table's orientation.
-
-
-which is used to determine the orientation of the object.
-
-A orientation parallel to the vertical dimension of the image is interpreted as a rotation of 0 degrees.
-
-The object's rotation relative to the table 
-
+The original image of the object is shown in the first image and is cropped using the bounding box coordinates. The second image displays the result of converting the image to the HSV color space. The application of the Canny algorithm to the HSV image is shown in the third image. The fourth image presents the edges of the object after the inner edges have been removed using a mask. The edges of the object are smoothed using a Gaussian blur and displayed in the fifth image. The sixth image displays the result of detecting the edges using the Canny algorithm a second time. The final image presents the result of performing PCA on the edges, where the arrows represents the eigenvectors of the object's contours.
 
 ### Coordinate transformation
 
