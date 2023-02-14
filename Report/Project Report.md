@@ -601,43 +601,59 @@ A total of 1456 images were generated for training and 384 images for validation
 ```
 The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
 
-The batch size was set to 32 and the number of training experiments to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
+The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
 
 
 #### Result 
 
-The results of the training process are presented in the following table.
+The results of the training after the 100th iteration are presented below.
 
 ```prolog
     recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
 ```	
-The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358.
+The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358. 
 
-Recall, also known as true positive rate or sensitivity, measures the proportion of actual positive instances that were correctly detected by the model. The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset.
+The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. 
 
-Precision, or Positive Predictive Value, measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were indeed positive.
+Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem. 
 
-The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95.
+<div class="center-div">
+  <img src="./snapshot-detected-nms0.5.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 5: Object detection results self trained model </p>
+</div>
 
-In conclusion, the results suggest that the model performed well in terms of recall but had mediocre precision. However, the average precision across multiple classes was relatively high. Test results indicate that the model has a satisfactory level of performance for the intended application.
+Multiple bounding boxes with high probabilities were respectively created for each object. This is a common problem in object detection tasks. 
 
-#### Notes for this chapter (to be deleted later)
+The problem can be addressed by using non-maximum suppression (NMS) to apply an algorithm to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library.
 
-- How the first approach turned out
-  - bad accuracy 
-  - not enough useable object classes 
-  - no Proto files for existing object classes 
-- custom detection
-  - use of imageAI library 
-- custom training
-  - transfer learning
-  - trainings data
-    - randomized objects
-    - labeling
-    - automatization of data creation
-  - training itself
-    - Settings
-- detection results
+
+
+Figure 5 shows the results of the object detection process using the custom model.
+
+<div class="center-div">
+  <img src="./snapshot-detected.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
+  <p class = "image-description">Figure 6: Object detection results self trained model </p>
+</div>
+
+ The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly detect and indentify each object on the table.  
+
+- relevent data will be transmitted upon return 
+
+### Orientation of the object
+
+1. image of object is generated using the bounding box
+2. Image converted to HSV color space
+3. Using cv2’s canny algorithm to detect edges
+4. Mask image to remove inner edges
+5. Applying gaussian blur to smoothen edges
+6. Using canny algorithm again to detect contours
+7. Using PCA (Principal Component Analysis) to compute the main orientation of the object
+   
+
+<div class="center-div">
+  <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
+  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
+</div>
 
 ### Coordinate transformation
 
@@ -700,12 +716,24 @@ In conclusion, the results suggest that the model performed well in terms of rec
 
 ## Results
 
+- image table unorganized
+
+- table organized 
+
 - TODO: presenting results
 
 ## Outlook / Conclusion
 
-- Robot controller can be used to in real world applications
+- what we discovered
+- what we achieved
+  - successful
+  - 
+- milestones in development
+- 
 
+- Robot controller can be used to in real world applications
+  - flexibility regarding the organization/Enviroment setups
+  - 
 - same content as in presentation silde
 
 - Framework created to automate the process of creating training data 
@@ -713,6 +741,15 @@ In conclusion, the results suggest that the model performed well in terms of rec
     - Depending on the quality of the object animation. (Proto files)
       - number of polygons
       - textures  
+
+- System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs
+
+
+- Room for improvement
+  - improve data
+    - only one model usedm per type
+  - improve training
+    - maybe overfitted
 
 <div style="page-break-after: always"></div>
 
