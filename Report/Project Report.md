@@ -613,37 +613,29 @@ The results of the training after the 100th iteration are presented below.
 ```	
 The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358. 
 
-The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. 
+The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
-Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem. 
+The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem. 
 
 <div class="center-div">
   <img src="./snapshot-detected-nms0.5.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
   <p class = "image-description">Figure 5: Object detection results self trained model </p>
 </div>
 
-Multiple bounding boxes with high probabilities were respectively created for each object, destorting the result. This is a common problem in object detection tasks. A possible cause of this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Additionally, the dataset used for training may not be diverse enough, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
+Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
+The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
-
-Due to time constrains we decided to use the model as is and not retrain it.
-
-The problem can be addressed by using non-maximum suppression (NMS) to apply an algorithm to find the best fitting box based on a given treshold. The NMS algorithm is implemented in the ImageAI library.
-
-
-
-Figure 5 shows the results of the object detection process using the custom model.
+The results of the object detection process using The NMS algorithm with a treshold of 0.05 are presented in figure 6.
 
 <div class="center-div">
   <img src="./snapshot-detected.jpg"  class = "center-image" alt="Object detection results in custom YOLOv3 model" >
   <p class = "image-description">Figure 6: Object detection results self trained model </p>
 </div>
 
- The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly detect and indentify each object on the table. 
- 
- Another possible explanation could be an inadequate training dataset, which lacks diversity in its data. 
+The test results indicate that the model has a satisfactory level of performance for the intended application. The model was able to correctly determine the position and class of each object on the table in multiple test cases. 
 
-- relevent data will be transmitted upon return 
+To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
 
 ### Orientation of the object
 
@@ -666,7 +658,7 @@ To determine the orientation of the object, the cv2 library was utilized. The ap
 The function used to determine the orientation of the object is shown below:
 
 ```python
-    recall: 0.748433 precision: 0.683522 mAP@0.5: 0.736085, mAP@0.5-0.95: 0.340358
+    ..
 ```	
 
 ### Coordinate transformation
