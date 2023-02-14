@@ -861,7 +861,7 @@ class Table(logger):
                          [0,0,0,1]])
                 
         
-        TMat = np.matmul(np.matmul(WorldT, TableScaling), TableT_unscaled)
+        TMat = np.matmul(WorldT, np.matmul(TableScaling, TableT_unscaled))
         
         r = np.matmul(TMat, np.array([*_pos,1]))[:3]
         self.logD(_pos, r)

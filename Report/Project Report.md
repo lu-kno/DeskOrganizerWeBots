@@ -116,6 +116,15 @@ red {
          3. [Training data](#training-data)
          4. [Training](#training)
          5. [Result](#result)
+      2. [Robot arm](#robot-arm)
+         1. [Robot Movement](#robot-movement)
+         2. [Gripper](#gripper)
+         3. [Movement Routine](#movement-routine)
+      3. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+   5. [Results](#results)
+   6. [Outlook / Conclusion](#outlook--conclusion)
+5. [Sources](#sources)
+   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -635,12 +644,69 @@ In conclusion, the results suggest that the model performed well in terms of rec
 ### Coordinate transformation
 
 With relative position of the objects within the image, this position vectors need to be transformed to the world coordinate system to know their position in the simulation relative to the robot. 
-This task was achieved by creating and combining two transformation matrices.
+This task was achieved by creating and combining two transformation matrices. The general procedure was implemented as follows:
 
-The first transormation matrix is used to transform the position vector from the image coordinate system to the table coordinate system. This was created as follows:
 
 ```python
+1   # Transformation Matrix from table corner in image to table center
+2   # - Rotation and Translation Matrix
+3   img2table_rot_trans = [[0, -1,  0, 0.5],
+4                         [-1,  0,  0, 0.5],
+5                         [ 0,  0, -1,   1],
+6                         [ 0,  0,  0,   1]]
+7   
+8   # - Scaling Matrix
+9   img2table_scale = [[Table.size[0],             0,             0,  0],
+10                     [            0, Table.size[1],             0,  0],
+11                     [            0,             0, Table.size[2],  0],
+12                     [            0,             0,             0,  1]]
+13  
+14  # Transformation Matrix from image to table center
+15  img2table = numpy.matmul(img2table_scale, img2table_rot_trans)
+16  
+17  # Transformation Matrix from table center to world
+18  table2world = numpy.array([[cos(Table.rotation[3]), -sin(Table.rotation[3]),  0,  Table.position[0]],
+19                             [sin(Table.rotation[3]),  cos(Table.rotation[3]),  0,  Table.position[1]],
+20                             [                     0,                       0,  1,  Table.position[2]],
+21                             [                     0,                       0,  0,                 1]])
+22  
+23  # Transformation Matrix from image to world
+24  TMatrix = numpy.matmul(table2world, img2table)
+```
 
+Since the origin of the table's coordinate system is in the center of the table and therefore the table's position and orientation reference its center point, a translation needs to be applied to the position vector in the image, whose coordinate system is located on the top left corner, while also rotating the coordinate axes to match the ones of the table's origin.
+
+A second matrix is then used to scale the position vector to the dimensions of the table with the help of the Table's properties supplied by the webots API.
+
+The rotation and translation matrix $M_rt$ is then multiplied with the scaling matrix $M_s$ to produce the transformation matrix $M_{img2table}$ from the image coordinate system to the table coordinate system.
+
+$$M_{img2table} = M_s \cdot M_{rt}$$
+
+<red>Figure X shows the coordinate systems of the image and table relative to eachother the vectors for a point in each of them. Shows the result of applying the first Transformation matrix to a point in the image</red>
+
+
+A second transformation matrix is then responsible of transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $M_{table2world}$.
+
+These two transformation matrices are then multiplied with one another to produce a final transformation matrix $M_{img2world}$ in order to directly transform the position vector from the image coordinate system to the world coordinate system.
+
+$$M_{img2world} = M_{table2world} \cdot M_{img2table}$$
+
+
+
+<red> Gotta mention the Z axis is flipped in the image coordinate system </red>
+<red> Include sample code to perform actual conversion, adding a fourth value to the position vector</red>
+
+<!-- 
+ This matrix is created by multiplying the position vector with the rotation matrix $M_r$ and the translation matrix $M_t$ to produce the final transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system.
+
+
+The final transformation matrix $M_{img2table}$ is then multiplied with the transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system to produce the final transformation matrix $M_{img2world}$ from the image coordinate system to the world coordinate system.
+ -->
+<!-- 
+
+Once the position vector relative to the tables coordinate system is known
+
+The first transormation matrix is used to transform the position vector from the image coordinate system to the table coordinate system. This was created as follows:
 
 - TODO: description of implementation Coord transition
   
@@ -651,13 +717,12 @@ The first transormation matrix is used to transform the position vector from the
 
 - the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
 - the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
-- with this, the transformation matrix is produced.
+- with this, the transformation matrix is produced. -->
 
 - to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.
 
 - the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).
 
-- the transformation matrix is then multiplied with the position vector to obtain the position vector in the world coordinate system.
 - the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.
 
 ### Robot arm
@@ -671,7 +736,57 @@ The first transormation matrix is used to transform the position vector from the
 - <red>insert pictures of a point being reached with both solutions</red>
 
 
+- decisions taken
+  - objects are approached from above
+  - robot movements should not produce collisions with other objects in the scene, other than the contact with the object to be picked up
+    - this requires some degree of predictability forthe robots movements while moving between two points and the pose taken when reaching a point
+  - IK with full chain requires an iterative procedure to find the correct joint angles due to the number of degrees of freedom
+    - reduced performance and increased complexity
+    - non deterministic behaviour can cause unexpected erratic movements which could lead to a collision with other objects
+    - 
+  - the chosen requirements allows the  degrees of freedom to be reduced to 3
+    - explain why having 3 degrees of freedom allows the implementation of an algebraic solution whit reduced complexity, deterministic results leading to an increased preditability in the robots movements, as well as deterministic computation time, which allows this method to be used in other applications where critical time constraints are present with increased reliability.
+    -  
+  - 
 
+<red>Insert figure from presentation</red>
+
+The position of the first motor $\omega_0$ can be calculated by removing the z component of the position vector $\vec{p_{xyz}}$, resulting in the vector $\vec{p_{xy}}$ and finding the angle $\omega_0$ produced between $\vec{p_{xy}}$ and the x axis $\vec{e_x}$ of the coordinate system with the following formula:
+
+$$\omega_0=\arctan{\frac{y}{x}}$$
+
+This procedure is represented geometrically on the left side of Figure Y
+
+The position of the second and third motors $\omega_1$ and $\omega_2$ can be represented on the plane produced by the the vector $\vec{p_{xy}}$ and the z axis $\vec{e_z}$ and calculating using the following formulas:
+
+$$\omega_1=\frac{\pi}{2} - (\arctan{\frac{z}{h}} + \arccos{\frac{a^2-b^2+c^2}{2ac}})$$
+$$\omega_2 = \frac{pi}{2} - \arccos{\frac{a^2+b^2-c^2}{2ab}} + r_{\omega_2}$$
+
+where:
+- $a$ is the length of the first arm
+- $b$ is the length of the second arm
+- $c$ is the distance between the origin of the coordinate system and the point of interest $\vec{p_{xyz}}$
+- $r_{\omega_2}$ is the angle created between the vector $\vec{p_{xy}}$ and the vector $\vec{p_{xy}}$ rotated by $\theta_0$ around the z axis of the coordinate system
+
+
+ cancalculated by finding the angle $\theta_1$ produced between the vector $\vec{p_{xy}}$ and the vector $\vec{p_{xy}}$ rotated by $\theta_0$ around the z axis of the coordinate system with the following formula:
+
+The distance over the xy plane between the point of interest $\vec{p_{xyz}}$ and the origin of the coordinate system $\vec{O}$ can be calculated with the following formula:
+magnitude $h$ of the position vector $\vec{p_{xy}}$ gives us its distance to the origin of the coordinate system as follows:
+$$h=|\vec{p_{xy}}|$$
+
+ and the point $\vec{p_{xyz}}$ over the xy plane
+and can be calculated with the following formula:
+
+where:
+- $O$ is the origin of the coordinate system
+
+  as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:
+The position of the first motor $\omega_0$ can be calculated as the angle created between the x and y components of the position vector and the x axis of the coordinate system with the following formula:
+
+$$\omega_0=\arctan{\frac{y}{x}}$$ 
+where: 
+- $y$ and $z$ are the y and z coordinates of the object in the simulation.
 
 <red>following is probably better in implementation</red>  
 
@@ -679,10 +794,6 @@ Since the direction from which the robot is approaching the objects needs to be 
 
 The following figure shows the robot's coordinate system and the position of the objects in the simulation.
 
-<red>Insert figure from presentation</red>
-
-The position of the first motor $\omega_0$ can obtained as the angle between the two dimensional position vector in the xy plane with $\omega_0=arctan(\frac{y}{x})$, where 
-$y$ and $z$ are the y and z coordinates of the object in the simulation.
 
 #### Gripper
 
