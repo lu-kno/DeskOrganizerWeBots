@@ -780,43 +780,27 @@ The first image corresponds to the original cropped section containing the objec
 
 ## Results
 
-This chapter provides an overview of the results achieved during the development of the project. The objective of the project was to develop an autonomous system that can detect objects in a specific environment and relocate them to a designated location.
+This chapter provides an overview of the results achieved during the development of the project. The objective of the project was to develop an autonomous system that can detect objects in a specific environment and relocate them to a designated location. In order to achieve this, a robot arm was designed and programmed to perform a series of tasks. 
 
-In order to achieve this objective, a robot arm was designed and programmed to perform a series of tasks. The first task was to detect the objects present in the environment using computer vision algorithms. This involved using a camera mounted on the robot arm to capture images of the workspace and then processing these images to identify the objects present.
-
-Once the objects were detected, the robot arm used its gripper to pick up each object and relocate it to a designated location. The gripper features force feedback to prevent object damage and avoid simulation glitches.
+The first task was to detect the objects present in the environment using computer vision algorithms. This involved using a camera mounted on the robot arm to capture images of the workspace and then processing these images to identify the objects present. Once the objects were detected, the robot arm used its gripper to pick up each object and relocate it to a designated location. The gripper features force feedback to prevent object damage and avoid simulation glitches.
 
 The results of the project were successful, as demonstrated by the before and after images shown below. The first image shows a cluttered table containing objects with randomized positions, while the second image shows the same table after the robot arm has organized the objects.
 
 <div class="center-div">
-  <img src="./workspace-cluttered.jpg" width = 90% class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
+  <img src="./workspace-cluttered.jpg" width = "80%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
   <p class = "image-description">Figure 8: Cluttered workspace at the start of the simulation </p>
 </div>
 
+Figure 8 shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
+
 <div class="center-div">
-  <img src="./workplace-organized.jpg" width = 90% class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
+  <img src="./workplace-organized.jpg" width = "80%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
   <p class = "image-description">Figure 9: Organized workspace at the end of the routine </p>
 </div>
 
-As can be seen from the images, the robot arm was able to successfully detect and relocate all of the objects present in the workspace. This demonstrates the effectiveness of the computer vision algorithms and the implementation of the movement routine of the robot arm.
+Figure 9 presents the organized workspace at the end of the simulation. The robot arm has successfully detected and relocated all objects to their designated locations within the workspace.
 
-Overall, the project was a success in achieving its objective of developing an autonomous system that can detect objects in a specific environment and relocate them to a designated location.
-
-The results are presented by showing
-
-- image table unorganized
-
-- table organized 
-  
-The robot arm demonstrated high accuracy and efficiency in its movements, as evidenced by its ability to successfully locate and rearrange objects on the workspace. 
-
-- due to being a simulation we didnt have to face the nuanced problems of the real world
-  - all objects are the same size
-  - only one type of object in each object class
-
-- ability to use framework designed to create data for different setups / use cases
-
-The results achieved correspond to the requirements that were set in advance for the project.
+Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained through a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
 ## Outlook / Conclusion
 
 
