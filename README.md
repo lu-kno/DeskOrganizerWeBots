@@ -56,6 +56,7 @@ Movement directions make sense when "standing" in front of the robot
 ## Report To Do
   - [ ] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
     - [ ] include webots version and python version used
+  
   - [ ] find solution for model download (maybe use git lfs) 
   - [ ] write abstract 
   - [ ] export final pdf (attempt in latex)
@@ -65,7 +66,7 @@ Movement directions make sense when "standing" in front of the robot
   - [ ] (optional) config.yaml file to change global flags and maybe set parameters
   - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
   - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
-
+  - [ ] remove object detection model from git ignore and push it to github
 
 
 Lu:
