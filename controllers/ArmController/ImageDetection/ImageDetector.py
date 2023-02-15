@@ -1,30 +1,17 @@
 # from __future__ import annotations
-import typing
-from typing import Optional, Iterable, Literal, Any
-
-import ctypes
-import json
+from typing import Iterable, Literal, Any
 import math
 import os
 import random
 import warnings
-from pathlib import Path
-from pprint import pprint
-from typing import Callable, List, Union
-from imageai.Detection.Custom import (CustomObjectDetection,
-                                      DetectionModelTrainer)
+from imageai.Detection.Custom import (CustomObjectDetection)
 import cv2
 import matplotlib
 import numpy as np
 import yaml
-from imageai.Detection import ObjectDetection
 from matplotlib import pyplot as plt
 matplotlib.use('TKAgg')
-from scipy.ndimage import zoom
 from utils import logger, OUTPUT_DIR
-
-from . import TrainingsHelper
-
 
 warnings.filterwarnings("ignore", category=UserWarning) 
 imageWidth = 2560
@@ -35,6 +22,9 @@ categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','for
 
 
 class ImageScanner(logger):
+    """
+    Class for scanning images for objects and returning their position and orientation. Which extends from the Logger class.
+    """
     def __init__(self, master, model: Any|Literal['webots'] = 'webots', logging: str = 'D', logName: str = 'ImageScanner', **kwargs) -> None:
         super().__init__(logging=logging, logName=logName, **kwargs)
         if model=='webots':
@@ -51,25 +41,6 @@ class ImageScanner(logger):
         
         self.camera.saveImage(snapshot_path,100)
         img = cv2.imread(snapshot_path).astype('uint8')
-        # plt.imshow(img)
-        # plt.suptitle('using saveImage and imread')
-        # plt.show()
-        
-        # # The following block is bugged
-        # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
-        # plt.imshow(img)
-        # plt.suptitle('using getImageArray and removing alpha')
-        # plt.show()
-        
-        # imgraw = np.array(list(self.camera.getImageArray()),dtype='uint8').reshape((1066, 1920, 3))
-        # img = imgraw[:,:,::-1]
-        # plt.imshow(img)
-        # plt.suptitle('using getImageArray, removing alpha and reshape((HEIGTH, WIDTH, 3)')
-        # plt.show()
-        # plt.imshow(imgraw)
-        # plt.suptitle('using getImageArray, removing alpha and reshape((HEIGTH, WIDTH, 3)')
-        # plt.show()
-        
         
         self.logV(f"img.shape: {img.shape}")
         self.logV(f"img.dtype: {img.dtype}")
@@ -85,14 +56,10 @@ class ImageScanner(logger):
             boxPoints = np.reshape(obj['box_points'],[2,2]) # reshape from [4] to [2x2]
             
             posAbsolute = boxPoints.mean(0)
-            pos = posAbsolute/np.array(img.shape[1::-1])
-            
-            # boxPointsMargin = boxPoints+ np.array([[-5,-5],[5,5]])
-            
-            
+            pos = posAbsolute/np.array(img.shape[1::-1]) 
+        
             objImage = img[boxPoints[0,1]:boxPoints[1,1],boxPoints[0,0]:boxPoints[1,0]]
             
-            # objImage = img[max(boxPoints[0,0]-5,0):min(boxPoints[1,0]+5,img.shape[0]),max(boxPoints[0,1]-5,0):min(boxPoints[1,1]+5,img.shape[1]),:3]
             printout = f"Name = {obj['name']}\n"
             printout+= f"img.shape [y,x,f] = {img.shape}\n"
             printout+= f"boxPoints  [x1,y1],[x2,y2] = {boxPoints.tolist()}\n"
@@ -101,7 +68,6 @@ class ImageScanner(logger):
             printout+= f"np.max(objImage) = {np.max(objImage)}\n"
             printout+= f"===================================="
             self.logD(printout)
-            
             
             oValues = dict(name = obj['name'],
                            position = pos.tolist(),
