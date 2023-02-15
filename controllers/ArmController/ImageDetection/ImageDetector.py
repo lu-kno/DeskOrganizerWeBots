@@ -285,8 +285,8 @@ class CustomModel(logger):
         self.execution_path = os.path.dirname(__file__)
         self.detector = CustomObjectDetection()
         self.detector.setModelTypeAsYOLOv3()
-        self.modelPath = os.path.join(self.execution_path , "../Modelle/first/yolov3_DataSet_last.pt")
-        self.jsonPath = os.path.join(self.execution_path , "../Modelle/first/DataSet_yolov3_detection_config.json")
+        self.modelPath = os.path.join(self.execution_path , "../Modelle/yolov3_DataSet_last.pt")
+        self.jsonPath = os.path.join(self.execution_path , "../Modelle/DataSet_yolov3_detection_config.json")
         self.detector.setModelPath(self.modelPath) # path to custom trained model
         self.detector.setJsonPath(self.jsonPath) # path to corresponding json
         self.detector.loadModel()

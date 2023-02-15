@@ -1,9 +1,0 @@
-%\begin{tabular}{r l}
-ROI	 & Region of Interest\\ 
-GMAW & Gas Metal Arc Welding\\
-SMAW & Shielded Metal Arc Welding\\
-IQR	 & Interquartile Range\\ 
-IQM	 & Inter Quartile Mean\\ 
-STD	 & Standard Deviation\\ 
-RFR  & Random Forest Regressor\\
-%\end{tabular}
