@@ -18,7 +18,12 @@
   
 5. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
 
-Info: The "vidoes" directory contains various videos showcasing the robot in action.
+Additional information: 
+- The "vidoes" directory contains various videos showcasing the robot in action.
+  
+- The custom trained model is at: project-root\controllers\ArmController\Modelle\yolov3_DataSet_last.pt
+  
+- The origin model used for transfer learning is available [here]((https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/))
 # DeskOrganizerWeBots
 
 ## Movement
@@ -80,11 +85,13 @@ Movement directions make sense when "standing" in front of the robot
     - [x] Mention video directory in repo to present results
     - [ ] test install instructions on a fresh machine
   
-  - [ ] find solution for model download (maybe use git lfs) 
-      - [ ] remove object detection model from git ignore and push it to repo
+  - [x] find solution for model download (maybe use git lfs) 
+      - [x] remove object detection model from git ignore and push it to repo
   
-  - [ ] make sure that the git repo is publicly accessible
+  - [x] make sure that the git repo is publicly accessible
   
+  - [ ] merge project to master branch
+
   - [x] fix First page
     - [x] matrikelnumbers
     - [x] logo of th koeln instead of kepten and 
