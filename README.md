@@ -1,8 +1,8 @@
 # Instructions to run the simulation
 
-1. [Dowload](https://cyberbotics.com/doc/guide/installation-procedure) Webots following the steps provided in the link. Make sure to install the version that matches your operating system.
+1. [Download](https://cyberbotics.com/doc/guide/installation-procedure) Webots following the steps provided in the link. Make sure to install the version that matches your operating system.
    
-2. [Dowload](https://www.python.org/downloads/) Python version 3.7 or higher. Make sure to add Python to your PATH.
+2. [Download](https://www.python.org/downloads/) Python version 3.7 or higher. Make sure to add Python to your PATH.
 
 3. Install dependencies:
    
@@ -17,6 +17,15 @@
   ```
   
 5. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
+
+# Instructions to use the interface
+ on autoloop mode, you can press the key 'k' to randomize the position of the object on the table.
+
+ on manual mode you can use the following keys to control the robot:
+ WASD to move the sphere around in X-Y-Z directions
+ Q and E to open and close the gripper
+ 1 and 3 to pick up an object or place it down
+
 
 Info: The "vidoes" directory contains various videos showcasing the robot in action.
 # DeskOrganizerWeBots
