@@ -10,13 +10,13 @@ In this chapter we will describe the implementation of the solutions proposed in
 \subsubsection{First approach}
 The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
 
-Figure 2 shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
+\Vref{fig:object_detection_results} shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/cvResultExistingModel.jpg}
     \caption{Figure 2: Object detection results YOLOv3 model }
-    %\label{fig:figure}
+    \label{fig:object_detection_results}
 \end{figure}
 
 
@@ -49,37 +49,37 @@ Two configurations were set up to generate training data. The first setup produc
 The initial step in realizing the top-down configuration involved the definition of a function for capturing camera images and generating the corresponding annotation files. This function utilizes a reference of the camera object to obtain the objects currently detected, determine the values needed for annotation and store the images and annotation files in their designated directories. The following code segment demonstrates a shortened version of the implementation of this function.
 
 \begin{lstlisting}[language=python]
-1 def createTrainingFiles(camera,type = "train"):
-2    ... # initialize variables and generate pathes
-3    while True: # get current fileName
-4       filename = f"image_{fileNamePostfix}.txt"
-5       filepath = os.path.join(annotationPath, filename)
-6       if not os.path.isfile(filepath): 
-7           break # if file does not exist, use this name
-8       fileNamePostfix += 1
-9   fileName = f"image_{fileNamePostfix}"
-10  for obj in recognizedObjectes:
-11      id = obj.getId()
-12      name = obj.getModel()
-13      if name not in categories:
-14          continue
-15      position = list(obj.getPosition())
-16      positionOnImage = list(obj.getPositionOnImage())
-17      orientation = list(obj.getOrientation())
-18      size = list(obj.getSize())
-19      sizeOnImage = list(obj.getSizeOnImage())
-20      relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
-21      relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
-22      yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
-23      jsonData.append({
-24          "id": id,
-25          ... # adding the remaining properties to json data
-26      })
-27  camera.saveImage(imagePath+fileName+".jpg",100) # save image
-28  with open(jsonPath+fileName+".json", 'w') as file: # save json data
-29      json.dump(jsonData, file, indent=4)   
-30  with open(annotationPath+fileName+".txt", 'w') as file: # save yolo annotation
-31      file.writelines(yoloData)
+def createTrainingFiles(camera,type = "train"):
+   ... # initialize variables and generate pathes
+   while True: # get current fileName
+      filename = f"image_{fileNamePostfix}.txt"
+      filepath = os.path.join(annotationPath, filename)
+      if not os.path.isfile(filepath): 
+          break # if file does not exist, use this name
+      fileNamePostfix += 1
+  fileName = f"image_{fileNamePostfix}"
+  for obj in recognizedObjectes:
+      id = obj.getId()
+      name = obj.getModel()
+      if name not in categories:
+          continue
+      position = list(obj.getPosition())
+      positionOnImage = list(obj.getPositionOnImage())
+      orientation = list(obj.getOrientation())
+      size = list(obj.getSize())
+      sizeOnImage = list(obj.getSizeOnImage())
+      relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
+      relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
+      yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+      jsonData.append({
+          "id": id,
+          ... # adding the remaining properties to json data
+      })
+  camera.saveImage(imagePath+fileName+".jpg",100) # save image
+  with open(jsonPath+fileName+".json", 'w') as file: # save json data
+      json.dump(jsonData, file, indent=4)   
+  with open(annotationPath+fileName+".txt", 'w') as file: # save yolo annotation
+      file.writelines(yoloData)
 \end{lstlisting}
 The function accepts two parameters, a reference to the camera object, and a "type". The purpose of the "type" parameter is to specify whether the function should generate training or validation data. The function starts by initializing various variables and generating file paths for the image, annotation, and JSON data. In addition to the required training data, all available information about an object was saved in a JSON file so that it can be used later. The JSON file shares the same name as the image file and is stored in the directory \(raw_data\). Lines 3-8 determine the current file name for the output files. The filename is generated by appending a postfix to the string \(image\). The postfix is generated by incrementing a counter until a file with the generated name does not exist. This ensures that the file name is unique and does not overwrite existing files.
 At line 10 a loop iterates over the objects that the camera recognizes, and collects information about each object, including its model name, position and size. These values are converted into the required format, by determining the object's relative position and size. Subsequently, in lines 22 and 23, Strings for the annotation and the JSON representation of the detected object are prepared so they can be appended to the corresponding lists for this image. Finally, the function saves the image, JSON data, and YOLO annotation data to their respective files using the file name generated earlier. The image is saved using the "camera.saveImage" function.
@@ -87,25 +87,25 @@ At line 10 a loop iterates over the objects that the camera recognizes, and coll
 After a snapshot was taken the object's position and orientation on the table needed to be randomized. The corresponding function is shown below.
 
 \begin{lstlisting}[language=python]
-1 def moveTableNodes(supervisor,table):
-2    margin = 0.1
-3    bottomLeft = table.local2world([0,1,0])
-4    topRight = table.local2world([1,0,0])
-5    x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
-6    x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
-7    y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
-8    y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
-9   for cat in categories:
-10       obj = supervisor.getFromDef(cat)
-11       x = random.uniform(x_min, x_max)
-12       y = random.uniform(y_min, y_max)
-13       z = bottomLeft[2] # any z coordinate
-14       obj.getField('translation').setSFVec3f([x, y, z])
-15       xRotation = random.uniform(1, 360)
-16       yRotation = random.uniform(1, 360)
-17       zRotation = random.uniform(1, 360)
-18       angle = random.uniform(1, 360)
-19       obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
+def moveTableNodes(supervisor,table):
+   margin = 0.1
+   bottomLeft = table.local2world([0,1,0])
+   topRight = table.local2world([1,0,0])
+   x_min = bottomLeft[0] + (topRight[0] - bottomLeft[0]) * margin
+   x_max = topRight[0] - (topRight[0] - bottomLeft[0]) * margin
+   y_min = bottomLeft[1] + (topRight[1] - bottomLeft[1]) * margin
+   y_max = topRight[1] - (topRight[1] - bottomLeft[1]) * margin
+  for cat in categories:
+       obj = supervisor.getFromDef(cat)
+       x = random.uniform(x_min, x_max)
+       y = random.uniform(y_min, y_max)
+       z = bottomLeft[2] # any z coordinate
+       obj.getField('translation').setSFVec3f([x, y, z])
+       xRotation = random.uniform(1, 360)
+       yRotation = random.uniform(1, 360)
+       zRotation = random.uniform(1, 360)
+       angle = random.uniform(1, 360)
+       obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
 
 \end{lstlisting}
 The function accepts two parameters: a reference to the supervisor object and a reference to the table object. The function begins by determining the boundaries of the table using coordinate transformation. Intervals for the x and y coordinates are determined for the random positioning of objects on the table and then adjusted to leave a margin of 0.1 meters around it. At line 9 a loop iterates the objects on the table and generates a random position and orientation for each object using the previously calculates intervals.
@@ -114,33 +114,33 @@ Finally a loop needed to be developed to call the snapshot and object randomizat
 
 \begin{lstlisting}[language=python]
 @looper
-1 def randomPosSamplingLoop(self,sampleSize,type):
-2     if self.loopCount % 10 == 0:
-3         if self.loopCount % 20 == 0:
-4             TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
-5         else:
-6             TrainingsHelper.makeSnapshot(self.camera,type)
-7             self.dataCount +=1
-8     self.loopCount += 1
-9     if self.dataCount>sampleSize:
-10        return -1
+def randomPosSamplingLoop(self,sampleSize,type):
+    if self.loopCount % 10 == 0:
+        if self.loopCount % 20 == 0:
+            TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
+        else:
+            TrainingsHelper.makeSnapshot(self.camera,type)
+            self.dataCount +=1
+    self.loopCount += 1
+    if self.dataCount>sampleSize:
+        return -1
 \end{lstlisting}
 The function takes two arguments as input: the quantity of samples, and the type of data, to be generated. In operation, the function initiates the execution of the \(moveTableNodes\) function at regular intervals of 20 iterations, ensuring the repositioning and reorientation of the objects every 2 seconds. Additionally, the \(makeSnapshot\) function is called every 10 iterations to secure the capturing of snapshots at a rate of once per second. The function concludes its operation by returning a value of -1 when the predetermined number of samples has been generated.
 
-The method must be invoked twice, once for the generation of training data and once for the generation of validation data. Upon the completion of this process, a dataset is produced that is ready for the training of a custom model. Figures 3 and 4 present a demonstration of one of the generated images and its accompanying annotation file, respectively.
+The method must be invoked twice, once for the generation of training data and once for the generation of validation data. Upon the completion of this process, a dataset is produced that is ready for the training of a custom model. \Vref{fig:dataset_train_img} and \Vref{fig:dataset_train_ann} present a demonstration of one of the generated images and its accompanying annotation file, respectively.
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/image_344.jpg}
     \caption{Figure 3: image\_344.jpg in path: ..\\DataSet\\train\\images  }
-    %\label{fig:figure}
+    \label{fig:dataset_train_img}
 \end{figure}
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/image_344.txt.jpg}
     \caption{Figure 4: image\_344.txt in path: ..\\DataSet\\train\\annotations  }
-    %\label{fig:figure}
+    \label{fig:dataset_train_ann}
 \end{figure}
 
 We generated 1200 images for training and 300 images for validation using this configuration. In order to enhance the performance of the model, an alternative image configuration was also developed.
@@ -150,39 +150,39 @@ We generated 1200 images for training and 300 images for validation using this c
 The second configuration was designed to provide single object images at four distinct viewpoints, serving as training data. To achieve this, a function was created to relocate the camera to a designated viewpoint. This function accepts two inputs: a reference to the supervisor object and an index specifying the desired viewpoint. The supervisor is used to alter the camera perspective while index is utilized to determine the camera's position based on a list of coordinates. Furthermore, a function was implemented to facilitate the exchange of objects on the table. This function takes three inputs as arguments: a reference to the supervisor object, a reference to the table object, and an index indicating the desired object. Finally, a function was created to randomly modify the orientation of the current node-object, resulting in a diverse set of images taken from the same viewpoint. After the completion of these steps, a routine was implemented that integrates the various functions. The code segment below presents the implementation of this function. 
 
 \begin{lstlisting}[language=python]
-1 def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
-2     global count, currentNode, lastViewPointPos
-3     amountViewpoints = 4
-4     if(count==0): # init viewpoint position for first run
-5         moveViewPoint(supervisor,lastViewPointPos)
-6         swapObj(currentNode,table,supervisor)
-7     # change viewpoint if given imagesPerViewpoint is met
-8     if((count % imagesPerViewpoint) == 0):
-9         lastViewPointPos = (lastViewPointPos+1)%4
-10        moveViewPoint(supervisor,lastViewPointPos)
-11    # change object if limit is met
-12    if((count % (imagesPerViewpoint*amountViewpoints))==0):
-13        currentNode = (currentNode+1) % len(categories)
-14        swapObj(currentNode,table,supervisor)
-15    spinTableNode(supervisor,table,currentNode)
-16    count += 1
+def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
+    global count, currentNode, lastViewPointPos
+    amountViewpoints = 4
+    if(count==0): # init viewpoint position for first run
+        moveViewPoint(supervisor,lastViewPointPos)
+        swapObj(currentNode,table,supervisor)
+    # change viewpoint if given imagesPerViewpoint is met
+    if((count % imagesPerViewpoint) == 0):
+        lastViewPointPos = (lastViewPointPos+1)%4
+        moveViewPoint(supervisor,lastViewPointPos)
+    # change object if limit is met
+    if((count % (imagesPerViewpoint*amountViewpoints))==0):
+        currentNode = (currentNode+1) % len(categories)
+        swapObj(currentNode,table,supervisor)
+    spinTableNode(supervisor,table,currentNode)
+    count += 1
 \end{lstlisting}
 The function is meant to be executed each time after an image has been created and prepares the next image to be captured. The number of image configurations provided by the function is determined by the value of "imagesPerViewpoint". A global variable is used to keep track of the number of function invocations. The first time this method is called, the viewpoint and the first object are initialized. The if statement at line 8 verifies whether the number of images taken from the current viewpoint has reached the predetermined limit. In the event that the limit has been met, the viewpoint is shifted to the next one in the designated list. At line 12, the function examines whether the number of images captured from the current object has reached its limit. If this is the case, the object is swapped for the next one in the list. Finally, the function rotates the current object to a random orientation with each invocation. 
 
 The training data can be generated using the same function as in the first configuration. The loop to call these functions during the simulation closely mirrors the looper-function used before. The code segment below presents the implementation of this function. 
 
 \begin{lstlisting}[language=python]	
-1 @looper
-2 def singleObjectImageLoop(self,imagesPerPerspective,type):
-3     if self.loopCount % 10 == 0:
-4         if self.loopCount % 20 == 0:
-5             TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
-6         else:
-7             TrainingsHelper.makeSnapshot(self.dataCam,type)
-8             self.dataCount +=1
-9     self.loopCount += 1
-10    if self.dataCount>imagesPerPerspective*amountPerspectives*len(categories): 
-11        return -1
+@looper
+def singleObjectImageLoop(self,imagesPerPerspective,type):
+    if self.loopCount % 10 == 0:
+        if self.loopCount % 20 == 0:
+            TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
+        else:
+            TrainingsHelper.makeSnapshot(self.dataCam,type)
+            self.dataCount +=1
+    self.loopCount += 1
+    if self.dataCount>imagesPerPerspective*amountPerspectives*len(categories): 
+        return -1
 \end{lstlisting}
 
 This loop operates in a similar fashion to the first configuration, alternately executing the \(single_object_setup\) and \(makeSnapshot\) functions with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
@@ -192,16 +192,16 @@ This loop operates in a similar fashion to the first configuration, alternately 
 A total of 1456 images were generated for training and 384 images for validation. The training was performed using the ImageAI library, which provides a pre-trained YOLOv3 model that was used as a starting point for transfer learning. The following code segments presents the implementation of the training function, using the ImageAI library. 
 
 \begin{lstlisting}[language=python]
-1 def startTraining():
-2     execution_path = os.path.dirname(__file__)
-3     data_dir_path = os.path.join(execution_path , "DataSet")
-4     model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
-5     createClassFiles(categories) 
-6     trainer = DetectionModelTrainer()
-7     trainer.setModelTypeAsYOLOv3()
-8     trainer.setDataDirectory(data_directory=data_dir_path)
-9     trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
-10    trainer.trainModel()
+def startTraining():
+    execution_path = os.path.dirname(__file__)
+    data_dir_path = os.path.join(execution_path , "DataSet")
+    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
+    createClassFiles(categories) 
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsYOLOv3()
+    trainer.setDataDirectory(data_directory=data_dir_path)
+    trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
+    trainer.trainModel()
 \end{lstlisting}
 The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
 
@@ -220,26 +220,26 @@ The results of the evaluation revealed that the model achieved a recall value of
 
 The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
-The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. Figure 5 shows the results of the object detection process using the custom model and demonstrates the problem. 
+The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/snapshot-detected-nms0.5.jpg}
     \caption{Figure 5: Object detection results self trained model }
-    %\label{fig:figure}
+    \label{fig:trained_model_results}
 \end{figure}
 
 Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
 The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the \(nms_threshold\) parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the IoU, is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
-The results of the object detection process using The NMS algorithm with a threshold of 0.05 are presented in figure 6.
+The results of the object detection process using The NMS algorithm with a threshold of 0.05 are presented in \vref{fig:trained_model_results_2}.
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/snapshot-detected.jpg}
     \caption{Figure 6: Object detection results self trained model }
-    %\label{fig:figure}
+    \label{fig:trained_model_results_2}
 \end{figure}
 
 The test results indicate that the model has a satisfactory level of performance for the intended application, as it was capable to correctly determine the position and class of each object on the table in multiple test cases. 
@@ -297,22 +297,24 @@ def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None
 The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks that select from each direction the pixels that are not contained within the objects area. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
 
 \begin{lstlisting}[language=python]
-1 def getOrientationPCA(self, edges):
-2     pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
-3     # Perform PCA analysis
-4     mean = np.empty((0))
-5     mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
-6     angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
-7     return angle
+def getOrientationPCA(self, edges):
+    pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
+    # Perform PCA analysis
+    mean = np.empty((0))
+    mean, eigenvectors, eigenvalues = cv2.PCACompute2(pts, mean)
+    angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+    return angle
 \end{lstlisting}
 This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]
 
-A graphical representation of these steps is shown in Figure 7, which highlights the individual images of the object at different stages of the process. 
+A graphical representation of these steps is shown in \vref{fig:orientation_steps}, which highlights the individual images of the object at different stages of the process. 
 
-<div class="center-div">
-  <img src="./hammerTime.jpg" width = 90% class = "center-image" alt="Steps do determine the orientation of an object" >
-  <p class = "image-description">Figure 7: Steps do determine the orientation of an object </p>
-</div>
+\begin{figure}[!h]
+    \centering
+    \adjincludegraphics[width=0.7\textwidth]{Figures/hammerTime.jpg}
+    \caption{Figure 7: Steps do determine the orientation of an object }
+    \label{fig:orientation_steps}
+\end{figure}
 
 The annotations below the images correspond to the respective steps in the "getAngle" function and are referred to in the comments of the function.
 
@@ -325,30 +327,30 @@ This task was achieved by creating and combining two transformation matrices. Th
 
 
 \begin{lstlisting}[language=python]
-1   # Transformation Matrix from table corner in image to table center
-2   # - Rotation and Translation Matrix
-3   img2table_rot_trans = [[0, -1,  0, 0.5],
-4                         [-1,  0,  0, 0.5],
-5                         [ 0,  0, -1,   1],
-6                         [ 0,  0,  0,   1]]
-7   
-8   # - Scaling Matrix
-9   img2table_scale = [[Table.size[0],             0,             0,  0],
-10                     [            0, Table.size[1],             0,  0],
-11                     [            0,             0, Table.size[2],  0],
-12                     [            0,             0,             0,  1]]
-13  
-14  # Transformation Matrix from image to table center
-15  img2table = numpy.matmul(img2table_scale, img2table_rot_trans)
-16  
-17  # Transformation Matrix from table center to world
-18  table2world = numpy.array([[cos(Table.rotation[3]), -sin(Table.rotation[3]),  0,  Table.position[0]],
-19                             [sin(Table.rotation[3]),  cos(Table.rotation[3]),  0,  Table.position[1]],
-20                             [                     0,                       0,  1,  Table.position[2]],
-21                             [                     0,                       0,  0,                 1]])
-22  
-23  # Transformation Matrix from image to world
-24  TMatrix = numpy.matmul(table2world, img2table)
+# Transformation Matrix from table corner in image to table center
+# - Rotation and Translation Matrix
+img2table_rot_trans = [[0, -1,  0, 0.5],
+                      [-1,  0,  0, 0.5],
+                      [ 0,  0, -1,   1],
+                      [ 0,  0,  0,   1]]
+
+# - Scaling Matrix
+img2table_scale = [[Table.size[0],             0,             0,  0],
+                   [            0, Table.size[1],             0,  0],
+                   [            0,             0, Table.size[2],  0],
+                   [            0,             0,             0,  1]]
+
+# Transformation Matrix from image to table center
+img2table = numpy.matmul(img2table_scale, img2table_rot_trans)
+
+# Transformation Matrix from table center to world
+table2world = numpy.array([[cos(Table.rotation[3]), -sin(Table.rotation[3]),  0,  Table.position[0]],
+                           [sin(Table.rotation[3]),  cos(Table.rotation[3]),  0,  Table.position[1]],
+                           [                     0,                       0,  1,  Table.position[2]],
+                           [                     0,                       0,  0,                 1]])
+
+# Transformation Matrix from image to world
+TMatrix = numpy.matmul(table2world, img2table)
 \end{lstlisting}
 
 Since the origin of the table's coordinate system is in the center of the table and therefore the table's position and orientation reference its center point, a translation needs to be applied to the position vector in the image, whose coordinate system is located on the top left corner, while also rotating the coordinate axes to match the ones of the table's origin.
@@ -587,7 +589,7 @@ The implementation of this procedure is shown below:
 
 <red>add Gripper.close code </red>
 
-The `@looper` decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of `-1` to indicate that the function should no longer be called and the loop must be finished.
+The \(@looper\) decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of \(-1\) to indicate that the function should no longer be called and the loop must be finished.
 
 
 <draft>
@@ -599,28 +601,28 @@ The `@looper` decorator is used to call the function repeatedly each time it fin
 
 \subsubsection{Movement Routine}
 
-The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function `moveTo`, directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the `imageScan` module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
+The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function \(moveTo\), directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the \(imageScan\) module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
 
-Afterwards, the `organizeObjects` function is called which iterates through the found objects. For each object the procedure is as follows: 
+Afterwards, the \(organizeObjects\) function is called which iterates through the found objects. For each object the procedure is as follows: 
 
-A check is perfomed to see if the `stopOrganization` variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the `HOME` position and the imageScan module is called again to update the list of objects. 
+A check is perfomed to see if the \(stopOrganization\) variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the \(HOME\) position and the imageScan module is called again to update the list of objects. 
 
-If the `stopOrganization` variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset `voffset`required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object. 
+If the \(stopOrganization\) variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset `voffset`required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object. 
 
-The position of the object within the image is then transformed to the global coordinates with the use of the function `local2world`, which was implemented as described in the previous section.
+The position of the object within the image is then transformed to the global coordinates with the use of the function \(local2world\), which was implemented as described in the previous section.
 
-The vertical offset in the `z` dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it. 
+The vertical offset in the \(z\) dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it. 
 
-Together with the objects orientation from the `image Detection` module, the resulting `pickPosition` and `placePosition` are then passed  to the `pickNplace` function,  which passes the positions to the functions `pickUpObject` and `placeObject` respectively and calls them one after the other.
+Together with the objects orientation from the `image Detection` module, the resulting \(pickPosition\) and \(placePosition\) are then passed  to the \(pickNplace\) function,  which passes the positions to the functions \(pickUpObject\) and \(placeObject\) respectively and calls them one after the other.
 
 
 The \(pickUpObject\) begins by calling the function \(moveTo\), moving the arm and gripper to a position above the object to be picked up and rotating the gripper according to the objects orientation. The distance to this object defined by the variable \(SAFE_HEIGHT\).
-The gripper is open by a call to `Gripper.open` and the robot lowers the gripper to reach the object at `pickPosition` through a second call to the `moveTo` function.
-This is followed by the `Gripper.close` function, which closes the grippers fingers like previously described to grab the object, and a last call to the `moveTo` function to move the robot back to the safe position above the object above the object.
+The gripper is open by a call to \(Gripper.open\) and the robot lowers the gripper to reach the object at \(pickPosition\) through a second call to the \(moveTo\) function.
+This is followed by the \(Gripper.close\) function, which closes the grippers fingers like previously described to grab the object, and a last call to the \(moveTo\) function to move the robot back to the safe position above the object above the object.
 
-The implementation of the `placeObject` function is very similar to the `pickUpObject` function, with the only difference being that the gripper is kept closed holding the object until the `placePosition` is reached. Once the robot has reached the `placePosition`, the gripper is opened and the robot moves back to a safe height above the objects position.
+The implementation of the \(placeObject\) function is very similar to the \(pickUpObject\) function, with the only difference being that the gripper is kept closed holding the object until the \(placePosition\) is reached. Once the robot has reached the \(placePosition\), the gripper is opened and the robot moves back to a safe height above the objects position.
 
-After this, the process of getting the pick and place positions and calling the `pickNplace` function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
+After this, the process of getting the pick and place positions and calling the \(pickNplace\) function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
 
 <red> make reference to the following diagram </red>
 <red> close section </red>

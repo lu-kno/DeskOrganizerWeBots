@@ -9,24 +9,24 @@ This chapter provides an overview of the results achieved during the development
 
 The first task was to detect the objects present in the environment using computer vision algorithms. This involved using a camera mounted on the robot arm to capture images of the workspace and then processing these images to identify the objects present. Once the objects were detected, the robot arm used its gripper to pick up each object and relocate it to a designated location. The gripper features force feedback to prevent object damage and avoid simulation glitches.
 
-The results of the project are demonstrated by the before and after images shown below. The first image shows a cluttered table containing objects with randomized positions, while the second image shows the same table after the robot arm has organized the objects.
+The results of the project are demonstrated on \vref{fig:workspace_start} and \vref{fig:workspace_end}. The first of them shows a cluttered table containing objects with randomized positions, while the second shows the same table after the robot arm has organized the objects.
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/workspace-cluttered.jpg}
     \caption{Figure 8: Cluttered workspace at the start of the simulation }
-    %\label{fig:figure}
+    \label{fig:workspace_start}
 \end{figure}
 
-Figure 8 shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
+\Vref{fig:workspace_start} shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
 
 \begin{figure}[!h]
     \centering
     \adjincludegraphics[width=0.7\textwidth]{Figures/workplace-organized.jpg}
     \caption{Figure 9: Organized workspace at the end of the routine }
-    %\label{fig:figure}
+    \label{fig:workspace_end}
 \end{figure}
 
-Figure 9 presents the organized workspace at the end of the simulation. The robot arm has successfully detected and relocated all objects to their designated locations within the workspace.
+\Vref{fig:workspace_end} presents the organized workspace at the end of the simulation. The robot arm has successfully detected and relocated all objects to their designated locations within the workspace.
 
 Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained in a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
