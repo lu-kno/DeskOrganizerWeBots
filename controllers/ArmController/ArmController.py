@@ -53,10 +53,21 @@ if ikpy.__version__[0] < '3':
 IKPY_MAX_ITERATIONS = 4
 
 class MyGripper(logger):
+    """
+    Class to manage the gripper of the robot, which extends from the class Logger.
+    """
     SPEED = 5 # SPEED in DEGREES
     GRIP_FORCE = 2
     
     def __init__(self,master: RobotArm, logging: str = 'D', logName: str = 'Gripper') -> None:
+        """
+        Initializes an instance of the MyGripper class.
+        Parameters:
+            master (RobotArm): reference to the robot arm.
+            logging (str):  the logging level. Default value is 'D'.
+            logName (str):  the name of the log file. Default value is 'Gripper'.
+            
+        """
         super().__init__(logging=logging, logName=logName)
         
         self.master = master
@@ -188,11 +199,21 @@ class MyGripper(logger):
             
 
 class RobotArm(logger):
+    """
+    Class to manage the robot arm, which extends from the class Logger.
+    """
     HAND_LENGTH = 0.365#75 ## To Do: This value needs to be checked. Might need to be .03 larger
     SAFE_HEIGHT = 0.3
     HOME_POSITION = [0.7, 0, 1.1]
     
     def __init__(self,logging: str = 'D', logName: str = 'RobotArm') -> None:
+        """
+        Initializes an instance of the RobotArm class.
+        Parameters:
+            logging (str):  the logging level. Default value is 'D'.
+            logName (str):  the name of the log file. Default value is 'RobotArm'.
+            
+        """
         super().__init__(logging=logging, logName=logName)
         
         self.supervisor = Supervisor()
@@ -383,6 +404,14 @@ class RobotArm(logger):
     
     @looper
     def randomPosSamplingLoop(self,sampleSize,type):
+        """
+        Performs the generation of training data with configuration 1 (top-down perspective), garantueeing that the object's position and orientation
+        is always randomized for each sample.
+        
+        Arguments:
+            sampleSize (int): Number of samples to be generated
+            type (str): Type of data to be generated. Can be 'train' or 'validaiton'
+        """
         if self.loopCount % 10 == 0:
             if self.loopCount % 20 == 0:
                 TrainingsHelper.moveTableNodes(self.supervisor,self.mainTable)
@@ -395,6 +424,15 @@ class RobotArm(logger):
 
     @looper
     def singleObjectImageLoop(self,imagesPerPerspective,type):
+        """
+        Performs the generation of training data with configuration 2 (Four-angled rotation), producing training data of 
+        individual objects from 4 different perspectives. Multiple samples per position can be generated, as the object's rotation
+        is randomized for each sample.
+        
+        Arguments:
+            imagesPerPerspective (int): Number of samples to be generated from one perspective
+            type (str): Type of data to be generated. Can be 'train' or 'validaiton'
+        """
         if self.loopCount % 10 == 0:
             if self.loopCount % 20 == 0:
                 TrainingsHelper.single_objectImage_setup(self.supervisor,self.mainTable,imagesPerPerspective)
@@ -770,8 +808,18 @@ def image2worldTest(arm: RobotArm) -> None:
         
     
 class Table(logger):
-        
+    """
+    Class to manage the workspace of the simulation, which extends from the class Logger.
+    """        
     def __init__(self, node: Node, logging: str = 'D', logName: str = 'Table') -> None:
+        """
+        Initializes an instance of the Table class.
+        Parameters:
+            node (Node): reference node object of the table
+            logging (str):  the logging level. Default value is 'D'.
+            logName (str):  the name of the log file. Default value is 'Table'.
+            
+        """
         super().__init__(logging=logging, logName=logName)
         self.node = node
         # self.size = node.getField('size').getSFVec3f()
