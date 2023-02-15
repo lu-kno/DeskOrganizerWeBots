@@ -56,18 +56,18 @@ Movement directions make sense when "standing" in front of the robot
 ## Report To Do
   - [ ] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
     - [ ] include webots version and python version used
+    - [ ] Mention video directory in repo to present results
   
   - [ ] find solution for model download (maybe use git lfs) 
   - [ ] write abstract 
   - [ ] export final pdf (attempt in latex)
-  - [ ] record video of robot in action (already recorded by Lu)
   - [ ] complete source code comments and docstrings
   - [ ] fix indexing of table of contents in pdf
   - [ ] (optional) config.yaml file to change global flags and maybe set parameters
   - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
   - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
   - [ ] remove object detection model from git ignore and push it to github
-
+  - [x] record video of robot in action (already recorded by Lu)
 
 Lu:
 

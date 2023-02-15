@@ -11,7 +11,8 @@ import warnings
 from pathlib import Path
 from pprint import pprint
 from typing import Callable, List, Union
-
+from imageai.Detection.Custom import (CustomObjectDetection,
+                                      DetectionModelTrainer)
 import cv2
 import matplotlib
 import numpy as np
@@ -29,6 +30,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 imageWidth = 2560
 imageHeight = 1422
 SAVEFIGS=False
+MINIMUM_PERCENTAGE_PROBABILITY = 95
 categories = ['','apple', 'orange', 'bottle','can','computer_mouse','knife','fork','hammer','wooden_spoon','beer_bottle']
 
 
@@ -42,7 +44,7 @@ class ImageScanner(logger):
         
         self.master=master
         self.camera=master.camera
-        self.imageAImodel=TrainingsHelper.MyModel(logging=logging)
+        self.customModel= CustomModel(logging=logging)
         
     def imageAIScan(self) -> Iterable[dict]:
         snapshot_path = os.path.join(OUTPUT_DIR, 'snapshot.jpg')
@@ -74,7 +76,7 @@ class ImageScanner(logger):
         self.logVV(f"img.unique: {np.unique(img)}")
         if not np.any(img):
             return []
-        objectsRaw: list[dict[str,Any]] = self.imageAImodel.getObjectsFromImage(img)
+        objectsRaw: list[dict[str,Any]] = self.customModel.getObjectsFromImage(img)
         
         objects: list[dict[str,Any]] = []
         
@@ -256,210 +258,29 @@ class ImageScanner(logger):
         
         return angle, img
 
-# def imageAiTest(filename="snapshot.jpg"):
-#     imageWidth = 2560
-#     imageHeight = 1422
-#     print('imageAiTest() called')
-#     # execution_path = os.getcwd()
-#     execution_path = os.path.dirname(__file__)
-#     detector = ObjectDetection()
-#     #detector.setModelTypeAsYOLOv3()
-#     #detector.setModelPath( os.path.join(execution_path , "Modelle/yolov3.pt"))
-#     detector.setModelTypeAsRetinaNet()
-#     detector.setModelPath( os.path.join(execution_path , "Modelle/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
-#     detector.loadModel()
-#     custom = detector.CustomObjects(apple=True, orange=True,fork=True,knife=True,spoon=True,mouse=True,bottle=True)
-#     detections = detector.detectObjectsFromImage(custom_objects=custom,input_image=os.path.join(execution_path , filename), output_image_path=os.path.join(execution_path , "imagenew.jpg"), minimum_percentage_probability=1)
-#     image = cv2.imread(os.path.join(execution_path , filename))
-
-#     for detection in detections:
-#         xmin, ymin, xmax, ymax = detection['box_points']
-
-#         center = getRectangleCenter(xmin,xmax,ymin,ymax)
-#         relativeCoords = getRelativeCoords(imageWidth, imageHeight, center[0], center[1])
-#         print(detection["name"] , " : ", detection["percentage_probability"], " : ", relativeCoords )
-
-#         # Crop object from the image
-#         margin=5
-#         objectImage = image[ymin-margin:ymax+margin, xmin-margin:xmax+margin]
-#         angle = getAngle(objectImage, name=detection['name'], savefig=SAVEFIGS)
-#         if angle != 999:
-#             print(f"Object with class ID {detection['name']} has an average rotation angle of {angle} degrees")
-#         else:
-#             print(f"Object with class ID {detection['name']} does not have a clear rotation angle")
+class CustomModel(logger):
+    """ Class to create training data as well as train and test the custin nidek """
+    def __init__(self, logging: str = 'D', logName: str = 'ImageAImodel'):
+        super().__init__(logging=logging, logName=logName)
         
+        self.execution_path = os.path.dirname(__file__)
+        self.detector = CustomObjectDetection()
+        self.detector.setModelTypeAsYOLOv3()
+        self.modelPath = os.path.join(self.execution_path , "../Modelle/first/yolov3_DataSet_last.pt")
+        self.jsonPath = os.path.join(self.execution_path , "../Modelle/first/DataSet_yolov3_detection_config.json")
+        self.detector.setModelPath(self.modelPath) # path to custom trained model
+        self.detector.setJsonPath(self.jsonPath) # path to corresponding json
+        self.detector.loadModel()
 
-
-# def drawAxis(img, p_, q_, color, scale):
-#   p = list(p_)
-#   q = list(q_)
- 
-#   ## [visualization1]
-#   angle = math.atan2(p[1] - q[1], p[0] - q[0]) # angle in radians
-#   hypotenuse = math.sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
- 
-#   # Here we lengthen the arrow by a factor of scale
-#   q[0] = p[0] - scale * hypotenuse * math.cos(angle)
-#   q[1] = p[1] - scale * hypotenuse * math.sin(angle)
-#   img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
- 
-#   # create the arrow hooks
-#   p[0] = q[0] + 9 * math.cos(angle + math.pi / 4)
-#   p[1] = q[1] + 9 * math.sin(angle + math.pi / 4)
-#   img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
- 
-#   p[0] = q[0] + 9 * math.cos(angle - math.pi / 4)
-#   p[1] = q[1] + 9 * math.sin(angle - math.pi / 4)
-#   img = cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
-  
-#   return img
-
-
-
-# def openCvTest():
-#     pictureData = findObject("snapshot.jpg","all")
-
-
-
-# def findObject(imageName, targetColor) -> json:
-#     # Lade das Bild
-#     img = cv2.imread(imageName)
-#     # Konvertieren das Bild in HSV-Farbraum
-#     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-#     if(targetColor == 'red'):
-#         low_red = np.array([161, 155, 84])
-#         high_red = np.array([179, 255, 255])
-#         mask = cv2.inRange(hsv, low_red, high_red)
-#         #red = cv2.bitwise_and(img, img, mask=mask)  
-#     elif(targetColor == 'green'):
-#         low_green = np.array([25, 52, 72])
-#         high_green = np.array([102, 255, 255])
-#         mask = cv2.inRange(hsv, low_green, high_green)
-#         #green = cv2.bitwise_and(img, img, mask=mask)
-#     elif(targetColor == 'blue'):
-#         low_blue = np.array([110,50,50])
-#         high_blue = np.array([130,255,255])
-#         mask = cv2.inRange(hsv, low_blue, high_blue)
-#         #blue = cv2.bitwise_and(img, img, mask=mask)
-#     else:
-#         # Every color except white
-#         low = np.array([0, 42, 0])
-#         high = np.array([179, 255, 255])
-#         mask = cv2.inRange(hsv, low, high)
-#         allColors = cv2.bitwise_and(img, img, mask=mask)
-#         cv2.imshow("allColors", allColors)
-
-#     # Define range of blue color in HSV
-#     #lower_blue = np.array([110,50,50])
-#     #upper_blue = np.array([130,255,255])
-
-#     # Mask the image to only select blue colors
-#     # mask = cv2.inRange(hsv, lower_blue, upper_blue)
-
-#     # Find the contours in the mask
-#     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-#     # Iterieren durch die Konturen
-#     for cnt in contours:
-#       # cv2.approxPloyDP() function to approximate the shape
-#         approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-#         # Überprüfen die Anzahl der Ecken der Kontur
-#         if len(approx) == 3:
-#       # Dreieck erkannt
-#             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-#             cv2.drawContours(img, [approx], 0, (255, 255, 255), 2)
-#             M = cv2.moments(cnt)
-#             if M['m00'] != 0.0:
-#                 mittelpunktX = int(M["m10"] / M["m00"])
-#                 mittelpunktY = int(M["m01"] / M["m00"])
-#             print("Dreieck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
-#         elif len(approx) == 4:
-#             # Rechteck erkannt
-#             x, y, w, h = cv2.boundingRect(cnt)
-#             cv2.rectangle(img, (x, y), (x+w, y+h), (255, 255, 255), 2)
-#             mittelpunktX = x + w/2
-#             mittelpunktY = y + h/2
-#             print("Rechteck - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
-#         elif len(approx) > 4:
-#             # Polygon erkannt
-#             polygon = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-#             cv2.drawContours(img, [polygon], 0, (255, 255, 255), 2)
-#             M = cv2.moments(cnt)
-#             if M['m00'] != 0.0:
-#                 mittelpunktX = int(M["m10"] / M["m00"])
-#                 mittelpunktY = int(M["m01"] / M["m00"])
-#             print("Polygon - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
-#         else:
-#             # Kreis erkannt
-#             (x,y),radius = cv2.minEnclosingCircle(cnt)
-#             center = (int(x),int(y))
-#             radius = int(radius)
-#             cv2.circle(img,center,radius,(255,255,255),2)
-#             mittelpunktX, mittelpunktY = center
-#             print("Kreis - Mittelpunkt: (", mittelpunktX, ",", mittelpunktY, ")")
-
-#     # 0,0 oben links
-#     # Anzeigen Sie das bearbeitete Bild
-#     cv2.imshow("Detected Shapes", img)
-#     #cv2.imwrite("snapshot_new.jpg", img)
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
-#     # do stuff here
-
-#     result = dict(position = [mittelpunktX, mittelpunktY],
-#                 category = 'square', # or circle or triangle or polygon
-#                 color = 'targetcolor',
-#                 )
-
-#    # result.keys() -> list
-#     #result.values() -> list 
-
-#     return result
-
-# def crop_jpg(img, top_percent, bottom_percent, left_percent, right_percent):
-#     # Get the image height and width
-#     height, width = img.shape[:2]
-
-#     # Calculate the number of pixels to crop from the top, bottom, left and right
-#     top = int(height * (top_percent / 100))
-#     bottom = int(height * (bottom_percent / 100))
-#     left = int(width * (left_percent / 100))
-#     right = int(width * (right_percent / 100))
-
-#     # Crop the image
-#     img = img[top:-bottom, left:-right]
-
-#     return img
-
-
-# def callWeBotsRecognitionRoutine(camera):
-#     print('callRecognitionRoutine called')
-#     recObjs = camera.getRecognitionObjects()
-#     for obj in recObjs:
-#         print('Object detected: '+obj.getModel())
-
-
-    
-# def getRectangleCenter(x1,x2,y1,y2):
-#     return [ (x1 + x2) / 2, (y1 + y2) / 2 ]
-
-# def getRelativeCoords(imageWidth, imageHeight, pointX, pointY):
-#     return [pointX / imageWidth, pointY / imageHeight]
-
-# def edge_detection(img, blur_ksize=5, threshold1=100, threshold2=200):
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#     img_gaussian = cv2.GaussianBlur(gray, (blur_ksize, blur_ksize), 0)
-#     img_canny = cv2.Canny(img_gaussian, threshold1, threshold2)
-
-#     return img_canny
-
-
-
-
-if __name__=="__main__":
-    # imageAiTest()
-    print('DONE')
+    def getObjectsFromImage(self, image) -> list[dict[str,Any]]:
+        
+        detections = self.detector.detectObjectsFromImage(input_image=image, 
+                                                    output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
+                                                    nms_treshold = 0.05,
+                                                    objectness_treshold = 0.5,
+                                                    minimum_percentage_probability = MINIMUM_PERCENTAGE_PROBABILITY)
+        
+        return detections
 
 
 

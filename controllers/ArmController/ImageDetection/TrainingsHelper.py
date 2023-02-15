@@ -25,37 +25,17 @@ from scipy.ndimage import zoom
 from utils import logger
 
 warnings.filterwarnings("ignore", category=UserWarning) 
-
+# minimum probability threshold for an object to be detected
 MINIMUM_PERCENTAGE_PROBABILITY = 95
-
+# defining the categories of objects that can be detected
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
 
-class MyModel(logger):
-    def __init__(self, logging: str = 'D', logName: str = 'ImageAImodel'):
-        super().__init__(logging=logging, logName=logName)
-        
-        self.execution_path = os.path.dirname(__file__)
-        self.detector = CustomObjectDetection()
-        self.detector.setModelTypeAsYOLOv3()
-        self.modelPath = os.path.join(self.execution_path , "../Modelle/first/yolov3_DataSet_last.pt")
-        self.jsonPath = os.path.join(self.execution_path , "../Modelle/first/DataSet_yolov3_detection_config.json")
-        self.detector.setModelPath(self.modelPath) # path to custom trained model
-        self.detector.setJsonPath(self.jsonPath) # path to corresponding json
-        self.detector.loadModel()
 
-    def getObjectsFromImage(self, image) -> list[dict[str,Any]]:
-        
-        detections = self.detector.detectObjectsFromImage(input_image=image, 
-                                                    output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
-                                                    nms_treshold = 0.05,
-                                                    objectness_treshold = 0.5,
-                                                    minimum_percentage_probability = MINIMUM_PERCENTAGE_PROBABILITY)
-        
-        return detections
         
 
 
 def startTraining():
+    """ Function """
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
     model_path = os.path.join(execution_path , "Modelle/yolov3_DataSet_mAP-0.02411_epoch-10.pt")
