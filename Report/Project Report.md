@@ -103,38 +103,38 @@ Solution theory, implementations and documentation of the developed system are p
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
-      3. [Robot controller](#robot-controller)
-         1. [Robot Kinematics](#robot-kinematics)
-         2. [Gripper Actuation](#gripper-actuation)
-         3. [Movement coordination](#movement-coordination)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Training data](#training-data)
-         4. [Training](#training)
-         5. [Result](#result)
-      2. [Coordinate transformation](#coordinate-transformation)
-      3. [Robot arm](#robot-arm)
-         1. [Robot Movement](#robot-movement)
-         2. [Gripper](#gripper)
-         3. [Movement Routine](#movement-routine)
-      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-   5. [Results](#results)
-   6. [Outlook / Conclusion](#outlook--conclusion)
-5. [Sources](#sources)
-   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+      - [Transformation Matrix](#transformation-matrix)
+    - [Robot controller](#robot-controller)
+      - [Robot Kinematics](#robot-kinematics)
+      - [Gripper Actuation](#gripper-actuation)
+      - [Movement coordination](#movement-coordination)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+      - [First approach](#first-approach)
+      - [Second approach / Solution](#second-approach--solution)
+      - [Training data](#training-data)
+      - [Training](#training)
+      - [Result](#result)
+    - [Coordinate transformation](#coordinate-transformation)
+    - [Robot arm](#robot-arm)
+      - [Robot Movement](#robot-movement)
+      - [Gripper](#gripper)
+      - [Movement Routine](#movement-routine)
+    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+  - [Results](#results)
+  - [Outlook / Conclusion](#outlook--conclusion)
+- [Sources](#sources)
+  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -645,7 +645,7 @@ The effect is that the model is more likely to detect multiple bounding boxes fo
 
 Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
-The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the metric Intersection over Union (IoU), is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
+The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the "nms_threshold" parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the IoU, is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
 The results of the object detection process using The NMS algorithm with a threshold of 0.05 are presented in figure 6.
 
@@ -1007,14 +1007,14 @@ The first task was to detect the objects present in the environment using comput
 The results of the project are demonstrated by the before and after images shown below. The first image shows a cluttered table containing objects with randomized positions, while the second image shows the same table after the robot arm has organized the objects.
 
 <div class="center-div">
-  <img src="./workspace-cluttered.jpg" width = "80%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
+  <img src="./workspace-cluttered.jpg" width = "70%" class = "center-image" alt="Figure 8: Cluttered workspace at the start of the simulation" >
   <p class = "image-description">Figure 8: Cluttered workspace at the start of the simulation </p>
 </div>
 
 Figure 8 shows the starting configuration of the simulation. The objects are randomly positioned on the table and the robot controller prepares the task by moving the arm into starting position and calling the object detection routine.
 
 <div class="center-div">
-  <img src="./workplace-organized.jpg" width = "80%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
+  <img src="./workplace-organized.jpg" width = "70%" class = "center-image" alt="Figure 9: Organized workspace at the end of the routine" >
   <p class = "image-description">Figure 9: Organized workspace at the end of the routine </p>
 </div>
 
@@ -1023,34 +1023,40 @@ Figure 9 presents the organized workspace at the end of the simulation. The robo
 Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained through a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
 ## Outlook / Conclusion
 
+In this project a robot controller for a robot arm that can be used to organize a workspace was successfully developed. The milestones achieved in the development process included the successful implementation of computer vision techniques, the creation of a framework to automate the process of creating training data and robot arm as well as gripper movement routines.
 
-- what we discovered
+The framework created to automate the process of training data generation is transferable to other projects in webots and possibly real world applications, depending on the quality of the object animation, including the number of polygons and textures used. Further projects could incorporate this approach and utilize a more realistic object animation to train a model for a real world use case. 
+
+Despite the project successfully achieving its objectives, there is still room for improvement.
+The framework implemented to automate the process of training data generation should include more configurations to setup the environment. This includes the ability utilize different objects of the same class as well as the ability to use multiple objects of the same class in the same scene.
+Improving the training data, including using multiple models per type, and improving the training process to prevent overfitting are key areas for future development.
+
+In conclusion, our project has contributed to the field of robotics by demonstrating the feasibility of using a robot controller for a robot arm in real-world applications. While our project focused on the specific use case of tidying up a cluttered workspace, the potential applications of this technology are vast, and we look forward to seeing how this technology can be further developed and applied in the future.
+
+In conclusion, the project has been successfully completed and the objectives and requirements have been fulfilled. 
+
 - what we achieved
-  - successful
-  - 
-- milestones in development
-- 
-
+  -  milestones in development
+  
+- Obstacles we faced and what we discovered / learned 
+  
 - Robot controller can be used to in real world applications
   - flexibility regarding the organization/Enviroment setups
-  - 
-- same content as in presentation silde
+
+ - System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs 
 
 - Framework created to automate the process of creating training data 
   - Possibly transfarable to other projects
     - Depending on the quality of the object animation. (Proto files)
       - number of polygons
       - textures  
-
-- System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs
-
-- further use
-
+  
 - Room for improvement
   - improve data
     - only one model usedm per type
   - improve training
     - maybe overfitted
+
 
 <div style="page-break-after: always"></div>
 
