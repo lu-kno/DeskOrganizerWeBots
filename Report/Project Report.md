@@ -1019,35 +1019,10 @@ In this project a robot controller for a robot arm that can be used to organize 
 
 The framework created to automate the process of training data generation is transferable to other projects in webots and possibly real world applications, depending on the quality of the object animation, including the number of polygons and textures used. Further projects could incorporate this approach and utilize a more realistic object animation to train a model for a real world use case. 
 
-Despite the project successfully achieving its objectives, there is still room for improvement.
-The framework implemented to automate the process of training data generation should include more configurations to setup the environment. This includes the ability utilize different objects of the same class as well as the ability to use multiple objects of the same class in the same scene.
-Improving the training data, including using multiple models per type, and improving the training process to prevent overfitting are key areas for future development.
+Despite the project successfully achieving its objectives, there is still room for improvement. The framework implemented to automate the process of training data generation should include more configurations to set up the environment. This includes the ability to utilize different objects of the same class, as well as the ability to use multiple objects of the same class in the same scene. Improving the training data, by adding further configurations to the framework, and the training process to prevent overfitting, are key areas for future development.
 
-In conclusion, our project has contributed to the field of robotics by demonstrating the feasibility of using a robot controller for a robot arm in real-world applications. While our project focused on the specific use case of tidying up a cluttered workspace, the potential applications of this technology are vast, and we look forward to seeing how this technology can be further developed and applied in the future.
 
-In conclusion, the project has been successfully completed and the objectives and requirements have been fulfilled. 
 
-- what we achieved
-  -  milestones in development
-  
-- Obstacles we faced and what we discovered / learned 
-  
-- Robot controller can be used to in real world applications
-  - flexibility regarding the organization/Enviroment setups
-
- - System able to be applied in other use cases by simulating the env first and then configuring the robot arm to fit the needs 
-
-- Framework created to automate the process of creating training data 
-  - Possibly transfarable to other projects
-    - Depending on the quality of the object animation. (Proto files)
-      - number of polygons
-      - textures  
-  
-- Room for improvement
-  - improve data
-    - only one model usedm per type
-  - improve training
-    - maybe overfitted
 
 
 <div style="page-break-after: always"></div>
