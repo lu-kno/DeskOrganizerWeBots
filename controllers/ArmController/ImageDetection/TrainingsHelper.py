@@ -1,41 +1,22 @@
-
-# from __future__ import annotations
-
-import ctypes
 import json
-import math
 import os
 import random
-import typing
-import warnings
-from pathlib import Path
-from pprint import pprint
-from typing import Any, Callable, Iterable, List, Literal, Optional, Union
-
-import cv2
+from typing import Any
 import matplotlib
-import numpy as np
-from imageai.Detection import ObjectDetection
 from imageai.Detection.Custom import (CustomObjectDetection,
                                       DetectionModelTrainer)
-from matplotlib import pyplot as plt
 matplotlib.use('TKAgg')
-
-from scipy.ndimage import zoom
-from utils import logger
-
-warnings.filterwarnings("ignore", category=UserWarning) 
 # minimum probability threshold for an object to be detected
 MINIMUM_PERCENTAGE_PROBABILITY = 95
 # defining the categories of objects that can be detected
 categories = ['apple', 'orange','can','computer_mouse','hammer','beer_bottle','Cylinder','Cube']
-
-
-        
-
+# defining global variables for training data genration process
+lastViewPointPos = 0
+count = 0
+currentNode = 0
 
 def startTraining():
-    """ Function """
+    """ Function to initiate the training process """
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
     model_path = os.path.join(execution_path , "Modelle/yolov3_DataSet_mAP-0.02411_epoch-10.pt")
@@ -47,6 +28,7 @@ def startTraining():
     trainer.trainModel()
 
 def testModel():
+    """ Function to test the model """
     execution_path = os.path.dirname(__file__)
     detector = CustomObjectDetection()
     detector.setModelTypeAsYOLOv3()
@@ -63,6 +45,14 @@ def testModel():
         print(detection["name"], " : ", detection["percentage_probability"], " : ", detection["box_points"])
 
 def createClassFiles(classes):
+    """ 
+    Function to generate the class files in the train and annotation directories.
+    The class files specify which objects can be detected.
+
+    Parameters:
+    classes (list of str): A list of strings specifying the objects that can be detected.
+
+    """
     execution_path = os.path.dirname(__file__)
     annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/classes.txt")
     annotationPathValidation = os.path.join(execution_path , "DataSet/validation/annotations/classes.txt")
@@ -74,15 +64,43 @@ def createClassFiles(classes):
             file.write(obj+"\n")
 
 def makeSnapshot(camera,type='train'):
+    """
+    Takes a snapshot of the current scene captured by the provided camera, and saves it along with the corresponding 
+    annotation files in the specified directory. The annotation files are created using the `createTrainingFiles()`
+    method.
+
+    Parameters:
+    camera (Camera): An instance of the `Camera` class that captures the current scene.
+    type (str): (optional) A string that specifies the type of snapshot to be created. Possible values are 'train' and 'test'. 
+        Defaults to 'train'.
+
+    Returns:
+    None
+    """
     print('Create training image and corresponding files in mode: '+type)
     recObjs = camera.getRecognitionObjects()
     createTrainingFiles(recObjs,camera,type)
 
 
 def createTrainingFiles(recognizedObjectes,camera,type):
+    """
+    Creates annotation files in YOLO format and a JSON file with corresponding `rawData` for each detected object in the image.
+    The data is obtained using the object detection provided in Webots.
+
+    Parameters:
+    recognizedObjects (list): A list of `RecognitionObject` instances that were detected in the current scene.
+    camera (Camera): An instance of the `Camera` class that captured the current scene.
+    type (str): A string that specifies the type of snapshot for which the annotation files are being created. 
+        Possible values are 'train' and 'validation'.
+
+    Returns:
+    None
+    """
     fileNamePostfix = 1
     imageWidth = camera.getWidth()
     imageHeight = camera.getHeight()
+
+    # init directories
     execution_path = os.path.dirname(__file__)
     if(type=='validation'):
         dir = 'validation'
@@ -91,14 +109,15 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     annotationPath = os.path.join(execution_path , "DataSet", dir, "annotations/")
     jsonPath = os.path.join(execution_path , "DataSet", dir, "raw_data/")
     imagePath = os.path.join(execution_path , "DataSet", dir, "images/")
+    # create directories if needed
     if not os.path.exists(annotationPath):
         os.makedirs(annotationPath)
     if not os.path.exists(jsonPath):
         os.makedirs(jsonPath)
     if not os.path.exists(imagePath):
         os.makedirs(imagePath)
+
     # get current fileName
-    
     while True:
         filename = f"image_{fileNamePostfix}.txt"
         filepath = os.path.join(annotationPath, filename)
@@ -106,8 +125,10 @@ def createTrainingFiles(recognizedObjectes,camera,type):
             break
         fileNamePostfix += 1
     fileName = f"image_{fileNamePostfix}"
+
     jsonData = []
     yoloData = []
+    # Iterate recognized objects and create annotation files
     for obj in recognizedObjectes:
         id = obj.getId()
         name = obj.getModel()
@@ -120,7 +141,9 @@ def createTrainingFiles(recognizedObjectes,camera,type):
         sizeOnImage = list(obj.getSizeOnImage())
         relativeSize = [sizeOnImage[0]/imageWidth, sizeOnImage[1]/imageHeight]
         relativePosition = [positionOnImage[0]/imageWidth, positionOnImage[1]/imageHeight]
+        # prepare yolo data
         yoloData.append(f"{categories.index(name)} {relativePosition[0]} {relativePosition[1]} {relativeSize[0]} {relativeSize[1]}\n")
+        #prepare json data
         jsonData.append({
             "id": id,
             "name": name,
@@ -132,7 +155,7 @@ def createTrainingFiles(recognizedObjectes,camera,type):
             "relativeSize": relativeSize,
             "relativePosition": relativePosition
         })
-
+    # save files
     camera.saveImage(imagePath+fileName+".jpg",100)
     with open(jsonPath+fileName+".json", 'w') as file:
         json.dump(jsonData, file, indent=4)   
@@ -141,6 +164,16 @@ def createTrainingFiles(recognizedObjectes,camera,type):
     print('File: '+fileName+' created')
 
 def moveTableNodes(master,table):
+    """
+    Randomizes the position and orientation of objects on the table by selecting a random location and rotation for each object.
+
+    Parameters:
+    master (Supervisor): The Webots Supervisor object that controls the simulation.
+    table (Node): The Webots Node object for the table that the objects will be placed on.
+
+    Returns:
+    None
+    """
     print('Randomize objects position and rotation on table')
     margin = 0.1
     bottomLeft = table.local2world([0,1,0])
@@ -161,24 +194,21 @@ def moveTableNodes(master,table):
         yRotation = random.uniform(1, 360)
         zRotation = random.uniform(1, 360)
         angle = random.uniform(1, 360)
-        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])
-    
-    # master.sleep(2)
-    
-    # for cat in categories:
-    #     obj = master.supervisor.getFromDef(cat)
-    #     obj.getField('linearVelocity').setSFVec3f([0,0,0])
-    #     obj.getField('angularVelocity').setSFVec3f([0,0,0])
-    #     self.log(f"{cat} linearVelocity: {obj.getField('linearVelocity').setSFVec3f([0,0,0])}")
-    #     self.log(f"{cat} angularVelocity: {obj.getField('angularVelocity').setSFVec3f([0,0,0])}")
-    
+        obj.getField('rotation').setSFRotation([xRotation,yRotation,zRotation,angle])      
 
-        
 
-lastViewPointPos = 0
-count = 0
-currentNode = 0
 def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
+    """
+    Controls the simulation for generating images of a single object from various viewpoints.
+
+    Parameters:
+    supervisor (Supervisor): The Webots Supervisor object that controls the simulation.
+    table (Node): The Webots Node object for the table that the objects will be placed on.
+    imagesPerViewpoint (int): The number of images to generate per viewpoint.
+
+    Returns:
+    None
+    """
     global count, currentNode, lastViewPointPos
     amountViewpoints = 4
     # init Viewpoint pos for first run
@@ -193,21 +223,22 @@ def single_objectImage_setup(supervisor,table,imagesPerViewpoint):
     if((count % (imagesPerViewpoint*amountViewpoints))==0):
         currentNode = (currentNode+1) % len(categories)
         swapObj(currentNode,table,supervisor)
-
+    # call spinTableNode to randomize the orientation of the object each call
     spinTableNode(supervisor,table,currentNode)
     count += 1
     
 def moveViewPoint(supervisor,index):
-    print(f'moveViewPoint with index: {index} called')
-    positionsOld = [[1.1844, -0.101363, 1.13083],
-                    [1.50827,-0.565378,1.0785],
-                    [1.8847,-0.0885509,1.08804],
-                    [1.48313,0.243925,1.06886]]
-    orientationsOld = [[0.0315591,0.999032,0.0306494,0.832904],
-                    [-0.264641,0.28607,0.920939,1.6946],
-                    [-0.358425,0.00291554,0.933554,3.21961],
-                    [0.327652,0.330169,-0.88523,1.57763]]
+    """
+    Moves the viewpoint in the simulation to a specified position and orientation.
 
+    Parameters:
+    supervisor (Supervisor): The Webots Supervisor object that controls the simulation.
+    index (int): The index of the viewpoint to move to. Must be between 0 and 3, inclusive.
+
+    Returns:
+    None
+    """
+    print(f'moveViewPoint with index: {index} called')
     positions = [[1.02803, -0.117245, 1.67074],
                     [1.53629,-0.679258,1.98548],
                     [2.17341,-0.04583,2.05814],
@@ -226,6 +257,17 @@ def moveViewPoint(supervisor,index):
   
 
 def swapObj(index,table,supervisor):
+    """
+    Swaps the current object with a new object from the `categories` list at the specified index, and positions the new object at the center of the table.
+
+    Parameters:
+    index (int): The index of the new object to be placed on the table.
+    table (Node): The Webots Node object for the table that the objects will be placed on.
+    supervisor (Supervisor): The Webots Supervisor object that controls the simulation.
+
+    Returns:
+    None
+    """
     print(f'swapObj with index: {index} called')
     baseX = -0.115024
     baseY = -2.20312
@@ -253,6 +295,17 @@ def spinTableNode(supervisor,table,index):
     obj.getField('translation').setSFVec3f([x, y, z])
 
 def compare_directories(path1, path2):
+    """Compare the content of two directories and check which files are only present in one of them, to 
+    ensure that each image file has a corresponding annotation file. If the simulation is interrupted during the training data 
+    generation process, this function can be used to verify the integrity of the dataset.
+
+    Parameters:
+    - path1 (str): A string representing the path to the first directory to compare.
+    - path2 (str): A string representing the path to the second directory to compare.
+
+    Returns:
+    - bool: True if the directories have the same content, False otherwise.
+    """
     files1 = []
     for file in os.listdir(path1):
         if file != "classes":
@@ -279,6 +332,11 @@ def compare_directories(path1, path2):
         return False
 
 def dataSetIntegrityTest():
+    """
+    Tests the integrity of a dataset by comparing the contents of two directories.
+    The function prints the results of the comparison to the console.
+
+    """
     execution_path = os.path.dirname(__file__)
     annotationPathTrain = os.path.join(execution_path , "DataSet/train/annotations/")
     imagePathTrain = os.path.join(execution_path , "DataSet/train/images/")
@@ -287,8 +345,9 @@ def dataSetIntegrityTest():
     print(f"Trainings folder integrity: {compare_directories(annotationPathTrain,imagePathTrain)}")
     print(f"Validation folder integrity: {compare_directories(annotationPathValidation,imagePathValidation)}")
 
+# If statement to use the script via console rather than simulation
 if __name__=="__main__":
     #testModel()
-    startTraining()
+    #startTraining()
     #dataSetIntegrityTest()
     print('DONE')
