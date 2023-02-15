@@ -75,33 +75,29 @@ Movement directions make sense when "standing" in front of the robot
 
 
 ## Report To Do
-  - [ ] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
-    - [ ] include webots version and python version used
-    - [ ] Mention video directory in repo to present results
-  
-  - [ ] find solution for model download (maybe use git lfs) 
-      - [ ] remove object detection model from git ignore and push it to github
+- [ ] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
+  - [x] include webots version and python version used
+  - [ ] Mention video directory in repo to present results
 
-  - [ ] provide new requirements.txt
+- [ ] find solution for model download (maybe use git lfs) 
+    - [ ] remove object detection model from git ignore and push it to github
 
-  - [ ] make sure that the git repo is publicly accessible
-  
-  - [ ] export final pdf (attempt in latex)- [DeskOrganizerWeBots](#deskorganizerwebots)
-  - [Movement](#movement)
-  - [To Do](#to-do)
-  - [Report To Do](#report-to-do)
-  - [used to avoid tracking of some world files](#used-to-avoid-tracking-of-some-world-files)
-  - [sources](#sources)
+- [ ] provide new requirements.txt
 
-  - [ ] complete source code comments and docstrings
-  - [ ] fix indexing of table of contents in pdf
-  - [ ] (optional) config.yaml file to change global flags and maybe set parameters
+- [ ] make sure that the git repo is publicly accessible
 
-  - [X] write abstract 
-  - [x] record video of robot in action (already recorded by Lu)
+- [ ] export final pdf (attempt in latex)-
 
-  - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
-  - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
+- [ ] complete source code comments and docstrings
+- [x] fix indexing of table of contents in pdf
+- [ ] (optional) config.yaml file to change global flags and maybe set parameters
+
+- [X] write abstract 
+- [x] record video of robot in action (already recorded by Lu)
+
+- [ ] implement functionality START_WITH_RANDOMIZED_TABLE
+- [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
+
 Lu:
 
 - [ ] add code snippets

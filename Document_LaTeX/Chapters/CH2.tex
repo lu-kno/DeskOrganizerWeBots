@@ -166,7 +166,7 @@ This process called inverse kinematics (IK), for which different methods can be 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.5\textwidth]{Figures/fk_vs_ik.png}
-    \caption{Forward and inverse kinematics}
+    \caption{Forward and inverse kinematics shown with the green and red arrows respectively.}
     \label{fig:fkik}
 \end{figure}
 
@@ -183,11 +183,32 @@ A different approach that aims to improve the contact area of the gripper, is po
 
 The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
 
+% \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{Figures/red_color.jpg}
+%     \caption{From left to rigth: Gripper in open, closed claw, and closed flat positions.}
+%     \label{fig:gripper_states}
+% \end{figure}
+
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=0.5\textwidth]{Figures/red_color.jpg}
-    \caption{From left to rigth: Gripper in open, closed claw, and closed flat positions.}
-    \label{fig:gripper_states}
+    \begin{subfigure}[b]{0.5\textwidth}
+        \adjincludegraphics[width=\textwidth]{Figures/grip_open.png}   
+        \caption{Open Grip}
+    \end{subfigure}\\\vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.4\textwidth}
+        \adjincludegraphics[width=\textwidth]{Figures/grip_claw.png}        
+        \caption{Claw Grip}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \adjincludegraphics[width=\textwidth]{Figures/grip_flat.png}        
+        \caption{Flat Grip}
+    \end{subfigure}\\\vspace{0.5cm}
+
+    \caption{Comparison between the open (resting) position of the gripper with the closed claw and flat grip methods.}
+    \label{fig:grip_states}
 \end{figure}
 
 \subsection{Movement coordination}
@@ -196,22 +217,29 @@ The main loop of actions that need to be taken to complete the task of organizin
 
 The process starts by moving the robot to a HOME position where it wont interfere with the camera's view of the desk. A picture is taken and any objects present are detected. If objects were detected, the robot iterates through the found objects, picking them up and placing them on the a second table on their corresponding position, until all the detected objects have been moved. The robot then moves back to the HOME position. If no object is detected, no movement of the robot takes place. This process is repeated until the user decides to stop the simulation.
 
-\begin{lstlisting}[]%language=plantuml
-@startuml
-:**Simulation Start**;
-repeat :Move Robot to HOME Position;
-    repeat :Take Picture;
-        :Perform Object Detection;
-    repeat while (objects found?) is (no) not (yes)
+% \begin{lstlisting}[]%language=plantuml
+% @startuml
+% :**Simulation Start**;
+% repeat :Move Robot to HOME Position;
+%     repeat :Take Picture;
+%         :Perform Object Detection;
+%     repeat while (objects found?) is (no) not (yes)
 
-    repeat :Coordinate Transformation;
-        :Move object;
-        :Remove from found objects;
-    repeat while (more objects?) is (yes)
-repeat while (Keep Watching?) is (yes)
-:stop;
-@enduml
-\end{lstlisting}
+%     repeat :Coordinate Transformation;
+%         :Move object;
+%         :Remove from found objects;
+%     repeat while (more objects?) is (yes)
+% repeat while (Keep Watching?) is (yes)
+% :stop;
+% @enduml
+% \end{lstlisting}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/sim_loop.png}
+    \caption{Flowchart of the main loop of actions}
+    \label{fig:flowchart}
+\end{figure}
 
 \textcolor{orange}{
 . moves to pick up the object and places  
