@@ -13,11 +13,11 @@
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Object detection results self trained model \relax }}{23}{figure.caption.141}%
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Object detection results self trained model \relax }}{24}{figure.caption.142}%
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Steps do determine the orientation of an object \relax }}{27}{figure.caption.194}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Inverse Kinematic algorithm for the simplified kinematic chain.\relax }}{31}{figure.caption.223}%
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Gripper closing through can and getting an object stuck between its fingers.\relax }}{34}{figure.caption.269}%
-\contentsline {figure}{\numberline {3.9}{\ignorespaces behaviourof the gripper when attempting to grab an object with feedback force detection disabled.\relax }}{35}{figure.caption.270}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Coordinate systems of the table and the image\relax }}{28}{figure.caption.221}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Inverse Kinematic algorithm for the simplified kinematic chain.\relax }}{31}{figure.caption.224}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Behaviour of the gripper when attempting to grab an object with feedback force detection disabled.\relax }}{34}{figure.caption.270}%
 \contentsline {figure}{\numberline {3.10}{\ignorespaces Pick and place implementation\relax }}{39}{figure.caption.353}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Cluttered workspace at the start of the simulation \relax }}{42}{figure.caption.355}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Organized workspace at the end of the routine \relax }}{43}{figure.caption.356}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Cluttered workspace at the start of the simulation \relax }}{41}{figure.caption.355}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Organized workspace at the end of the routine \relax }}{42}{figure.caption.356}%
 \addvspace {10\p@ }
