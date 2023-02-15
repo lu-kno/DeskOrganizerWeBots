@@ -85,14 +85,14 @@ Movement directions make sense when "standing" in front of the robot
   
   - [ ] make sure that the git repo is publicly accessible
   
-  - [ ] fix First page
-    - [ ] matrikelnumbers
-    - [ ] logo of th koeln instead of kepten and 
+  - [x] fix First page
+    - [x] matrikelnumbers
+    - [x] logo of th koeln instead of kepten and 
   
-  - [ ] provide new requirements.txt
+  - [x] provide new requirements.txt
   
-  - [ ] remove references for latex
-  - [ ] fix references in pdf (example at chapter 3.1.2) 
+  - [x] remove references for latex
+  - [x] fix references in pdf (example at chapter 3.1.2) 
   - [x] Add sources section
   - [x] Add table of illustrations
   - [x] fix indexing of table of contents in pdf
