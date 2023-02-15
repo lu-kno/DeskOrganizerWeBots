@@ -6,14 +6,14 @@
 
 This chapter addresses the solution concepts for the problems that needed to be solved in order to realize the project and is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control. 
  
-\subsection{Object detection}
+\section{Object detection}
 The first component of the project is the object detection. Its purpose is to detect objects in the workspace and determine their relative coordinates and size in the image as well as their orientation in relation to the table. 
 
 To simplify these problems, we decided to use a top-down view of the workspace. This means that the camera is positioned above the workspace, so that a linear correlation between the image and the table coordinates emerges. At the early stages of project development the training of a custom object detection model was not intended and it was planned to utilize an existing model. The YOLOv3 model, a convolutional neural network that is trained to detect objects in images, was selected due to its wide array of object classes and its high performance.
 
 To detect the orientation of an object relative to the table, we decided to use OpenCV, a python library used in computer vision applications which provides a broad array of functions for image processing. The main idea was to determine the contours of the object by converting the image into the HSV color space and applying different filter. The contours are then used to calculate the main orientation of the object, using principle component analysis. 
 
-\subsection{Coordinates transformation}
+\section{Coordinates transformation}
 
 Once the objects are detected, the next step is to determine their coordinates in the simulation. 
 
@@ -25,7 +25,7 @@ the next step is to transform the objects position vector from the image's coord
 
 % <!-- the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used. -->
 
-\subsubsection{Transformation Matrix}
+\subsection{Transformation Matrix}
 
 Assuming a current coordinate system $\mathbf{A}$ and a target coordinate system $\mathbf{B}$, the transformation matrix $\mathbf{T}$ can be used to transform a vector $\vec{v}$ from $\mathbf{A}$ to $\mathbf{B}$.
 A transformation matrix can be represented as a matrix frame, built from a combination of a rotation matrix, a translation vector, a scaling vector and a perspective projection matrix.
@@ -128,7 +128,7 @@ $$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
 % where \(width\), \(height\), and \(depth\) are the dimensions of the table in the simulation. -->
 
-\subsection{Robot controller}
+\section{Robot controller}
 
 The robot controller is the main program where the behaviour of the robot is defined. It is responsible for the different actions that take place in the simulation. By marking the crobot as a supervisor in webots, it can access and modify the properties of other elements in the scene and the environment. 
 
@@ -157,7 +157,7 @@ The main tasks of the robot controller are the following:
 % \end{itemize}  
 % These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location. -->
 
-\subsubsection{Robot Kinematics}
+\subsection{Robot Kinematics}
 
 
 The Robot chosen for this task consists of a robotic arm with a gripper attached to the end of the arm. The robot by itself can be represented as a kinematic chain with 6 joints, resulting in 6 degrees of freedom.
@@ -175,7 +175,7 @@ The numerical methods are based on the use of iterative algorithms, which can be
 \textcolor{red}{Insert image showing forward and inverse kinematics from Folien} % end red
 
 
-\subsubsection{Gripper Actuation}
+\subsection{Gripper Actuation}
 
 The gripper consists of three individual fingers, each of them having three joints. The closing action of the finger is achieved by rotating the first joint of each finger until the desired object is grabed or the maximum joint rotation is reached. This alone creates a claw like grip, since all finger sections rotate with the first joint relative to the global coordinates. While useful in some cases, its contact area with the object being grabbed is significantly reduced.
 
@@ -186,7 +186,7 @@ The following figure shows the gripper in the open and closed position using the
 \textcolor{red}{insert figure of gripper open, closed claw and closed flat} % end red
 
 
-\subsubsection{Movement coordination}
+\subsection{Movement coordination}
 
 The main loop of actions that need to be taken to complete the task of organizing the desk can be defined as seen in figure ASD. 
 

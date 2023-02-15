@@ -5,9 +5,9 @@
 
 
 In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
-\subsection{Object detection}
+\section{Object detection}
 
-\subsubsection{First approach}
+\subsection{First approach}
 The first approach to solve the problem of object detection was to use the YOLOv3 model. The model was trained on the COCO dataset, which contains 80 different object classes. During the early stages of development we setup a test scenario in Webots, where we placed various objects in the workspace and used the YOLOv3 model to detect the objects. 
 
 \Vref{fig:object_detection_results} shows the results of the object detection using the YOLOv3 model. The following objects on the workspace are included in the COCO dataset and should therefore be detectable by the model: computer mouse, apple, beer can and orange. The camera perspective in this test scenario was similar to the perspective in the final project setup.  
@@ -22,13 +22,13 @@ The first approach to solve the problem of object detection was to use the YOLOv
 
 The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed.
 
-\subsubsection{Second approach}
+\subsection{Second approach}
 
 The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]
 
 In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [2] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
-\subsubsection{Training data }
+\subsection{Training data }
 
 The first step to train a custom model is to gather and arrange the training data in the YOLO annotation format. In this format the data is divided into two main directories: "train" and "validation". Each of these directories contains two sub-directories: "images" and "annotations". It's recommended to use 80% of the data for training and 20% for validation. The data consists of both images of objects we want to detect and accompanying annotation files. Each image is linked with a corresponding annotation file that shares the same name as the image file and provides information about the objects in the image. The general structure of the object annotation is shown below. 
 
@@ -187,7 +187,7 @@ def singleObjectImageLoop(self,imagesPerPerspective,type):
 
 This loop operates in a similar fashion to the first configuration, alternately executing the \(single_object_setup\) and \(makeSnapshot\) functions with a set time delay. The termination criteria for this loop has been revised to ensure that the number of iterations is equal to the product of the amount of images per perspective, the number of perspectives, and the number of objects. In this configuration, we generated 256 training images and 64 validation images per object, capturing diverse orientations of the object from 4 different viewpoints.
 
-\subsubsection{Training }
+\subsection{Training }
 
 A total of 1456 images were generated for training and 384 images for validation. The training was performed using the ImageAI library, which provides a pre-trained YOLOv3 model that was used as a starting point for transfer learning. The following code segments presents the implementation of the training function, using the ImageAI library. 
 
@@ -208,7 +208,7 @@ The function sets up the data directory, model path, and configuration for the t
 The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
 
 
-\subsubsection{Result }
+\subsection{Result }
 
 The results of the training after the 100th iteration are presented below.
 
@@ -246,7 +246,7 @@ The test results indicate that the model has a satisfactory level of performance
 
 To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
 
-\subsection{Orientation of the object}
+\section{Orientation of the object}
 
 To determine the angle of an object relative to the table, the cv2 library was utilized. The approach relies on Principle Component Analysis (PCA) to determine the primary orientation of the object's contours. The function used to prepare the image for the orientation analysis is presented below.
 
@@ -320,7 +320,7 @@ The annotations below the images correspond to the respective steps in the "getA
 
 The first image corresponds to the original cropped section containing the object of interest. The second image displays the result obtained by performing a conversion to the HSV color space. This was performed to improve the distinction of edges between areas with different hues. Applying the Canny algorithm to this produces the third image as a result. The fourth image shows the area obtained by selecting all the pixels not encased by the detected edges. Applying a gaussian blur to this results in smoother edges as can be seen in the fifth image. Performing a second pass of the Canny algorithm results in what can be seen in the sixth image. Lastly, the seventh image shows the original cropped section of the object with an overlay displaying the direction of the eigenvectors, which determines the rotation of the object in relation to the fixed coordinate system of the image.
 
-\subsection{Coordinate transformation}
+\section{Coordinate transformation}
 
 With relative position of the objects within the image, this position vectors need to be transformed to the world coordinate system to know their position in the simulation relative to the robot. 
 This task was achieved by creating and combining two transformation matrices. The general procedure was implemented as follows:
@@ -413,7 +413,7 @@ $$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}
 } %end orange
 
 
-\subsection{Robot arm}
+\section{Robot arm}
 
 \textcolor{orange}{
 \begin{itemize}
@@ -422,7 +422,7 @@ $$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}
 } %end orange
 
 
-\subsubsection{Robot Movement}
+\subsection{Robot Movement}
 
 For the current implementation of the robot controller, some key decisions were made with the goal of preventing collisions with other objects in the scene during the robot's movement and increasing the predictability of the robot's behaviour:
 
@@ -588,7 +588,7 @@ def moveTo(self, pos, rotation: float|None = None):
 \end{lstlisting}
 
 
-\subsubsection{Gripper}
+\subsection{Gripper}
 
 The gripper consists of three fingers, two of which are on one side and the third being on the oppossite side. similarly to the robot arm, the gripper is controlled by setting the position of the individual motors. Since all the fingers have the same geometry, the same procedure can be used for all of them. 
 
@@ -641,7 +641,7 @@ The \(@looper\) decorator is used to call the function repeatedly each time it f
 } %end orange
 
 
-\subsubsection{Movement Routine}
+\subsection{Movement Routine}
 
 The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function \(moveTo\), directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the \(imageScan\) module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
 
