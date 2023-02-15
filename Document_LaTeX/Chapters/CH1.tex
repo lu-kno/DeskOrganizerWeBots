@@ -1,0 +1,34 @@
+\chapter{Introduction} % 
+\label{CH1} % \ref{CHX}
+The purpose of this project is to address the problem of an cluttered work space.
+The solution we developed is a robotic arm that is designed to clean up and organize the work area. 
+In this report we will document and discuss the development process of the project. 
+
+The report is comprised of three sections. The first part provides a general introduction to the Project, where the project idea as well as technology used will be addressed. The main section of this report is divided into two chapters: "Solution theory" and "Implementation".
+The "Solution Theory" chapter addresses the problems that needed to be solved in order to realize the project and the corresponding theoretical solutions for these problems. 
+The "Implementation" chapter provides detailed explanations of how the solutions were actually implemented and draws a comparison between the theoretical solution and the actual implementation. Finally, the last part of the report focuses on the project results and provides a conclusion, evaluating whether we have achieved our project goals and discussing further improvements for the project as well as learning outcomes. 
+
+\section{Project Description}
+
+The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
+
+\begin{itemize}
+    \item prove of concept for varios real world application
+    \item Solution transferable to other use cases
+\end{itemize}
+
+
+In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications. Git was used to manage the project and to facilitate collaboration between the team members.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \adjincludegraphics[width=0.7\textwidth]{Figures/project2.png}
+    \caption{Figure 1: Project setup in Webots }
+    %\label{fig:figure}
+\end{figure}
+
+Figure one shows the project setup in Webots. A camera is used to detect objects in the workspace. The robot-arm is equipped with a gripper that can be utilized to grasp objects. The robot and its devices are controlled by a controller that is responsible for detecting objects, determining the robot's movement, and controlling the gripper. The entire system is self contained and doesn't require human interaction, other devices or an active web connection.
+
+The system was developed by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. 
+

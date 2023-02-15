@@ -1,0 +1,10 @@
+%\begin{tabular}{r l}
+V\_ARC\_MAX	 & Maximum Arc Voltage\\ 
+V\_ARC\_MEAN	 & Mean Arc Voltage\\  
+V\_ARC\_T	     & Arc Duration\\ 
+V\_SC\_MIN	 & Instant Short Circuit Voltage\\ 
+V\_SC\_MEAN	 & Mean Short Circuit Voltage\\ 
+V\_SC\_T	     & Short Circuit Duration\\ 
+V\_P\_T	     & Bead Deposition Duration\\ 
+V\_P\_MEAN	 & Mean Voltage During Deposition Period\\ 
+%\end{tabular}

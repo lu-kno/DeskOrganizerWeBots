@@ -1,0 +1,182 @@
+
+\chapter{Conclusions} % Main chapter title
+
+\label{conclusions} % \ref{CHX}
+
+
+In this project a robot controller for a robot arm that can be used to organize a workspace was successfully developed. The milestones achieved in the development process included the successful implementation of computer vision techniques, the creation of a framework to automate the process of creating training data and robot arm as well as gripper movement routines.
+
+The framework created to automate the process of training data generation is transferable to other projects in webots and possibly real world applications, depending on the quality of the object models, including their polygon density and texture resolution. Further projects could incorporate this approach and utilize a more realistic object animation to train a model for a real world use case. 
+
+The robot controller as implemented in this project has the potential of being used in real world applications due to its simplicity and deterministic nature, increased safety due to the predictability of its movements and the ability of the inverse kinematics implementation to allow for a deterministic computation time in time critical scenarios.
+
+Despite the project successfully achieving its objectives, there is still room for improvement. The framework implemented to automate the process of training data generation should include more configurations to set up the environment. This includes the ability to utilize different objects of the same class, as well as the ability to use multiple objects of the same class in the same scene. Improving the training data, by adding further configurations to the framework, and the training process to prevent overfitting, are key areas for future development.
+
+One aspect of the robot's movement implementation that could be considered a significant limitation in some applications is the inability to grab and position objects from different orientations. If for example the robot arm was to be used to pick up objects from a shelf, it would be necessary to be able to grab objects from the front. While this adaptation could be easily made, having to consider objects in a shelf and a table might prove to be more challenging. 
+Another aspect that could be improved is the movement of the gripper's fingers, which has its fingertips moving in a bow shape when being opened or closed. This leads to them not being able to grasp thin flat objects from the surface, like a ruler or a knife for example. This could be improved by making use of the second joint of the fingers in order to compensate for the displacement of the fingertips in the `z` axis.
+
+
+\chapter{References for \LaTeX} % Main chapter title
+\section{Result overview}
+    
+contamination.  The electrode takes the form of a rod or stick, leading to this process also being known as stick welding.
+
+gas like \(CO_2\) is used or mixed in. 
+
+    
+\begin{figure}[!htbp]
+    \centering
+    \adjincludegraphics[width=0.7\textwidth,
+    trim={0 {.11\height} 0 0},
+    clip]{Figures/logo-thk.jpg}
+    \caption{Diagram of the GMAW Method showing the electrode, the welding torch and the area around it protecting the welding site from atmospheric contamination by the shielding gas. }
+    \label{fig:gmaw_nozzle}
+\end{figure}
+    
+
+
+List:
+
+
+\begin{itemize}
+    \item Cracks
+    \item Cavities
+    \item Solid Inclusions
+    \item Lack of fusion and penetration
+    \item Imperfect shape and dimension
+    \item Miscellaneous imperfections
+\end{itemize}
+
+
+
+\HRule\\
+
+    
+\begin{equation}
+    \mathbf{X} = \left\lbrace \mathbf{x}^t,\mathbf{r}^t \right\rbrace_{t=1}^N\
+    \label{eq:dataset}
+\end{equation}
+
+\begin{conditions}
+    \mathbf{X} & training set\\
+    \mathbf{x}^t & input variables for sample \(t\) \\
+    \mathbf{r}^t & output (result) for sample \(t\) \\
+    t & sample number\\
+\end{conditions}
+
+        The main hyperparameters are the following:
+        \begin{description}
+            \item[\textit{Max. tree depth}] The largest amount of consecutive decision nodes in a branch before creating a leaf node.
+            \item[\textit{Min. samples for each split}] The minimal amount of samples from the training set that need to reach a node before producing a split into separate branches.
+            \item[\textit{Min. samples for each leaf}] The minimal amount of samples from the training set that need to reach each leaf node following a split by a decision node.
+        \end{description}
+        
+
+    
+        \begin{figure}[!htbp]
+            \centering
+    
+            \adjincludegraphics[width=0.7\textwidth,
+                            trim={{.2\width} {.11\height} 0 0},
+                            clip]{Figures/logo-thk.jpg}
+            \caption{Nozzle offset specified in SEP 1220 }
+            \label{fig:nozzle_position}
+        \end{figure}
+    
+    
+        \begin{table}
+            \begin{tabular}{l|l}
+                    \showrowcolors
+                    % \hline
+                    Type of shielding gas & M21 (18 \% \(CO_2\))\\
+                    % \hline
+                    Shielding gas rate \(V_G\) & 12 l/min\\
+                    % \hline
+                    Welding filler material, \(d _D = 1,0 mm \) &  \makecell[tp{0.5\textwidth}]{
+                        G42 3 M G3Si1 (\(R_m \leq 500 MPa\))\\
+                        G46 4 M G4Si1 (\(R_m > 500 MPa\))
+                    }\\
+                %    \hline
+                    Stick-out [mm] &    10x Wire diameter\\
+                    % \hline
+                    Welding speed \(v_s\) & 0,5 m/min\\
+                    % \bottomrule
+                    \hiderowcolors
+            \end{tabular}
+            \caption{Welding Parameters according to  SEP-1220. }
+            \label{tab:guideline_parameters_table}
+        \end{table}
+    
+    
+    
+        
+        
+    
+        
+
+    
+\begin{figure}[!htbp]
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{Figures/logo-thk.jpg}
+        \caption{Processed radiographic image with colored ROI and pores.}
+    \end{subfigure}\\
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{Figures/logo-thk.jpg}
+        \caption{Extracted ROI and detected pores through separation of the color channels of the processed radiographic image.}
+    \end{subfigure}
+    \caption{Extraction of porosity information from analyzed radiographic image.}
+    \label{fig:pore_extraction}
+\end{figure}
+
+
+
+    This allows the arc ignition times to be detected through the intersections between the voltage signal \(V(t)\) and its Gaussian filtered form \(V_f(t)\) with a positive slope, as well as the short-circuit start at the intersections with a negative slope. (\Vref{eq:dataset})% forming the arc\_start and shortc\_start sets respectively
+
+    \begin{align}
+        V_f(t)&=G(V(t))\label{eq:v_gauss_filter}\\
+        V_{diff}(t)&=V(t)-V_f(t)\label{eq:v_diff}\\
+        V_{diff}(t_i)&=0 \land
+        \begin{cases}
+            \frac{dV_{diff}}{dt}(t_i)> 0 \; \rightarrow \text{\(t_i=\) point at arc ignition} \\
+            \frac{dV_{diff}}{dt}(t_i)< 0 \; \rightarrow \text{\(t_i=\) point at short-circuit start}
+        \end{cases}
+        \label{eq:voltage_phase_identification}
+    \end{align}
+
+applicators' experience and the known limited repeatability of the weld porosity during the welding process. These were defined as follows:
+\[Upper limit = 1.4x + 2\]
+\[Lower limit = 0.6x - 0.5\]
+\begin{conditions}
+    \mathbf{x} & Measured porosity in percent\\
+\end{conditions}
+With the identified set of Hyperparameters, a new Random Forest regression model was trained on the complete dataset used during the previous procedure.
+
+
+effective sample size.
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \adjincludegraphics[width=\textwidth,
+        trim={0 {0.68\height} {0.08\width} {0.1\height}},
+        clip]{Figures/logo-thk.jpg}   
+        \caption{Section duration = \(2s\) \\ 68.36\% within tolerances (n=1558). }
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.5\textwidth}
+        \adjincludegraphics[width=\textwidth,
+        trim={0 {0.68\height} {0.08\width} {0.1\height}},
+        clip]{Figures/logo-thk.jpg}        
+        \caption{Section duration = \(10s\) \\ 82.81\% within tolerances (n=1286). }
+    \end{subfigure}\\\vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.5\textwidth}
+        \adjincludegraphics[width=\textwidth,
+        trim={0 {0.68\height} {0.08\width} {0.1\height}},
+        clip]{Figures/logo-thk.jpg}        
+        \caption{Section duration = \(20s\) \\ 89.75\% within tolerances (n=946). }
+    \end{subfigure}
+
+    \caption{Weld section porosity prediction - Performance evaluation using weld sections of different lengths. }
+    \label{fig:rfr_evaluation_sections_diff_lengths}
+\end{figure}
+

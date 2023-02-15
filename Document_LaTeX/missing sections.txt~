@@ -1,0 +1,53 @@
+falta:
+1.3.2 pore formation !!! This one i simply removed, consider adding it again. only classification is done !!!!!!!!!1
+        1.4 porosity identification -> intro
+        1.4.1 Radiographic inspection -> i might need to remove this part but the following would need fto be modified. 
+1.6 model selection
+    1.6.1 No free lunch theorem
+    1.6.2 cross validation
+1.6.3 Final model test
+
+
+3.4 Selection of relevant Features
+3.4.1 Histogram visualization of variables
+3.4.2 Correlation Analysis
+
+
+
+4 Model Selection and Training
+4.1 Model Selection
+4.2 Model Training
+4.2.1 Train Test split
+4.2.2 weld Section optimal overlap determination
+
+4.3 Model validation
+    - Increased Weld Section overlap for prediction -> increased redundancy of data 
+4.3.1 Defining acceptable tolerances for prediction performance.
+4.3.3 Measured vs Predicted values
+
+4.4 Evaluation of the validation results
+
+
+
+5 Discussion of results
+5.1 Conclusion
+5.2 Limitations of the chosen method
+5.3 Areas for improvement
+
+
+
+
+
+
+        The following block is done. YAYY! Its only missing zoomed in figures to show porosity detection
+        2.2 Weld evaluation -> intro
+        2.2.1 Non destructive testing
+        2.2.1.1 Visual inspection
+        2.2.1.2 Radiographic Inspection
+        2.2.2 Radiographic Image Analysis
+        2.2.2.1 ROI and porosity identification
+        
+        
+
+
+

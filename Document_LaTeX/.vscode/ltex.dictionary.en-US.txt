@@ -1,0 +1,12 @@
+GMAW
+SMAW
+FCAW
+underfit
+Underfitting
+parametrically
+Kempten
+reignition
+joinability
+Wolpert
+Macready
+GTAW

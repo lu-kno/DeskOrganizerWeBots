@@ -1,0 +1,48 @@
+% Appendix A
+
+\chapter{Appendix A} % Main appendix title
+
+\label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
+
+\iffalse
+    \section{How do I change the colors of links?}
+    
+    The color of links can be changed to your liking using:
+    
+    {\small\verb!\hypersetup{urlcolor=red}!}, or
+    
+    {\small\verb!\hypersetup{citecolor=green}!}, or
+    
+    {\small\verb!\hypersetup{allcolor=blue}!}.
+    
+    \noindent If you want to completely hide the links, you can use:
+    
+    {\small\verb!\hypersetup{allcolors=.}!}, or even better: 
+    
+    {\small\verb!\hypersetup{hidelinks}!}.
+    
+    \noindent If you want to have obvious links in the PDF but not the printed text, use:
+    
+    {\small\verb!\hypersetup{colorlinks=false}!}.
+\fi
+
+
+\iffalse
+\section{Table of weekly activities}
+    %\begin{tabular}[c]{c|p{4cm}|p{3.3cm}}
+    %    \showrowcolors
+    %    Art der Tätigkeit & Abteilung & von/bis\\ \hline
+    %    Praktikant & P BU Engine \& Drivetrain Systems & \ptimeperiod\\
+    %    \hiderowcolors
+    %\end{tabular}
+%\begin{table}[ht]
+%    \centering
+      \begin{longtable}{c|p{13cm}}
+        \showrowcolors
+             \expandableinput Lists/weekly_tasks.txt
+        \hiderowcolors
+        \caption[Weekly Tasks]{Weekly Tasks}
+        \label{tab:Tasks_Table}
+    \end{longtable}
+%\end{table}
+\fi

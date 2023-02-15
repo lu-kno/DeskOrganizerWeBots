@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+for file in ./Figures/*.dot; do 
+echo $file
+echo `pwd`
+dot -Tpng $file -o ${file//.dot/png}
+done
