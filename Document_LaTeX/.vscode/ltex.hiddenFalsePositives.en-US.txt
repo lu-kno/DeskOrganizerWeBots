@@ -1,0 +1,21 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QX training set x^t input variables for sample \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q r^t output (result) for sample \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q t sample number\\E$"}
+{"rule":"DT_JJ_NO_NOUN","sentence":"^\\QIn this transfer mode, which has lower wire-feed rate than the other modes, the tip of the electrode periodically comes in contact with the weld pool, which causes a short-circuit.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe molten metal is then transferred to the weld pool by the materials surface tension and is separated from the electrode, therefore breaking the short circuit and allowing the arc to be reestablished \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q (fig:short_arc_gmaw_states)\\E$"}
+{"rule":"THERE_RE_MANY","sentence":"^\\QThere are numerous machine learning algorithms that work in different ways and create different types of models.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QInstead, a controlled flow of shielding gas around the electrode and the welding point is provided to displace the air it and protect the weld from atmospheric contamination.(fig:gmaw_nozzle)\\E$"}
+{"rule":"DOUBLE_PUNCTUATION","sentence":"^\\QThe following report describes the work and research performed by me, , as a study of the Topic stated on this Thesis Title.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QLists/pore_types.tex\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q(fig:px_column_sum)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q(fig:pore_loc_to_time)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Qfig:curr_gaussian_phase_detection\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qfig:curr_gaussian_phase_detection\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q(fig:curr_gaussian_phase_detection_a)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q(fig:curr_gaussian_phase_detection_b)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q[width=0.7, trim=0 .11 0 0, clip]Figures/weman_welding_mig_mag.png Diagram of the GMAW Method showing the electrode, the welding torch and the area around it protecting the welding site from atmospheric contamination by the shielding gas.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q(fig:gmaw_nozzle) \\E(?:Dummy|Ina|Jimmy-)[0-9]+$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe molten metal is then transferred to the weld pool by the materials surface tension and is separated from the electrode, therefore breaking the short circuit and allowing the arc to be reestablished (fig:short_arc_gmaw_states)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q[width=, trim=.6 .4 .3 .35,clip]Figures/2014_1205_0002_weld_oo Section from a radiographic image of weld showing the pores as darker spots inside the lighter weld area.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QA representation of the training task can be adopted from Alpaydin \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q- Pedro Domingos \\E(?:Dummy|Ina|Jimmy-)[0-9]+$"}
+{"rule":"THERE_RE_MANY","sentence":"^\\QThere are numerous machine learning algorithms that employ different optimization algorithms through which a model can be created.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qtree depth] The largest amount of consecutive decision nodes in a branch before creating a leaf node.\\E$"}

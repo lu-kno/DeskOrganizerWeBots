@@ -1,0 +1,391 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Masters/Doctoral Thesis 
+% LaTeX Template
+% Version 2.5 (27/8/17)
+%
+% This template was downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Version 2.x major modifications by:
+% Vel (vel@latextemplates.com)
+%
+% This template is based on a template by:
+% Steve Gunn (http://users.ecs.soton.ac.uk/srg/softwaretools/document/templates/)
+% Sunil Patel (http://www.sunilpatel.co.uk/thesis-template/)
+%
+% Template license:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+12pt, % The default document font size, options: 10pt, 11pt, 12pt
+oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+english, % ngerman for German
+onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+%toctotoc, % Uncomment to add the main table of contents to the table of contents
+JumpToContents, % Uncomment to add Jump to Contents href
+parskip, % Uncomment to add space between paragraphs
+%nohyperref, % Uncomment to not load the hyperref package
+headsepline, % Uncomment to get a line under the header
+%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+%consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+]{MastersDoctoralThesis} % The class file specifying the document structure
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage{mathpazo} % Use the Palatino font by default
+
+%\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\usepackage[backend=bibtex,style=iso-numeric,natbib=true]{biblatex}%verbose-trad2
+\addbibresource{biblio.bib} % The filename of the bibliography
+
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+%----------------------------------------------------------------------------------------
+%	Sorted Lists / reference to ToC SETTINGS 
+%----------------------------------------------------------------------------------------
+%\usepackage{verbatim}
+\makeatletter\let\expandableinput\@@input\makeatother % needed for \expandableinput
+
+\let\oldtableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{%
+  \cleardoublepage
+  \phantomsection% Place hyperlink marker
+  \label{ToC-first-page}% Set \label for hyperlink
+  \oldtableofcontents %t67
+}
+
+\usepackage[nobottomtitles*]{titlesec} % To avoid having a section title at the end of a page
+%\usepackage[table]{xcolor} % To add alternating colors to rows in tables. Already in use.
+\definecolor{light-gray}{gray}{0.96}
+
+\newcommand{\specialcell}[2][t]{%
+  \begin{tabular}[#1]{p{12.5cm}}#2\end{tabular}}
+  
+% \usepackage[acronym]{glossaries} % this adds acronyms to latex
+% \makenoidxglossaries
+% \include{Lists/Acronyms}
+%\usepackage{incgraph,tikz}
+\usepackage{amsmath}
+\usepackage{array}          % i dont remember
+\usepackage{listings}       % add code snippets to pdf
+\usepackage{varioref}       % adds page numbers to references. use \vref
+\usepackage{hyperref}       % has to be loaded before cleveref
+\usepackage[nameinlink]{cleveref}       % use \cref instead of \ref
+\usepackage{float}          % use [float,floatplacement=H] to avoid page breaks in listings
+\usepackage{placeins}       % provides command \FloatBarrier
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+%\usepackage{multicol}
+% \usepackage[british]{babel}
+\usepackage[export]{adjustbox}
+
+\usepackage{array}
+\newenvironment{conditions}[1][Where:]
+  {#1 \begin{tabular}[t]{>{$}l<{$} @{${}={}$} l}}
+  {\end{tabular}\\[\belowdisplayskip]}
+
+
+\usepackage{titlesec} % esto es para que los parrafos se comporten como secciones
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\usepackage{makecell} %esto es para tener linebreaks dentro de table cells
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+%\doublespacing
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,positioning,shadows,trees}
+\tikzset{
+  basic/.style  = {draw, text width=2cm, drop shadow, font=\sffamily, rectangle},
+  root/.style   = {basic, rounded corners=2pt, thin, align=center, fill=green!30},
+  level 2/.style = {basic, rounded corners=6pt, thin,align=center, fill=green!60, text width=8em},
+  level 3/.style = {basic, thin, align=left, fill=pink!60, text width=7em}
+}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    emph={GetVar, Wait, If, Message, Wait_Con, Calc, Endif, While, Wend},
+    emphstyle={\color{magenta}\bfseries}
+}
+\lstset{style=mystyle}
+
+
+
+% \makeatletter
+% \newcommand*{\NoBreakPar}{\vspace{\baselineskip}\par\nobreak\@afterheading}
+% \makeatother
+
+%----------------------------------------------------------------------------------------
+%	MARGIN SETTINGS
+%----------------------------------------------------------------------------------------
+
+\geometry{
+	paper=a4paper, % Change to letterpaper for US letter
+	inner=3.5cm, % Inner margin
+	outer=1.5cm, % Outer margin
+	bindingoffset=.5cm, % Binding offset
+	top=3cm, % Top margin
+	bottom=2.5cm, % Bottom margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	THESIS INFORMATION / MY VARIABLES
+%----------------------------------------------------------------------------------------
+\subject{Special Aspects of Mobile Autonomous Systems} % \subjectname
+\thesistitle{Autonomous Desk Organizer}    % \ttitle
+\examiner{Prof. Dr.-Ing. Chunrong \textsc{Yuan}} % \examname
+
+\university{\href{http://www.th-koeln.de}{Technische Hochschule Köln}}                    % title page and abstract \univname
+\faculty{\href{}{F07 - Fakultät für Informations-, Medien- und Elektrotechnik}}   % title page and abstract \facname
+\addresses{Köln} % \addressname
+
+\author{Lu \textsc{Knoblich}, Christian \textsc{Schmitz}}
+% \authora{Lu \textsc{Knoblich}} % title page/ abstract \authorname
+% \authorb{Christian \textsc{Schmitz}} % title page/ abstract \authorname
+\matrikelnra{373292}
+\matrikelnrb{373292}
+
+\timeperiod{February 15th, 2023}
+
+\supervisor{SUPA} % \supname
+\supervisorb{SUPB} % \supnameb
+
+\keywords{} % \keywordnames
+\semester{9}
+
+% \department{\href{https://www.hs-kempten.de/hochschule/fakultaeten/elektrotechnik.html}{Mechatronic}}   % title page and abstract \deptname
+% \group{\href{http://www.thyssenkrupp.de}{Thyssenkrupp}}                                        % research group's name, used in title page \groupname
+
+\company{\href{}{COMPANY}}
+\study{\textsc{STUDY}}
+
+\headtitle{\ttitle}
+
+%----------------------------------------------------------------------------------------
+%   END OF MY VARIABLES
+%----------------------------------------------------------------------------------------
+
+\AtBeginDocument{
+\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
+% \hypersetup{pdfauthor=\authornamea, \authornameb} % Set the PDF's author to your name
+\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
+\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+
+}
+
+\setlength\bibitemsep{0.5\baselineskip}
+\begin{document}
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+
+
+\pagestyle{plain} % Default to the plain heading style until the thesis style is called for the body content
+\rowcolors{1}{white}{light-gray}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+
+
+\begin{titlepage}
+    % \begin{figure}[p]
+    
+    % \vspace*{-5cm}
+    % \makebox[\linewidth]{
+    %     \includegraphics[width=1.5\linewidth]{Chapters/Deckblatt}
+    % }
+    % \end{figure}
+    
+\iftrue
+\begin{center}
+
+\iffalse
+    \begin{flushleft}
+    \emph{Authors} \\
+    \authorname
+    % {\authornamea - \pmatrikelnra \\
+    % \authornameb - \pmatrikelnrb}
+    \end{flushleft}
+    \begin{flushright} \large
+    \emph{Matriculation Number} \\
+    {\pmatrikelnra}
+    {\pmatrikelnrb}
+    \end{flushright}
+\fi
+
+\includegraphics[scale=0.15]{Figures/logo-thk.jpg}\\
+
+
+
+% \vspace*{.06\textheight}
+% {\scshape\LARGE \univname\par}\vspace{0.8cm} % University name
+\textsc{\Large Project Report}\\[0.4cm] % Thesis type % Bachelor Thesis
+Subject: \subjectname
+
+\HRule \\[0.2cm] % Horizontal line
+{\huge \bfseries \ttitle\par}\vspace{0.3cm}% at \compname \vspace{0.4cm} % Thesis title
+
+% \authornamea, \authornameb \\
+\authorname \\
+\HRule \\[0.8cm] % Horizontal line
+
+
+
+\begin{tabular}{r l}
+\hiderowcolors
+     \vspace{0.2cm}
+     Prüfer: & \examname \\
+     \vspace{0.2cm}
+     Arbeit vorgelegt am: & \today  \\
+     \vspace{0.2cm}
+      % 
+      % \vspace{0.2cm}
+      Matrikel Nummer: & \pmatrikelnra,\pmatrikelnrb\\
+      % \vspace{0.5cm}
+    %  \vspace{0.2cm}
+    %  Faculty: & \facname \\
+    %  \vspace{0.2cm}
+    %  Matriculation Number: & \pmatrikelnr \\
+    %  \vspace{0.2cm}
+    %  Place: & \addressname \\
+\end{tabular}
+\\[1.9cm]
+ 
+\vfill
+\end{center}
+\fi
+\end{titlepage}
+
+
+\begin{blocknotice}
+
+  \noindent \sloppy 
+  Die nachfolgende Arbeit enthält vertrauliche Informationen und Daten der Firma ThyssenKrupp AG.
+  
+  Veröffentlichungen oder Vervielfältigungen - auch nur auszugsweise oder in elektronischer Form - sind ohne ausdrückliche schriftliche Genehmigung der Firma ThyssenKrupp AG nicht gestattet.
+
+  Die Sperrfrist gilt bis zum 31. Dezember 2031.
+
+  Die Arbeit darf bis zum Ablauf der Sperrfrist nur für Prüfungszwecke verwendet werden.
+  
+
+  % The following work contains confidential information and data of ThyssenKrupp AG. 
+  
+  % Publication or reproduction - even in part or in electronic form - is not permitted without the express written approval of ThyssenKrupp AG.
+
+  % The blocking period is valid until December 31, 2032.
+
+  % Until the expiry of the blocking period, the work may only be used for examination purposes.
+
+\end{blocknotice}
+
+\cleardoublepage %Double Space needed for first pages to be printed one-sided only. 
+%\clearpage
+
+%----------------------------------------------------------------------------------------
+%	QUOTATION PAGE
+%----------------------------------------------------------------------------------------
+
+%\vspace*{0.2\textheight}
+
+%\noindent\enquote{\itshape\textcolor{red}{ Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}}\bigbreak
+
+%\hfill Dave Barry
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+    \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
+
+    
+    The workplace of the future is characterized by a high degree of automation, which is also reflected in the field of logistics. The aim of this project is to develop a robot that autonomously identifies, collects and organizes objects with the premise of having to organize a desk in such a way that the implementation is able to be easily adapted to other applications. The implementation of this project was done using the open source webots robotics simulation environment from cyberbotics.
+
+    The robot is linked to a camera with a view of the desk surface and the objects on it, and a gripper that allows the objects to be grabbed. The robot is able to detect objects and their position with the use of a neural net trained on images of the objects available and the use of the openCV python module for subsequent image processing. With a defined sequence of movements, the robot is able to pick up the individual objects and place them in their corresponding location.
+
+    Solution theory, implementations and documentation of the developed system are presented within this paper.
+
+    
+\end{abstract}
+
+
+
+\tableofcontents % Prints the main table of contents
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter % Begin numeric (1,2,3...) page numbering
+\pagestyle{thesis} % Return the page headers back to the "thesis" style
+
+\include{Chapters/CH1}
+\include{Chapters/CH2}
+\include{Chapters/CH3}
+\include{Chapters/CH4}
+\include{Chapters/CH5}
+% \include{Chapters/Chap1}
+% \include{Chapters/Chap2} 
+% \include{Chapters/Chap3}
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - APPENDICES
+%----------------------------------------------------------------------------------------
+
+\appendix % Cue to tell LaTeX that the following "chapters" are Appendices
+
+% \include{Appendices/AppendixA}
+%\include{Appendices/AppendixB}
+%\include{Appendices/AppendixC}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\printbibliography[heading=bibintoc]
+
+%----------------------------------------------------------------------------------------
+
+
+\cleardoublepage %Double Space needed for first pages to be printed one-sided only. 
+%\clearpage
+
+
+
+\end{document}  
