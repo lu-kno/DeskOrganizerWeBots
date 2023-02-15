@@ -93,7 +93,13 @@ draft {
 <div style="page-break-after: always"></div>
 
 # Abstract
-- TODO Abstract
+
+The workplace of the future is characterized by a high degree of automation, which is also reflected in the field of logistics. The aim of this project is to develop a robot that autonomously identifies, collects and organizes objects with the premise of having to organize a desk in such a way that the implementation is able to be easily adapted to other applications. The implementation of this project was done using the open source webots robotics simulation environment from cyberbotics.
+
+The robot is linked to a camera with a view of the desk surface and the objects on it, and a gripper that allows the objects to be grabbed. The robot is able to detect objects and their position with the use of a neural net trained on images of the objects available and the use of the openCV python module for subsequent image processing. With a defined sequence of movements, the robot is able to pick up the individual objects and place them in their corresponding location.
+
+Solution theory, implementations and documentation of the developed system are presented within this paper.
+
 <div style="page-break-after: always"></div>
 
 # Table of Content
@@ -416,21 +422,6 @@ Coornidation of the different steps required for the organization process.
 
 
 
-```plantuml
-@startuml
-start
-    :Move Gripper above Object Position;
-    :Open Gripper;
-    :Move Gripper down to Object Position;
-    :Close Gripper;
-    :Move Gripper up;
-    :Move Gripper above Target Position;
-    :Move Gripper down to Target Position;
-    :Open Gripper;
-    :Move Gripper up;
-stop
-@enduml
-```
 
 ### Notes for this chapter (to be deleted later)
 - Milestones or steps needed in project development
@@ -967,7 +958,24 @@ The implementation of the `placeObject` function is very similar to the `pickUpO
 
 After this, the process of getting the pick and place positions and calling the `pickNplace` function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
 
+<red> make reference to the following diagram </red>
+<red> close section </red>
 
+```plantuml
+@startuml
+start
+    :Move Gripper above Object Position;
+    :Open Gripper;
+    :Move Gripper down to Object Position;
+    :Close Gripper;
+    :Move Gripper up;
+    :Move Gripper above Target Position;
+    :Move Gripper down to Target Position;
+    :Open Gripper;
+    :Move Gripper up;
+stop
+@enduml
+```
 
 <draft>
 
