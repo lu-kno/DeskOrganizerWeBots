@@ -12,20 +12,13 @@ The "Implementation" chapter provides detailed explanations of how the solutions
 
 \section{Project Description}
 
-The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
-
-\begin{itemize}
-    \item prove of concept for varios real world application
-    \item Solution transferable to other use cases
-\end{itemize}
-
+The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot. The project is supposed to be a prove of concept appliable to various real world applications and the solution is possibly transferable to other use cases, such as the organizing of a production line or the sorting of objects in a warehouse.
 
 In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications. Git was used to manage the project and to facilitate collaboration between the team members.
 
-
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/project2.png}
+    \adjincludegraphics[width=1\textwidth]{Figures/project2.png}
     \caption{Figure 1: Project setup in Webots }
     \label{fig:project_setup}
 \end{figure}
