@@ -1086,3 +1086,27 @@ Another aspect that could be improved is the movement of the gripper's fingers, 
 
 
 <div style="page-break-after: always"></div>
+% chris [1]
+@online{wiki:Werkstoffübergang,
+    author = "Moses Olafenwa",
+    title  = "Official English Documentation for ImageAI!",
+    url    = "https://imageai.readthedocs.io/en/latest/index.html",
+    urldate = "12.02.23"
+}
+% chris [2]
+@book{alpaydin_machine_learning,
+  title={Design Patterns für Machine Learning. Entwurfsmuster  für Datenaufbereitung Modellbildung und MLOps.},
+  author={Sara Robinson et al.Sara Robinson et al.},
+  isbn={978-3-96010-597-8},
+  series={Adaptive Computation and Machine Learning series},
+  url={https://oreilly.de/produkt/design-patterns-fuer-machine-learning/,
+  year={2022},
+  publisher={O’Reilly}
+}
+% chris [3]
+@online{wiki:Werkstoffübergang,
+    author = "Automatic Addison",
+    title  = "How to Determine the Orientation of an Object Using OpenCV",
+    url    = "https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/",
+    urldate = "12.02.23"
+}
