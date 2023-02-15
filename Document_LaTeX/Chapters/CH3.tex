@@ -1,4 +1,4 @@
-
+% !TEX root = ../main.tex
 \chapter{Implementation} % Main chapter title
 
 \label{implementation} % \ref{CHX}
@@ -375,32 +375,33 @@ $$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}
 <red> Gotta mention the Z axis is flipped in the image coordinate system </red>
 <red> Include sample code to perform actual conversion, adding a fourth value to the position vector</red>
 
-<!-- 
- This matrix is created by multiplying the position vector with the rotation matrix $M_r$ and the translation matrix $M_t$ to produce the final transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system.
+% <!-- 
+%  This matrix is created by multiplying the position vector with the rotation matrix $M_r$ and the translation matrix $M_t$ to produce the final transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system.
 
 
-The final transformation matrix $M_{img2table}$ is then multiplied with the transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system to produce the final transformation matrix $M_{img2world}$ from the image coordinate system to the world coordinate system.
- -->
-<!-- 
+% The final transformation matrix $M_{img2table}$ is then multiplied with the transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system to produce the final transformation matrix $M_{img2world}$ from the image coordinate system to the world coordinate system.
+%  -->
 
-Once the position vector relative to the tables coordinate system is known
+% <!-- 
 
-The first transormation matrix is used to transform the position vector from the image coordinate system to the table coordinate system. This was created as follows:
+% Once the position vector relative to the tables coordinate system is known
 
-\begin{itemize}
-    \item TODO: description of implementation Coord transition
+% The first transormation matrix is used to transform the position vector from the image coordinate system to the table coordinate system. This was created as follows:
+
+% \begin{itemize}
+%     \item TODO: description of implementation Coord transition
       
-    \item the image is cropped to cintain only the table
-    \item the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
+%     \item the image is cropped to cintain only the table
+%     \item the positional data is given as a relative value with (0,0) on the upper left corner of the image and (1,1) on the lower right corner of the image.
       
     
     
-    \item the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
-    \item the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
-    \item with this, the transformation matrix is produced. 
-\end{itemize}
+%     \item the scaling vector used is taken from the dimension vector of the table taken from webots, with the z-axis set to 0.
+%     \item the rotation and translation vectors from the table are likewise obtained from the attributes of the table instance in webots to prooduce the corresponding matrices.
+%     \item with this, the transformation matrix is produced. 
+% \end{itemize}
 
--->
+% -->
 
 
 <draft>
@@ -436,45 +437,46 @@ The second implementation made use of the restrictions to the robots movement pr
 Since the gripper is required be pointing down, the rotation of the fourth joint is restricted to the a value of zero, and therefore reduces the degrees of freedom of the kinematic chain by one. Likewise the fifth and sixth joints are constrained by a value defined only by the configuration of the first three joints, further reducing the degrees of freedom of the kinematic chain by two.
 
 The following section describes the implementation of the second solution, which was chosen for the final implementation due to its deterministic nature and pretictable outcomes fullfilling the criteria previously mentioned. Furthermore, having a deterministic computation time results in an implementation that could be used with more reliability in other applications in which critical timing constraints are present.
-<!-- 
-the reduced degrees of freedom allow for a more efficient implementation of the solution, as well as a more efficient computation time.
+
+% <!-- 
+% the reduced degrees of freedom allow for a more efficient implementation of the solution, as well as a more efficient computation time.
 
 
-<draft>
+% <draft>
 
-\begin{itemize}
-    \item Behavior of the robot using IK
-    \item Behavior of the robot using Deterministic procedure
-    \item <red>insert pictures of a point being reached with both solutions</red>
+% \begin{itemize}
+%     \item Behavior of the robot using IK
+%     \item Behavior of the robot using Deterministic procedure
+%     \item <red>insert pictures of a point being reached with both solutions</red>
     
-    \item decisions taken
-    \begin{itemize}
-      \item objects are approached from above
-      \item robot movements should not produce collisions with other objects in the scene, other than the contact with the object to be picked up
-      \begin{itemize}
-        \item this requires some degree of predictability forthe robots movements while moving between two points and the pose taken when reaching a point
-      \end{itemize}
-      \item IK with full chain requires an iterative procedure to find the correct joint angles due to the number of degrees of freedom
-      \begin{itemize}
-        \item reduced performance and increased complexity
-        \item non deterministic behaviour can cause unexpected erratic movements which could lead to a collision with other objects
-      \end{itemize}
-      \item the chosen requirements allows the  degrees of freedom to be reduced to 3
-      \begin{itemize}
-        \item explain why having 3 degrees of freedom allows the implementation of an algebraic solution whit reduced complexity, deterministic results leading to an increased preditability in the robots movements, as well as deterministic computation time, which allows this method to be used in other applications where critical time constraints are present with increased reliability.
-      \end{itemize}
-    \end{itemize}
-\end{itemize}
+%     \item decisions taken
+%     \begin{itemize}
+%       \item objects are approached from above
+%       \item robot movements should not produce collisions with other objects in the scene, other than the contact with the object to be picked up
+%       \begin{itemize}
+%         \item this requires some degree of predictability forthe robots movements while moving between two points and the pose taken when reaching a point
+%       \end{itemize}
+%       \item IK with full chain requires an iterative procedure to find the correct joint angles due to the number of degrees of freedom
+%       \begin{itemize}
+%         \item reduced performance and increased complexity
+%         \item non deterministic behaviour can cause unexpected erratic movements which could lead to a collision with other objects
+%       \end{itemize}
+%       \item the chosen requirements allows the  degrees of freedom to be reduced to 3
+%       \begin{itemize}
+%         \item explain why having 3 degrees of freedom allows the implementation of an algebraic solution whit reduced complexity, deterministic results leading to an increased preditability in the robots movements, as well as deterministic computation time, which allows this method to be used in other applications where critical time constraints are present with increased reliability.
+%       \end{itemize}
+%     \end{itemize}
+% \end{itemize}
 
-</draft>
-<red>following is probably better in implementation</red>  
+% </draft>
+% <red>following is probably better in implementation</red>  
 
-<draft>
+% <draft>
 
-Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
-</draft> 
+% Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
+% </draft> 
 
--->
+% -->
 
 The following figure shows the robot's simplified kinematic chain with the resulting geometry used in the calculation of the required motor positions.
 
@@ -607,13 +609,13 @@ Afterwards, the \(organizeObjects\) function is called which iterates through th
 
 A check is perfomed to see if the \(stopOrganization\) variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the \(HOME\) position and the imageScan module is called again to update the list of objects. 
 
-If the \(stopOrganization\) variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset `voffset`required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object. 
+If the \(stopOrganization\) variable is set to False, the desired destination position corresponding to the current detected object is read aswell as the vertical offset \(voffset\) required to grab the object. This vertical offset proved to be necessary due to taller objects making contact with the palm or base of the fingers before the gripper is closed, resulting in a detected feedback force that prevents the gripper from closing and grabbing the object. 
 
 The position of the object within the image is then transformed to the global coordinates with the use of the function \(local2world\), which was implemented as described in the previous section.
 
 The vertical offset in the \(z\) dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it. 
 
-Together with the objects orientation from the `image Detection` module, the resulting \(pickPosition\) and \(placePosition\) are then passed  to the \(pickNplace\) function,  which passes the positions to the functions \(pickUpObject\) and \(placeObject\) respectively and calls them one after the other.
+Together with the objects orientation from the \(image Detection\) module, the resulting \(pickPosition\) and \(placePosition\) are then passed  to the \(pickNplace\) function,  which passes the positions to the functions \(pickUpObject\) and \(placeObject\) respectively and calls them one after the other.
 
 
 The \(pickUpObject\) begins by calling the function \(moveTo\), moving the arm and gripper to a position above the object to be picked up and rotating the gripper according to the objects orientation. The distance to this object defined by the variable \(SAFE_HEIGHT\).
