@@ -93,8 +93,8 @@ Movement directions make sense when "standing" in front of the robot
   
   - [ ] remove references for latex
   - [ ] fix references in pdf (example at chapter 3.1.2) 
-  - [ ] Add sources section
-  - [ ] Add table of illustrations
+  - [x] Add sources section
+  - [x] Add table of illustrations
   - [x] fix indexing of table of contents in pdf
   
   - [ ] export final pdf (attempt in latex)- [DeskOrganizerWeBots](#deskorganizerwebots)
