@@ -1,0 +1,23 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Project setup in Webots \relax }}{3}{figure.caption.7}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Forward and inverse kinematics shown with the green and red arrows respectively.\relax }}{8}{figure.caption.14}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Comparison between the open (resting) position of the gripper with the closed claw and pinch grip methods.\relax }}{9}{figure.caption.16}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Flowchart of the main loop of actions\relax }}{11}{figure.caption.18}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Object detection results YOLOv3 model \relax }}{13}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces image\_344.jpg in image directory \relax }}{18}{figure.caption.94}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces image\_344.txt in annotations directory \relax }}{18}{figure.caption.95}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Object detection results self trained model \relax }}{23}{figure.caption.141}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Object detection results self trained model \relax }}{24}{figure.caption.142}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Steps do determine the orientation of an object \relax }}{27}{figure.caption.194}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Inverse Kinematic algorithm for the simplified kinematic chain.\relax }}{31}{figure.caption.223}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Gripper closing through can and getting an object stuck between its fingers.\relax }}{34}{figure.caption.269}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces behaviourof the gripper when attempting to grab an object with feedback force detection disabled.\relax }}{35}{figure.caption.270}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Pick and place implementation\relax }}{39}{figure.caption.353}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Cluttered workspace at the start of the simulation \relax }}{42}{figure.caption.355}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Organized workspace at the end of the routine \relax }}{43}{figure.caption.356}%
+\addvspace {10\p@ }

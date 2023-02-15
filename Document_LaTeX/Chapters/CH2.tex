@@ -16,9 +16,8 @@ To detect the orientation of an object relative to the table, we decided to use 
 \section{Coordinates transformation}
 
 Once knowing the coordinates of the detected object in the image, 
-the next step is to transform the objects position vector from the image's coordinate system to the world's coordinate system. This type of transformation is best achieved with the use of a transformation matrix.
+the next step is to transform the objects' position vector from the image coordinate system to the world's coordinate system. This type of transformation is best achieved with the use of a transformation matrix.
 
-% <!-- the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used. -->
 
 \subsection{Transformation Matrix}
 
@@ -36,11 +35,14 @@ $$
 \end{array}
 \right]
 $$
-where:  
-* $\mathbf{R}$ is the rotation matrix with the dimensions $3\times 3$.  
-* $\vec{t}$ is the translation vector with the dimensions $3\times 1$.  
-* $\mathbf{P}$ is the perspective projection matrix with the dimensions $1\times 3$.  
-* $\mathbf{S}$ is the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).
+
+
+\begin{conditions}
+    \mathbf{R} & the rotation matrix with the dimensions $3\times 3$.  \\
+    \vec{t} & the translation vector with the dimensions $3\times 1$.  \\
+    \mathbf{P} & the perspective projection matrix with the dimensions $1\times 3$.  \\
+    \mathbf{S} & the scale factor with the dimensions $1\times 1$ (for uniform or isotropic scaling).\\
+\end{conditions}
 
 The rotation matrix for a rotation around any given axis given by the unit vector $\mathbf{\vec{u}(x,y,z)}$ by an angle $\theta$ is given by the following formula:
 
@@ -92,40 +94,25 @@ S_x & 0 & 0   & 0\\
 $$
 
 
-where $S_x$, $S_y$ and $S_z$ are the scaling factors in the x, y and z directions respectively.
+\begin{conditions}
+    S_x & scaling factor in x dimension \\
+    S_y & scaling factor in y dimension \\
+    S_z & scaling factor in z dimension   \\
+\end{conditions}
 
-With the rotation and translation matrices a primary Transformation matrix $\mathbf{T_{0}}$ is built with the previously described frame using the unit 1 as a scaling factor and a null matrix as the perspective matrix. 
+
+With the rotation and translation matrices a primary transformation matrix $\mathbf{T_{0}}$ is built with the previously described frame using the unit 1 as a scaling factor and a null matrix as the perspective matrix. 
 This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the complete transformation matrix $\mathbf{T}$ as follows. 
 
 $$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
-% <!-- 
-% \textcolor{red}{ The following is not complete, needs to be reworked and checked } % end red
+The position of a point from the current coordinate system $\mathbf{A}$ can be transformed to the target coordinate system $\mathbf{B}$ using the Transformation matrix $\mathbf{T}$ as follows:
 
-% This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
-
-% The first step is to determine the dimensions of the table in order to calculate the scale factor between the image and the simulation. Knowing the scale factor, it is necessary to determine the position and orientation of the table, in order to complete the transformation matrix that needs to be use to calculate the coordinates of the object in the simulation.
-
-% A transformation matrix is a 4x4 matrix that is used to transform a vector from one coordinate system to another. The transformation matrix is calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The rotation matrix is used to rotate the vector around the origin of the coordinate system. The scale matrix is used to scale the vector to the desired size.
-
-
-
-% In order to tranform the coordinates from the unit \(pixels\) to the unit \(meters\), the scale matrix is calculated as follows:
-
-% $$
-% \begin{bmatrix}
-%  width & 0 & 0 & 0 \\
-%  0 & height & 0 & 0 \\
-%  0 & 0 & depth & 0 \\
-%  0 & 0 & 0 & 1 \\
-% \end{bmatrix}
-% $$
-
-% where \(width\), \(height\), and \(depth\) are the dimensions of the table in the simulation. -->
+$$\vec{v_{B}} = \mathbf{T} \bullet \vec{v_{A}}$$
 
 \section{Robot controller}
 
-The robot controller is the main program where the behaviour of the robot is defined. It is responsible for the different actions that take place in the simulation. By marking the crobot as a supervisor in webots, it can access and modify the properties of other elements in the scene and the environment. 
+The robot controller is the main program where the behaviour of the robot is defined. It is responsible for the different actions that take place in the simulation. By marking the robot as a supervisor in webots, it can access and modify the properties of other elements in the scene and the environment. 
 
 The main tasks of the robot controller are the following:
 
@@ -137,31 +124,15 @@ The main tasks of the robot controller are the following:
     \item coordinating the actions of the different modules
 \end{itemize}
 
-% <!-- 
-% It manages and accesses the robot's motors and sensors, and by using the supervisor class from the webots API, it can also have access to the other devices and elements in the simulation. This class allows it to modify the simulation environment and the nodes that are present in the scene, It also provides the capability of accessing and modifying the properties of other elements in the simulation, as well as controlling how the simulation is run.
-
-%  that controlls the robotic arm and accesses the different modules and devices in the simulation. The webots environment provides a supervisor class which provides the capability of accessing and modifyng the properties of other elements in the simulation, as well as controlling how the simulation is run. -->
-
-
-% <!-- is responsible for the different actions that take place in the simulation. It manages and accesses the robot's motors and sensors of the actions and the access to the other devices in the simulation. It 
-
-% Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
-
-% \begin{itemize}
-%     \item TODO: first / theoretical approach to solve problem(s)
-% \end{itemize}  
-% These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location. -->
-
 \subsection{Robot Kinematics}
-
 
 The Robot chosen for this task consists of a robotic arm with a gripper attached to the end of the arm. The robot by itself can be represented as a kinematic chain with 6 joints, resulting in 6 degrees of freedom.
 In order to move the robot, the target angle of each individual joint in the kinematic chain needs to be set. Nevertheless, the position of the objects and target locations for the robot's movement are defined in a three dimensional coordinate system, so a transformation between the joint angles and the position of the end effector (last chain element) in space needs to be achieved in order to control its movements.
 
-Calculating the position of the gripper (the end effector) from the known position of the individual motor can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
+Calculating the position of the end effector (in this case the gripper) from the position of the individual motors can be achieved using a process called forward kinematics, which combines multiple applications of trigonometric formulas.
 
-Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain for a given position of the end effector presents a more challenging problem. 
-This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
+Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain needed to reach a given position with the end effector presents a more challenging problem. 
+This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into the categories analytical and numerical (\Vref{fig:fkik}). \autocite{robotik}
 
 \begin{figure}[!h]
     \centering
@@ -179,9 +150,9 @@ The numerical methods are based on the use of iterative algorithms, which can be
 
 The gripper consists of three individual fingers, each of them having three joints. The closing action of the finger is achieved by rotating the first joint of each finger until the desired object is grabed or the maximum joint rotation is reached. This alone creates a claw like grip, since all finger sections rotate with the first joint relative to the global coordinates. While useful in some cases, its contact area with the object being grabbed is significantly reduced.
 
-A different approach that aims to improve the contact area of the gripper, is possible rotate the last joint of each finger in the opposite direction by the same amount as the first one, compensating the rotation on the fingertips and creating a more stable grip.
+A different approach that aims to improve the contact area of the gripper, performs a rotation on the last joint of each finger in the opposite direction by the same amount as the first joint, compensating the rotation on the fingertips and creating a more stable grip with a flat surface area.
 
-The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
+\Vref{fig:grip_states} shows the gripper in the open and closed position using the a claw and a pinch grip.
 
 % \begin{figure}[!h]
 %     \centering
@@ -204,16 +175,16 @@ The following figure shows the gripper in the open and closed position using the
     \hfill
     \begin{subfigure}[b]{0.4\textwidth}
         \adjincludegraphics[width=\textwidth]{Figures/grip_flat.png}        
-        \caption{Flat Grip}
+        \caption{Pinch Grip}
     \end{subfigure}\\\vspace{0.5cm}
 
-    \caption{Comparison between the open (resting) position of the gripper with the closed claw and flat grip methods.}
+    \caption{Comparison between the open (resting) position of the gripper with the closed claw and pinch grip methods.}
     \label{fig:grip_states}
 \end{figure}
 
 \subsection{Movement coordination}
 
-The main loop of actions that need to be taken to complete the task of organizing the desk can be defined as seen in figure ASD. 
+The main loop of actions that need to be taken to complete the task of organizing the desk can be defined as seen in \vref{fig:flowchart}. 
 
 The process starts by moving the robot to a HOME position where it wont interfere with the camera's view of the desk. A picture is taken and any objects present are detected. If objects were detected, the robot iterates through the found objects, picking them up and placing them on the a second table on their corresponding position, until all the detected objects have been moved. The robot then moves back to the HOME position. If no object is detected, no movement of the robot takes place. This process is repeated until the user decides to stop the simulation.
 
@@ -240,28 +211,4 @@ The process starts by moving the robot to a HOME position where it wont interfer
     \caption{Flowchart of the main loop of actions}
     \label{fig:flowchart}
 \end{figure}
-
-\textcolor{orange}{
-. moves to pick up the object and places  
-Being able to detect the objects position and orientation, and moving 
-With the information regarding the objects' position and orientation in the simulation, the following step is to control the robots movement to produce the desired behavior. The robot controller is implemented in Python and uses the Webots API to control the robot. The robot controller is responsible for the following tasks:
-}
-
-\textcolor{orange}{
-Initialization of the robot instance and the devices attached to it: 
-* camera
-* gripper
-* internal variables
-* Motor sensors
-* Motor actuators
-}
-
-\textcolor{orange}{
-Coordination of the robot's movement.
-Coornidation of the different steps required for the organization process.
-* Reding the camera's image and forwarding the data to the object detection module.
-* Reading the object detection module's output and forwarding the data to the coordinate transformation module.
-* Reading the coordinate transformation module's output and forwarding the data to the robotic arm control module.
-* Perform the movement as required for the detected objects positions
-} %end orange
 
