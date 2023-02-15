@@ -300,8 +300,8 @@ def compare_directories(path1, path2):
     generation process, this function can be used to verify the integrity of the dataset.
 
     Parameters:
-    - path1 (str): A string representing the path to the first directory to compare.
-    - path2 (str): A string representing the path to the second directory to compare.
+    path1 (str): A string representing the path to the first directory to compare.
+    path2 (str): A string representing the path to the second directory to compare.
 
     Returns:
     - bool: True if the directories have the same content, False otherwise.

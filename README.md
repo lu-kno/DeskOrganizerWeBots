@@ -10,8 +10,15 @@
   pip install -r requirements.txt
   ```
 
-4. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
+4. Clone the Git-Repository of the project:
 
+  ```prolog
+  git clone https://github.com/lu-kno/DeskOrganizerWeBots.git
+  ```
+  
+5. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
+
+Info: The "vidoes" directory contains various videos showcasing the robot in action.
 # DeskOrganizerWeBots
 
 ## Movement
@@ -75,6 +82,10 @@ Movement directions make sense when "standing" in front of the robot
   - [ ] find solution for model download (maybe use git lfs) 
       - [ ] remove object detection model from git ignore and push it to github
 
+  - [ ] provide new requirements.txt
+
+  - [ ] make sure that the git repo is publicly accessible
+  
   - [ ] export final pdf (attempt in latex)- [DeskOrganizerWeBots](#deskorganizerwebots)
   - [Movement](#movement)
   - [To Do](#to-do)
