@@ -6,13 +6,13 @@
 
 3. Install dependencies:
    
-  ```prolog
+  ```
   pip install -r requirements.txt
   ```
 
 4. Clone the Git-Repository of the project:
 
-  ```prolog
+  ```
   git clone https://github.com/lu-kno/DeskOrganizerWeBots.git
   ```
   
@@ -85,14 +85,14 @@ Movement directions make sense when "standing" in front of the robot
   
   - [ ] make sure that the git repo is publicly accessible
   
-  - [ ] fix First page
-    - [ ] matrikelnumbers
-    - [ ] logo of th koeln instead of kepten and 
+  - [x] fix First page
+    - [x] matrikelnumbers
+    - [x] logo of th koeln instead of kepten and 
   
-  - [ ] provide new requirements.txt
+  - [x] provide new requirements.txt
   
-  - [ ] remove references for latex
-  - [ ] fix references in pdf (example at chapter 3.1.2) 
+  - [x] remove references for latex
+  - [x] fix references in pdf (example at chapter 3.1.2) 
   - [x] Add sources section
   - [x] Add table of illustrations
   - [x] fix indexing of table of contents in pdf
@@ -108,7 +108,7 @@ Movement directions make sense when "standing" in front of the robot
     - [ ] final report
     - [ ] software with source code
     - [ ] readme file with instructions
-    - [ ] video demonstraions
+    - [x] video demonstraions
 
 
   - [ ] (optional) config.yaml file to change global flags and maybe set parameters

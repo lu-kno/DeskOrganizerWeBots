@@ -19,7 +19,7 @@ def startTraining():
     """ Function to initiate the training process """
     execution_path = os.path.dirname(__file__)
     data_dir_path = os.path.join(execution_path , "DataSet")
-    model_path = os.path.join(execution_path , "Modelle/yolov3_DataSet_mAP-0.02411_epoch-10.pt")
+    model_path = os.path.join(execution_path , "Modelle/yolov3.pt")
     createClassFiles(categories) 
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsYOLOv3()
@@ -32,8 +32,8 @@ def testModel():
     execution_path = os.path.dirname(__file__)
     detector = CustomObjectDetection()
     detector.setModelTypeAsYOLOv3()
-    modelPath = os.path.join(execution_path , "Modelle/first/yolov3_DataSet_last.pt")
-    jsonPath = os.path.join(execution_path , "Modelle/first/DataSet_yolov3_detection_config.json")
+    modelPath = os.path.join(execution_path , "Modelle/yolov3_DataSet_last.pt")
+    jsonPath = os.path.join(execution_path , "Modelle/DataSet_yolov3_detection_config.json")
     detector.setModelPath(modelPath) # path to custom trained model
     detector.setJsonPath(jsonPath) # path to corresponding json
     detector.loadModel()
