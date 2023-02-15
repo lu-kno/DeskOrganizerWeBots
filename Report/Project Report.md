@@ -112,24 +112,12 @@ Solution theory, implementations and documentation of the developed system are p
    3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
       1. [Object detection](#object-detection)
       2. [Coordinates transformation](#coordinates-transformation)
-         1. [Transformation Matrix](#transformation-matrix)
       3. [Robot controller](#robot-controller)
-         1. [Robot Kinematics](#robot-kinematics)
-         2. [Gripper Actuation](#gripper-actuation)
-         3. [Movement coordination](#movement-coordination)
       4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
    4. [Implementation](#implementation)
       1. [Object detection](#object-detection-1)
-         1. [First approach](#first-approach)
-         2. [Second approach / Solution](#second-approach--solution)
-         3. [Training data](#training-data)
-         4. [Training](#training)
-         5. [Result](#result)
       2. [Coordinate transformation](#coordinate-transformation)
       3. [Robot arm](#robot-arm)
-         1. [Robot Movement](#robot-movement)
-         2. [Gripper](#gripper)
-         3. [Movement Routine](#movement-routine)
       4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
    5. [Results](#results)
    6. [Outlook / Conclusion](#outlook--conclusion)
@@ -906,6 +894,69 @@ $$\omega_4 = \frac{\pi}{2} - (\omega_1 + \omega_2)$$
 The rotation of the sixth joint $\omega_5$ corresponding to the rotation of the gripper is set to have a default value, such that the gripper's grabbing orientation is pointing parallel to the x-axis. This is done by setting its rotation $\omega_5$ to compensate the rotation $\omega_0$ of the first joint. Since the first and sixth joint are pointing in opossite directions, these two can take the exact same value. An angle $\theta$ with a default value of $0$ is added to the rotation of the sixth joint to allow for different orientations of the gripper.
 
 $$\omega_5 = \omega_0 + \theta$$
+
+
+The complete implementation was done as follows:
+
+```python
+def moveTo(self, pos, rotation: float|None = None):
+        '''
+        Input:
+            pos (list/iterable of length 3):
+                target position
+            rotation:
+                rotation angle of the gripper (after compensation of robots rotation)
+        
+        Moves the Gripper (fingertips) to given positions with hand pointing down.
+        Movements area awaited until desired position is reached.
+        '''
+        if not isinstance(rotation, numbers.Number):
+            rotation=0
+        
+        try:
+            x0,y0,z0 = pos
+            z0 = z0 + self.HAND_LENGTH
+
+            # length of first arm
+            a = 1.095594
+            # effective length of second arm (corrected)
+            b = math.sqrt(0.174998**2 + (0.340095+0.929888)**2) 
+            # angle correction for w2
+            w2_correction = math.atan(0.174998/(0.340095+0.929888))
+            
+            # origin to joint 1 translation
+            l1t = np.array([0.178445, 0, 0.334888]) + np.array([0, 0, 0.159498])
+                
+            x = x0
+            y = y0
+            z = z0 - l1t[2]
+            
+            h = math.sqrt(x*x+y*y)-l1t[0]
+            c = math.sqrt(h*h+z*z)
+            
+            w0 = math.atan(y0/x0) # base rotation (align arm with diagonal h on the xy plane)
+        
+            w1 = math.pi/2 - (math.atan(z/h) + math.acos((a*a-b*b+c*c)/(2*a*c))) # shoulder / first link pitch
+            w2 = math.pi/2 - math.acos((a*a+b*b-c*c)/(2*a*b)) + w2_correction# elbow direction
+            
+            w3 = 0 # forearm rotation (should always point to 0 (down))
+            w4 = math.pi/2-w1-w2#math.atan(h/z) + math.acos((b*b+c*c-a*a)/(2*b*c)) - math.pi/2# wrist direction
+            
+            w5 = w0 + rotation# wrist rotation
+            # w5 = ((w0+np.pi/2)%np.pi)-np.pi + rotation
+            
+            if x<0:
+                w0 += math.pi
+            motor_angles = (np.array([w0,w1,w2,w3,w4,w5]) + math.pi) % (2*math.pi) - math.pi
+            
+            # print(f'moving to: {motor_angles}')
+            
+            self.setPosition(motor_angles)
+            self.awaitPosition(motor_angles)
+                
+        except Exception as e:
+            self.logW(e)
+```
 
 
 #### Gripper
