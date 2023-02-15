@@ -24,9 +24,9 @@ The model was able to detect the beer can with an accuracy of 94 percent. Howeve
 
 \subsection{Second approach}
 
-The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]
+The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. \autocite{ImageAI}
 
-In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. [2] We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
+In order to reduce the effort needed to train the model, we decided to use transfer learning, which is a machine learning method where a model, trained on a large dataset, is used as a starting point for a new model. The new model is then trained, containing the pre-trained weights of the origin model. \autocite{mlearning} We chose to use the pre-trained YOLOv3 model, mentioned above, as the basis for transfer learning. 
 
 \subsection{Training data }
 
@@ -220,7 +220,7 @@ The results of the evaluation revealed that the model achieved a recall value of
 
 The recall value of 0.748433 indicates that the model correctly detected 74.84\% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35\% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60\% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03\% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
-The low mAP@0.5-0.95 score indiciates that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
+The low mAP@0.5-0.95 score indicates that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
 
 \begin{figure}[!h]
     \centering
@@ -366,7 +366,7 @@ $$\mathbf{M_{img2table}} = \mathbf{M_s} \cdot \mathbf{M_{rt}}$$
 \textcolor{red}{Figure X shows the coordinate systems of the image and table relative to eachother the vectors for a point in each of them. Shows the result of applying the first Transformation matrix to a point in the image} % end red
 
 
-A second transformation matrix is then responsible of transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $\mathbf{M_{table2world}}$.
+A second transformation matrix is then responsible for transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $\mathbf{M_{table2world}}$.
 
 These two transformation matrices are then multiplied with one another to produce a final transformation matrix $\mathbf{M_{img2world}}$ in order to directly transform the position vector from the image coordinate system to the world coordinate system.
 
@@ -488,12 +488,11 @@ The following section describes the implementation of the second solution, which
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/red_color.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/simple_ik_geometry.png}
     \caption{Inverse Kinematic algorithm for the simplified kinematic chain.}
     \label{fig:simplified_kinematic}
 \end{figure}
 
-\textcolor{red}{Insert figure from presentation} % end red
 
 The position of the first motor $\omega_0$ can be calculated by removing the z component of the position vector $\vec{p_{xyz}}$, resulting in the vector $\vec{p_{xy}}$ and finding the angle $\omega_0$ produced between $\vec{p_{xy}}$ and the x axis $\vec{e_x}$ of the coordinate system with the following formula:
 
@@ -530,63 +529,49 @@ $$\omega_5 = \omega_0 + \theta$$
 The complete implementation was done as follows:
 
 \begin{lstlisting}[language=python]
-def moveTo(self, pos, rotation: float|None = None):
-        '''
-        Input:
-            pos (list/iterable of length 3):
-                target position
-            rotation:
-                rotation angle of the gripper (after compensation of robots rotation)
+def moveTo(self, pos, rotation: float = 0):
         
-        Moves the Gripper (fingertips) to given positions with hand pointing down.
-        Movements area awaited until desired position is reached.
-        '''
-        if not isinstance(rotation, numbers.Number):
-            rotation=0
-        
-        try:
-            x0,y0,z0 = pos
-            z0 = z0 + self.HAND_LENGTH
+    try:
+        x0,y0,z0 = pos
+        z0 = z0 + self.HAND_LENGTH
 
-            # length of first arm
-            a = 1.095594
-            # effective length of second arm (corrected)
-            b = math.sqrt(0.174998**2 + (0.340095+0.929888)**2) 
-            # angle correction for w2
-            w2_correction = math.atan(0.174998/(0.340095+0.929888))
-            
-            # origin to joint 1 translation
-            l1t = np.array([0.178445, 0, 0.334888]) + np.array([0, 0, 0.159498])
-                
-            x = x0
-            y = y0
-            z = z0 - l1t[2]
-            
-            h = math.sqrt(x*x+y*y)-l1t[0]
-            c = math.sqrt(h*h+z*z)
-            
-            w0 = math.atan(y0/x0) # base rotation (align arm with diagonal h on the xy plane)
+        # length of first link
+        a = 1.095594
+        # effective length of second link (corrected)
+        b = math.sqrt(0.174998**2 + (0.340095+0.929888)**2) 
+        # angle correction for w2
+        w2_correction = math.atan(0.174998/(0.340095+0.929888))
         
-            w1 = math.pi/2 - (math.atan(z/h) + math.acos((a*a-b*b+c*c)/(2*a*c))) # shoulder / first link pitch
-            w2 = math.pi/2 - math.acos((a*a+b*b-c*c)/(2*a*b)) + w2_correction# elbow direction
+        # origin to joint 1 translation
+        l1t = np.array([0.178445, 0, 0.334888]) + np.array([0, 0, 0.159498])
             
-            w3 = 0 # forearm rotation (should always point to 0 (down))
-            w4 = math.pi/2-w1-w2#math.atan(h/z) + math.acos((b*b+c*c-a*a)/(2*b*c)) - math.pi/2# wrist direction
+        x = x0
+        y = y0
+        z = z0 - l1t[2]
+        
+        h = math.sqrt(x*x+y*y)-l1t[0]
+        c = math.sqrt(h*h+z*z)
+        
+        w0 = math.atan(y0/x0) # base rotation
+        w1 = math.pi/2 - (math.atan(z/h) + math.acos((a*a-b*b+c*c)/(2*a*c))) # first link (shoulder) pitch
+        w2 = math.pi/2 - math.acos((a*a+b*b-c*c)/(2*a*b)) + w2_correction # second link (elbow) pitch
+        w3 = 0 # third link (forearm) rotation (always 0)
+        w4 = math.pi/2-w1-w2 # fourth link (wrist) pitch
+        w5 = w0 + rotation # fifth link (hand) rotation
+        
+        # Check quadrant and add pi to w0 if necessary
+        if x<0:
+            w0 += math.pi
+
+        # clamp motor angles to [-pi,pi]
+        motor_angles = (np.array([w0,w1,w2,w3,w4,w5]) + math.pi) % (2*math.pi) - math.pi
+        
+        self.setPosition(motor_angles)
+        self.awaitPosition(motor_angles)
             
-            w5 = w0 + rotation# wrist rotation
-            # w5 = ((w0+np.pi/2)%np.pi)-np.pi + rotation
-            
-            if x<0:
-                w0 += math.pi
-            motor_angles = (np.array([w0,w1,w2,w3,w4,w5]) + math.pi) % (2*math.pi) - math.pi
-            
-            # print(f'moving to: {motor_angles}')
-            
-            self.setPosition(motor_angles)
-            self.awaitPosition(motor_angles)
-                
-        except Exception as e:
-            self.logW(e)
+    except Exception as e:
+        # Exception for when the position is out of reach
+        self.logW(e)
 \end{lstlisting}
 
 
@@ -603,6 +588,23 @@ This is done in order to prevent the gripper from closing through the object, wh
     \caption{Gripper closing through can and getting an object stuck between its fingers.}
     \label{fig:stuck_can}
 \end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \adjincludegraphics[width=\textwidth]{Figures/can_through.png}        
+        \caption{Gripper going through can}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \adjincludegraphics[width=\textwidth]{Figures/can_stuck.png}        
+        \caption{Can getting stuck between gripper's fingers}
+    \end{subfigure}\\\vspace{0.5cm}
+
+    \caption{behaviourof the gripper when attempting to grab an object with feedback force detection disabled.}
+    \label{fig:grip_states}
+\end{figure}
+
 
 The implementation of this procedure is shown below:
 
@@ -645,9 +647,20 @@ The \(@looper\) decorator is used to call the function repeatedly each time it f
 
 \subsection{Movement Routine}
 
-The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function \(moveTo\), directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the \(imageScan\) module responsible of taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
+The core functionality of the robot controller lies in the autoloop function, which is called after all necessary devices and attributes have been initialized. This function begins with a call to the function \(moveTo\), directing the robot to move to the HOME position.  This is done in order to ensure that the robot is not in the way of the camera for the following step, which consists on a call to the \(imageScan\) module responsible for taking a picture of the table, identifiying the objects and returning a list with dictionaries containing all the relevant information about them.
+
+\begin{lstlisting}
+@looper
+def autoloop(self) -> None:
+    '''Main loop of the robots controller. Autonomous mode'''
+    self.moveTo(self.HOME_POSITION)
+    objects = self.imageScanner.scanImage()
+    self.organizeObjects(objects)
+\end{lstlisting}
+
 
 Afterwards, the \(organizeObjects\) function is called which iterates through the found objects. For each object the procedure is as follows: 
+
 
 A check is perfomed to see if the \(stopOrganization\) variable has been set to True, which would meant that a change in the tables configuration has been performed. In this case, the controller return to moving the robot to the \(HOME\) position and the imageScan module is called again to update the list of objects. 
 
@@ -657,35 +670,102 @@ The position of the object within the image is then transformed to the global co
 
 The vertical offset in the \(z\) dimension is then  applied to both the current position and the destination position of the object, ensuring that the gripper is able to close around the object and grab it. 
 
+\begin{lstlisting}
+def organizeObjects(self, objects: Iterable[dict]) -> None:
+    for obj in objects:
+        if self.stopOrganization:
+            self.stopOrganization=False
+            return
+
+        worldpos = self.mainTable.local2world(obj['position'])
+        destination = self.mainTable.local2world((-0.1,0.9,0))
+        voffset = 0
+        
+        if obj['name'] in self.objectInfo.keys():
+            destination = self.objectInfo[obj['name']]['destination']
+            voffset = self.objectInfo[obj['name']]['voffset'] 
+            
+        
+        placePosition = tuple(np.array(destination)+np.array((0,0,voffset)))
+        pickPosition = tuple(np.array(worldpos)+np.array((0,0,voffset)))
+        
+        self.pickNplace(pickPosition, placePosition , rotation=-obj['orientation'])
+\end{lstlisting}
+
 Together with the objects orientation from the \(image Detection\) module, the resulting \(pickPosition\) and \(placePosition\) are then passed  to the \(pickNplace\) function,  which passes the positions to the functions \(pickUpObject\) and \(placeObject\) respectively and calls them one after the other.
+
+
+\begin{lstlisting}
+def pickNplace(self, position: Vec3, destination: Vec3, place_method = None, rotation = None) -> None:
+    self.pickUpObject(position, rotation=rotation)
+    self.placeObject(destination, method=place_method)
+\end{lstlisting}
 
 
 The \(pickUpObject\) begins by calling the function \(moveTo\), moving the arm and gripper to a position above the object to be picked up and rotating the gripper according to the objects orientation. The distance to this object defined by the variable \(SAFE\_HEIGHT\).
 The gripper is open by a call to \(Gripper.open\) and the robot lowers the gripper to reach the object at \(pickPosition\) through a second call to the \(moveTo\) function.
 This is followed by the \(Gripper.close\) function, which closes the grippers fingers like previously described to grab the object, and a last call to the \(moveTo\) function to move the robot back to the safe position above the object above the object.
 
+\begin{lstlisting}
+def pickUpObject(self, _pos: Vec3, safeHeight = None, rotation = None) -> None:
+    if safeHeight is None:
+        safeHeight = self.SAFE_HEIGHT
+
+    pos = np.array(_pos)
+    posSafe = pos + np.array([0,0,safeHeight])
+
+    self.moveTo(posSafe, rotation=rotation)
+    self.gripper.open()
+    self.moveTo(pos, rotation=rotation)
+    self.gripper.close()
+    self.moveTo(posSafe)
+\end{lstlisting}
+
 The implementation of the \(placeObject\) function is very similar to the \(pickUpObject\) function, with the only difference being that the gripper is kept closed holding the object until the \(placePosition\) is reached. Once the robot has reached the \(placePosition\), the gripper is opened and the robot moves back to a safe height above the objects position.
+
+\begin{lstlisting}
+def placeObject(self, _pos: Vec3, method: Literal['drop']|Any = 'place', safeHeight: float|None = None) -> None:   
+    if safeHeight is None:
+        safeHeight = self.SAFE_HEIGHT
+        
+    pos = np.array(_pos)
+    posSafe = pos + np.array([0,0,safeHeight])
+    
+    self.moveTo(posSafe)
+    if method != 'drop':
+        self.moveTo(pos)
+    self.gripper.open()
+    self.moveTo(posSafe)
+\end{lstlisting}
 
 After this, the process of getting the pick and place positions and calling the \(pickNplace\) function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
 
-\textcolor{red}{ make reference to the following diagram } % end red
+This pick and place implementation is also shown in \vref{fig:pick_n_place}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/pick_place_loop.png}
+    \caption{Pick and place implementation}
+    \label{fig:pick_n_place}
+\end{figure}
+
 \textcolor{red}{ close section } % end red
 
-\begin{lstlisting}[]%language=plantuml
-@startuml
-start
-    :Move Gripper above Object Position;
-    :Open Gripper;
-    :Move Gripper down to Object Position;
-    :Close Gripper;
-    :Move Gripper up;
-    :Move Gripper above Target Position;
-    :Move Gripper down to Target Position;
-    :Open Gripper;
-    :Move Gripper up;
-stop
-@enduml
-\end{lstlisting}
+% \begin{lstlisting}[]%language=plantuml
+% @startuml
+% start
+%     :Move Gripper above Object Position;
+%     :Open Gripper;
+%     :Move Gripper down to Object Position;
+%     :Close Gripper;
+%     :Move Gripper up;
+%     :Move Gripper above Target Position;
+%     :Move Gripper down to Target Position;
+%     :Open Gripper;
+%     :Move Gripper up;
+% stop
+% @enduml
+% \end{lstlisting}
 
 \textcolor{orange}{
 \begin{itemize}
