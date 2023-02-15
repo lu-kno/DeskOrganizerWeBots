@@ -109,7 +109,7 @@ Solution theory, implementations and documentation of the developed system are p
 - [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
   - [Introduction](#introduction)
   - [Project introduction](#project-introduction)
-  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+  - [Solution Theory](#solution-theory)
     - [Object detection](#object-detection)
     - [Coordinates transformation](#coordinates-transformation)
       - [Transformation Matrix](#transformation-matrix)
@@ -117,11 +117,10 @@ Solution theory, implementations and documentation of the developed system are p
       - [Robot Kinematics](#robot-kinematics)
       - [Gripper Actuation](#gripper-actuation)
       - [Movement coordination](#movement-coordination)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
   - [Implementation](#implementation)
     - [Object detection](#object-detection-1)
       - [First approach](#first-approach)
-      - [Second approach / Solution](#second-approach--solution)
+      - [Second approach](#second-approach)
       - [Training data](#training-data)
       - [Training](#training)
       - [Result](#result)
@@ -130,11 +129,9 @@ Solution theory, implementations and documentation of the developed system are p
       - [Robot Movement](#robot-movement)
       - [Gripper](#gripper)
       - [Movement Routine](#movement-routine)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
   - [Results](#results)
-  - [Outlook / Conclusion](#outlook--conclusion)
+  - [Conclusion](#conclusion)
 - [Sources](#sources)
-  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -193,7 +190,7 @@ Figure one shows the project setup in Webots. A camera is used to detect objects
 The system was developed by a team of two students and divided into three main components: object detection, coordinate transformation, and robotic arm control. 
 
 
-## Solution Theory (given problems and proposed solutions)
+## Solution Theory
 
 This chapter addresses the solution concepts for the problems that needed to be solved in order to realize the project and is structured according to the previously mentioned main components of the project: object detection, coordinate transformation, and robotic arm control. 
  
@@ -419,14 +416,6 @@ Coornidation of the different steps required for the organization process.
   
 </draft>
 
-
-
-
-
-### Notes for this chapter (to be deleted later)
-- Milestones or steps needed in project development
-- We define which problems we needed to solve and our first approaches to solve these problems
-
 ## Implementation 
 In this chapter we will describe the implementation of the solutions proposed in the previous chapter. Additionally, there will be a comparison between the theoretical solution and the actual implementation as well as a discussion of the difficulties that were encountered during the development process. The chapter is structured according to the previously mentioned main modules of the project: object detection, coordinate transformation, and robotic arm control.
 ### Object detection
@@ -444,7 +433,7 @@ Figure 2 shows the results of the object detection using the YOLOv3 model. The f
 
 The model was able to detect the beer can with an accuracy of 94 percent. However, the orange only had a likelihood of 71 percent whereas the apple and the computer mouse were not detected at all. Although the model was able to identify the beer can the overall performance was not satisfactory and another solution was needed.
 
-#### Second approach / Solution
+#### Second approach
 
 The second approach to solve the problem of object detection was to train a custom model. In the project plan, it was not initially planned to train an own model. However, to streamline the process, the decision was made to utilize the ImageAI library, a python library that offers a convenient framework for training and utilizing object detection models. [1]
 
@@ -924,9 +913,6 @@ The implementation of this procedure is shown below:
 The `@looper` decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of `-1` to indicate that the function should no longer be called and the loop must be finished.
 
 
-
-
-
 <draft>
 
 - closing the fingers through the object caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
@@ -986,18 +972,6 @@ stop
 
 </draft>
 
-
-
-
-### Notes for this chapter (to be deleted later)
-- implementation of solutions -> going into detail at interesting places 
-
-- Structure corresponds to chapter in solution theory
-
-- Point out differences between previously planned solutions and actual implementation
-
-- Describe how it actually works
-
 ## Results
 
 This chapter provides an overview of the results achieved during the development of the project. The objective of the project was to develop an autonomous system that can detect objects in a specific environment and relocate them to a designated location. In order to achieve this, a robot arm was programmed to perform a series of tasks. 
@@ -1020,8 +994,8 @@ Figure 8 shows the starting configuration of the simulation. The objects are ran
 
 Figure 9 presents the organized workspace at the end of the simulation. The robot arm has successfully detected and relocated all objects to their designated locations within the workspace.
 
-Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained through a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
-## Outlook / Conclusion
+Ultimately, it can be concluded that the objectives and requirements of the project have been fulfilled. It's important to note that the results presented in the project report were obtained in a simulation environment, which offers certain advantages and limitations. While the simulation allowed for a controlled and repeatable setup, it didn't include the nuanced challenges of real-world applications. For instance, in the simulation, all objects were of the same size, and only one type of object was present in each class. In real-world scenarios, objects may come in different shapes, sizes, and colors. Nevertheless, the simulation provided a proof of concept for the project, which can be further refined and adapted to more complex scenarios.
+## Conclusion
 
 In this project a robot controller for a robot arm that can be used to organize a workspace was successfully developed. The milestones achieved in the development process included the successful implementation of computer vision techniques, the creation of a framework to automate the process of creating training data and robot arm as well as gripper movement routines.
 
@@ -1049,78 +1023,3 @@ Another aspect that could be improved is the movement of the gripper's fingers, 
 
 
 <div style="page-break-after: always"></div>
-
-## References for Markdown (to be deleted later)
-
-![time spent on different calls](./timespentoncalls.png)
-
-```prolog
-piece(p01, [s00,s01,s02n,s00]).
-% (...)
-
-piece(marginLeft,[null,smargin,null,null]).
-piece(margin2d,[smargin,smargin,smargin,smargin]).
-piece(margin2d,[s00,smargin,smargin,smargin]).
-```
-
-
-
-
-This is achieved through the predicate `matchingShapes/2`, which was kept as a separate predicate to avoid the endless loops that would occur if `shapeMatch(A,B):## shapeMatch(B,A).` had been used.
-
-
-```plantuml
-@startyaml
-pSearch(Piece, [Upper, Right, Down, Left]):
-    0 deg rot.: piece(Piece, [Upper, Right, Down, Left])
-    90 deg rot.: piece(Piece, [Left, Upper, Right, Down])
-    180 deg rot.: piece(Piece, [Down, Left, Upper, Right])
-    270 deg rot.: piece(Piece, [Right, Down Left, Upper])
-
-@endyaml
-```
-
-```plantuml
-@startuml
-
-:**solutionDownwards**;
-    if (previous row __is__ last bottom row) then (no: continue)
-        :## matchRight starting on left margin 
-          matching upper row shape
-    #### add pieces from new row 
-          to list of unavailable pieces
-    #### solutionDownwards get following row (recursion)
-        **return** this row and following rows;
-    else (yes: stop)
-        : no more rows can be built (puzzle complete)
-        **return**  empty list;
-    endif
-:## list containing current and following rows;
-@startuml
-```
-
-```plantuml
-@startuml
-
-:**matchRight**;
-    if (current piece == right margin) then (no: continue)
-        :## get required Left and Upper shapes
-    #### search piece with matching shapes
-    #### check if piece is still available
-    #### matchRight on new piece (get following matches)(recursion)
-        **return** this piece and following matches;
-    else (yes: stop)
-        :**return**  empty list;
-    endif
-:## list of pieces forming built row
-## bottom shape of built row;
-@startuml
-```
-
-|**Call \ PuzzleSize**	|10	|25	|50	|75	|100	|125	|150    |
-|:---	|-:	|-:	|-:	|-:	|-:	|-:	|-:    |
-|$memberchk/3	|10.40%	|24.90%	|53.00%	|71.60%	|88.00%	|89.40%	|91.30% |
-|piece/2	|49.30%	|37.50%	|24.60%	|13.40%	|5.70%	|5.00%	|4.50%  |
-|matchRight/6	|25.40%	|5.00%	|4.00%	|2.60%	|0.90%	|0.60%	|0.40%  |
-|pieceSearch/3	|0.00%	|16.30%	|5.40%	|2.20%	|0.80%	|1.00%	|0.60%  |
-|pSearch/2	|4.50%	|5.30%	|3.50%	|3.40%	|1.00%	|0.90%	|0.70%  |
