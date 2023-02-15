@@ -15,11 +15,6 @@ To detect the orientation of an object relative to the table, we decided to use 
 
 \section{Coordinates transformation}
 
-Once the objects are detected, the next step is to determine their coordinates in the simulation. 
-
-\begin{itemize}
-    \item TODO: first / theoretical approach to solve problem(s)
-\end{itemize}
 Once knowing the coordinates of the detected object in the image, 
 the next step is to transform the objects position vector from the image's coordinate system to the world's coordinate system. This type of transformation is best achieved with the use of a transformation matrix.
 
@@ -168,11 +163,16 @@ Calculating the position of the gripper (the end effector) from the known positi
 Nonetheless, the reverse operation, which aims to calculate the required position of the joints in the kinematic chain for a given position of the end effector presents a more challenging problem. 
 This process called inverse kinematics (IK), for which different methods can be used. These methods can be divided into two categories: analytical and numerical.
 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/fk_vs_ik.png}
+    \caption{Forward and inverse kinematics}
+    \label{fig:fkik}
+\end{figure}
+
 The analytical methods are based on the use of trigonometric formulas, which can be used to calculate the required position values for the motors. However, these methods are limited to a specific number of degrees of freedom, and can only be used for a limited number of cases.
 
 The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and are non-deterministic procedures, meaning there can be more than one solution for a given point. Likewise, the time required to find a solution is also non-deterministic, which poses a problem when critical computations need to be performed in real time.
-
-\textcolor{red}{Insert image showing forward and inverse kinematics from Folien} % end red
 
 
 \subsection{Gripper Actuation}
@@ -183,8 +183,12 @@ A different approach that aims to improve the contact area of the gripper, is po
 
 The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
 
-\textcolor{red}{insert figure of gripper open, closed claw and closed flat} % end red
-
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/red_color.jpg}
+    \caption{From left to rigth: Gripper in open, closed claw, and closed flat positions.}
+    \label{fig:gripper_states}
+\end{figure}
 
 \subsection{Movement coordination}
 
