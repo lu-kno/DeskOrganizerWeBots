@@ -1,3 +1,17 @@
+# Instructions to run the simulation
+
+1. [Dowload](https://cyberbotics.com/doc/guide/installation-procedure) Webots following the steps provided in the link. Make sure to install the version that matches your operating system.
+   
+2. [Dowload](https://www.python.org/downloads/) Python version 3.7 or higher. Make sure to add Python to your PATH.
+
+3. Install dependencies:
+   
+  ```prolog
+  pip install -r requirements.txt
+  ```
+
+4. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
+
 # DeskOrganizerWeBots
 
 ## Movement
@@ -59,16 +73,24 @@ Movement directions make sense when "standing" in front of the robot
     - [ ] Mention video directory in repo to present results
   
   - [ ] find solution for model download (maybe use git lfs) 
-  - [ ] write abstract 
-  - [ ] export final pdf (attempt in latex)
+      - [ ] remove object detection model from git ignore and push it to github
+
+  - [ ] export final pdf (attempt in latex)- [DeskOrganizerWeBots](#deskorganizerwebots)
+  - [Movement](#movement)
+  - [To Do](#to-do)
+  - [Report To Do](#report-to-do)
+  - [used to avoid tracking of some world files](#used-to-avoid-tracking-of-some-world-files)
+  - [sources](#sources)
+
   - [ ] complete source code comments and docstrings
   - [ ] fix indexing of table of contents in pdf
   - [ ] (optional) config.yaml file to change global flags and maybe set parameters
-  - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
-  - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
-  - [ ] remove object detection model from git ignore and push it to github
+
+  - [X] write abstract 
   - [x] record video of robot in action (already recorded by Lu)
 
+  - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
+  - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
 Lu:
 
 - [ ] add code snippets

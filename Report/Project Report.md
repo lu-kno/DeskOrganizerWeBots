@@ -103,23 +103,23 @@ Solution theory, implementations and documentation of the developed system are p
 <div style="page-break-after: always"></div>
 
 # Table of Content
-1. [Robot Desk Organizer](#robot-desk-organizer)
-2. [Abstract](#abstract)
-3. [Table of Content](#table-of-content)
-4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-   1. [Introduction](#introduction)
-   2. [Project introduction](#project-introduction)
-   3. [Solution Theory](#solution-theory)
-      1. [Object detection](#object-detection)
-      2. [Coordinates transformation](#coordinates-transformation)
-      3. [Robot controller](#robot-controller)
-   4. [Implementation](#implementation)
-      1. [Object detection](#object-detection-1)
-      2. [Coordinate transformation](#coordinate-transformation)
-      3. [Robot arm](#robot-arm)
-   5. [Results](#results)
-   6. [Conclusion](#conclusion)
-5. [Sources](#sources)
+- [Robot Desk Organizer](#robot-desk-organizer)
+- [Abstract](#abstract)
+- [Table of Content](#table-of-content)
+- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+  - [Introduction](#introduction)
+  - [Project introduction](#project-introduction)
+  - [Solution Theory](#solution-theory)
+    - [Object detection](#object-detection)
+    - [Coordinates transformation](#coordinates-transformation)
+    - [Robot controller](#robot-controller)
+  - [Implementation](#implementation)
+    - [Object detection](#object-detection-1)
+    - [Coordinate transformation](#coordinate-transformation)
+    - [Robot arm](#robot-arm)
+  - [Results](#results)
+  - [Conclusion](#conclusion)
+- [Sources](#sources)
 
 <div style="page-break-after: always"></div>
 
@@ -162,10 +162,10 @@ The "Implementation" chapter provides detailed explanations of how the solutions
 
 The objective of the project is to create a robotic system capable of tidying and arranging a workspace. The design incorporates a camera that identifies objects within the area, which the robotic arm then grasps and relocates to a designated spot.
 
+In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications. Git was used to manage the project and to facilitate collaboration between the team members.
+
 - prove of concept for varios real world application
 - Solution transferable to other use cases
-
-In the initial phases of the project, the decision was made to utilize a simulation rather than a physical robot. This choice was made due to the ease of testing and development in a simulated environment. The Webots simulation platform was selected for its compatibility with the project, as it is an open-source simulation platform utilized for research and education purposes. The platform is based on the ODE physics engine and the OpenGl graphics library, and offers a broad array of sensors and actuators that can be utilized to develop a robot. Furthermore, Webots integrates various existing robot-devices so that the developed controllers can be used in the real world applications. We chose to use the Irb4600 robot, which is a six-axis industrial robot that is widely used in industry. Additionally the Webots API is provided in various programming languages, including C++, Python, Java, and Matlab. Due to the machine learning and computer vision components of the project, we decided to use Python to implement the developed solution, as it is widely supported in computer vision and machine learning applications. Git was used to manage the project and to facilitate collaboration between the team members.
 
 
 <div class="center-div">
