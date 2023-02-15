@@ -99,7 +99,8 @@ Movement directions make sense when "standing" in front of the robot
   - [Report To Do](#report-to-do)
   - [used to avoid tracking of some world files](#used-to-avoid-tracking-of-some-world-files)
   - [sources](#sources)
-
+  - [ ] fix First page 
+  - [ ] remove references for latex
 
   - [ ] fix indexing of table of contents in pdf
   - [ ] (optional) config.yaml file to change global flags and maybe set parameters
