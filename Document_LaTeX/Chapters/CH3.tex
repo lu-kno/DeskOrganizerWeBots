@@ -307,7 +307,7 @@ def getOrientationPCA(self, edges):
     angle = math.atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
     return angle
 \end{lstlisting}
-This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. [reference 3]
+This approach to determining the orientation of an object is based on the assumption that the main orientation of an object can be determined by finding the eigenvector with the highest variance in the dataset of edge points. OpenCV's principal component analysis implementation is used to find the eigenvectors of the dataset. The angle to the x-axis of the eigenvector with the highest variance is then calculated and returned as the main orientation of the object. The implementation of the function is partially based on an implementation example. \autocite{orientation}
 
 A graphical representation of these steps is shown in \vref{fig:orientation_steps}, which highlights the individual images of the object at different stages of the process. 
 
