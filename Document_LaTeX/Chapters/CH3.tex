@@ -14,7 +14,7 @@ The first approach to solve the problem of object detection was to use the YOLOv
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/cvResultExistingModel.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/cvResultExistingModel.jpg}
     \caption{Object detection results YOLOv3 model }
     \label{fig:object_detection_results}
 \end{figure}
@@ -131,14 +131,14 @@ The method must be invoked twice, once for the generation of training data and o
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/image_344.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/image_344.jpg}
     \caption{image\_344.jpg in image directory  }
     \label{fig:dataset_train_img}
 \end{figure}
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/image_344.txt.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/image_344.txt.jpg}
     \caption{image\_344.txt in annotations directory  }
     \label{fig:dataset_train_ann}
 \end{figure}
@@ -218,13 +218,13 @@ The results of the training after the 100th iteration are presented below.
 
 The results of the evaluation revealed that the model achieved a recall value of 0.748433, precision value of 0.683522, mAP@0.5 value of 0.736085, and mAP@0.5-0.95 value of 0.340358. 
 
-The recall value of 0.748433 indicates that the model correctly detected 74.84% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
+The recall value of 0.748433 indicates that the model correctly detected 74.84\% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35\% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60\% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03\% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
 The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/snapshot-detected-nms0.5.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/snapshot-detected-nms0.5.jpg}
     \caption{Object detection results self trained model }
     \label{fig:trained_model_results}
 \end{figure}
@@ -237,7 +237,7 @@ The results of the object detection process using The NMS algorithm with a thres
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/snapshot-detected.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/snapshot-detected.jpg}
     \caption{Object detection results self trained model }
     \label{fig:trained_model_results_2}
 \end{figure}
@@ -311,7 +311,7 @@ A graphical representation of these steps is shown in \vref{fig:orientation_step
 
 \begin{figure}[!h]
     \centering
-    \adjincludegraphics[width=0.7\textwidth]{Figures/hammerTime.jpg}
+    \adjincludegraphics[width=\textwidth]{Figures/hammerTime.jpg}
     \caption{Steps do determine the orientation of an object }
     \label{fig:orientation_steps}
 \end{figure}
