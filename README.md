@@ -41,3 +41,9 @@ the wrist of the robot now follows the target while positioning the hand/gripper
   
 - The origin model used for transfer learning is available [here]((https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/))
 
+
+
+
+# Public Repository
+
+https://github.com/lu-kno/DeskOrganizerWeBots
