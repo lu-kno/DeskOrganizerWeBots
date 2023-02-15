@@ -361,7 +361,7 @@ The rotation and translation matrix $\mathbf{M_{rt}}$ is then multiplied with th
 
 $$\mathbf{M_{img2table}} = \mathbf{M_s} \cdot \mathbf{M_{rt}}$$
 
-<red>Figure X shows the coordinate systems of the image and table relative to eachother the vectors for a point in each of them. Shows the result of applying the first Transformation matrix to a point in the image</red>
+\textcolor{red}{Figure X shows the coordinate systems of the image and table relative to eachother the vectors for a point in each of them. Shows the result of applying the first Transformation matrix to a point in the image} % end red
 
 
 A second transformation matrix is then responsible of transforming the position vector from the table coordinate system to the world coordinate system. For this implementation, a level table surface parallel to the XY plane is assumed, only allowing a rotation of the table in the Z axis. The rotation matrix is created from the rotation vector of the table, and the translation is taken from its position vector relative to the world origin, resulting in the transformation matrix $\mathbf{M_{table2world}}$.
@@ -372,8 +372,8 @@ $$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}
 
 
 
-<red> Gotta mention the Z axis is flipped in the image coordinate system </red>
-<red> Include sample code to perform actual conversion, adding a fourth value to the position vector</red>
+\textcolor{red}{ Gotta mention the Z axis is flipped in the image coordinate system } % end red
+\textcolor{red}{ Include sample code to perform actual conversion, adding a fourth value to the position vector} % end red
 
 % <!-- 
 %  This matrix is created by multiplying the position vector with the rotation matrix $M_r$ and the translation matrix $M_t$ to produce the final transformation matrix $M_{table2world}$ from the table coordinate system to the world coordinate system.
@@ -404,22 +404,23 @@ $$\mathbf{M_{img2world}} = \mathbf{M_{table2world}} \cdot \mathbf{M_{img2table}}
 % -->
 
 
-<draft>
+\textcolor{orange}{
 \begin{itemize}
     \item to simplify the calculation, the robot is assumed to be at the origin of the world coordinate system, with the z-axis pointing upwards and the x-axis pointing to the forwads.  
     \item the position vector of the object in the image has the shape 2X1, since the transformation matrix requires the shape 4x1, the vector is extended with a 0 for the z axis and a 1 for the scaling factor to result in a vector p(x,y,z,s).  
     \item the scaling factor from the resulting vector is then removed to obtain the final position vector with the shape 3x1.  
 \end{itemize}
-  
-</draft>
+} %end orange
+
 
 \subsection{Robot arm}
 
-<draft>
+\textcolor{orange}{
 \begin{itemize}
     \item TODO: description of implementation Robot arm
 \end{itemize}
-</draft>
+} %end orange
+
 
 \subsubsection{Robot Movement}
 
@@ -442,12 +443,12 @@ The following section describes the implementation of the second solution, which
 % the reduced degrees of freedom allow for a more efficient implementation of the solution, as well as a more efficient computation time.
 
 
-% <draft>
+% \textcolor{orange}{
 
 % \begin{itemize}
 %     \item Behavior of the robot using IK
 %     \item Behavior of the robot using Deterministic procedure
-%     \item <red>insert pictures of a point being reached with both solutions</red>
+%     \item \textcolor{red}insert pictures of a point being reached with both solutions} % end red
     
 %     \item decisions taken
 %     \begin{itemize}
@@ -468,26 +469,35 @@ The following section describes the implementation of the second solution, which
 %     \end{itemize}
 % \end{itemize}
 
-% </draft>
-% <red>following is probably better in implementation</red>  
+% } %end orange
 
-% <draft>
+% \textcolor{red}{following is probably better in implementation} % end red  
+
+% \textcolor{orange}{
 
 % Since the direction from which the robot is approaching the objects needs to be from above, some of the robots axis can be fixed to a predefined position. This reduces the number of degrees of freedom to 3, which makes it possible to use trigonometry to calculate the required position values for the remaining motors.
-% </draft> 
+% } %end orange
+ 
 
 % -->
 
-The following figure shows the robot's simplified kinematic chain with the resulting geometry used in the calculation of the required motor positions.
+\Vref{fig:simplified_kinematic} shows the robot's simplified kinematic chain with the resulting geometry used in the calculation of the required motor positions.
 
 
-<red>Insert figure from presentation</red>
+\begin{figure}[!h]
+    \centering
+    \adjincludegraphics[width=0.7\textwidth]{Figures/red_color.jpg}
+    \caption{Inverse Kinematic algorithm for the simplified kinematic chain.}
+    \label{fig:simplified_kinematic}
+\end{figure}
+
+\textcolor{red}{Insert figure from presentation} % end red
 
 The position of the first motor $\omega_0$ can be calculated by removing the z component of the position vector $\vec{p_{xyz}}$, resulting in the vector $\vec{p_{xy}}$ and finding the angle $\omega_0$ produced between $\vec{p_{xy}}$ and the x axis $\vec{e_x}$ of the coordinate system with the following formula:
 
 $$\omega_0=\arctan{\frac{y}{x}}$$
 
-This procedure is represented geometrically on the left side of Figure Y
+This procedure is represented geometrically on the left side of \vref{fig:simplified_kinematic}
 
 The position of the second and third motors $\omega_1$ and $\omega_2$ can be represented on the plane produced by the the vector $\vec{p_{xy}}$ and the z axis $\vec{e_z}$ and calculating using the following formulas:
 
@@ -582,24 +592,54 @@ def moveTo(self, pos, rotation: float|None = None):
 
 The gripper consists of three fingers, two of which are on one side and the third being on the oppossite side. similarly to the robot arm, the gripper is controlled by setting the position of the individual motors. Since all the fingers have the same geometry, the same procedure can be used for all of them. 
 
-One important distinction between the gripper and the robot arm is that the gripper can not be set to move to a predefined position in order to grab an object. Instead, the position in which the object is grabbed needs to be found by closing the gripper fingers in small increments. This is done while continously comparing the feedback force measured by the motors' sensors to a predefined threshold value defined as \(GRIP_FORCE\). When the force on a finger exceeds the threshold value, or its position has reached the maximum angle of the joints, the finger is identified as closed and any further closing movements are stopped. The gripper is considered to have grabbed the object when all three fingers have been closed. During this procedure, all other movements of the robot are halted.
-This is done in order to prevent the gripper from closing through the object, which would cause the object to be thrown out of the gripper or get stuck to it as can be seen in figure ASDA, which would prevent subsequent objects to be grabbed correctly.
+One important distinction between the gripper and the robot arm is that the gripper can not be set to move to a predefined position in order to grab an object. Instead, the position in which the object is grabbed needs to be found by closing the gripper fingers in small increments. This is done while continously comparing the feedback force measured by the motors' sensors to a predefined threshold value defined as \(GRIP\_FORCE\). When the force on a finger exceeds the threshold value, or its position has reached the maximum angle of the joints, the finger is identified as closed and any further closing movements are stopped. The gripper is considered to have grabbed the object when all three fingers have been closed. During this procedure, all other movements of the robot are halted.
+This is done in order to prevent the gripper from closing through the object, which would cause the object to be thrown out of the gripper or get stuck to it as can be seen in \vref{fig:stuck_can}, which would prevent subsequent objects from being grabbed correctly.
 
-<red> insert picture of gripper closing through can and getting stuck</red>
+\begin{figure}[!htb]
+    \centering
+    \adjincludegraphics[width=0.7\textwidth]{Figures/red_color.jpg}
+    \caption{Gripper closing through can and getting an object stuck between its fingers.}
+    \label{fig:stuck_can}
+\end{figure}
 
 The implementation of this procedure is shown below:
 
-<red>add Gripper.close code </red>
+\begin{lstlisting}[language=python]
+@looperTimeout
+def close(self) -> int|None:
+    inc = self.SPEED * np.pi/180
+
+    forces = np.array([f[0].getForceFeedback() for f in self.fingers])
+    maxPositions = np.array([f[0].getMaxPosition() for f in self.fingers])
+    minPositionsTip = np.array([f[2].getMinPosition() for f in self.fingers])
+    
+    positions = np.array([ps[0].getValue() for ps in self.positionSensors])
+    closedFingers = []
+
+    for finger, force, maxPos, minPosTip, pos in zip(self.fingers,forces,maxPositions, minPositionsTip,positions): #
+        if (force>self.GRIP_FORCE) or abs(pos-maxPos)<0.05  :
+            closedFingers.append(True)
+            continue
+        else:
+            closedFingers.append(False)
+
+        finger[0].setPosition(min(pos+inc, maxPos))
+        finger[2].setPosition(max(-pos-inc, minPosTip))
+        
+    if np.all(closedFingers):
+        return -1    
+\end{lstlisting}
+
 
 The \(@looper\) decorator is used to call the function repeatedly each time it finishes to accomplish the iterative movement to close the gripper. One the gripper has been closed, the function return a value of \(-1\) to indicate that the function should no longer be called and the loop must be finished.
 
 
-<draft>
-
+\textcolor{orange}{
 \begin{itemize}
     \item closing the fingers through the object caused prblems such as objects getting stuck to the gripper, objects being thrown out of the gripper or the object being grabbed with the wrong orientation.
 \end{itemize}  
-</draft>
+} %end orange
+
 
 \subsubsection{Movement Routine}
 
@@ -626,8 +666,8 @@ The implementation of the \(placeObject\) function is very similar to the \(pick
 
 After this, the process of getting the pick and place positions and calling the \(pickNplace\) function is repeated for the next object in the list of objects. This process is repeated until all the objects have been picked up and placed in their corresponding positions in the table.
 
-<red> make reference to the following diagram </red>
-<red> close section </red>
+\textcolor{red}{ make reference to the following diagram } % end red
+\textcolor{red}{ close section } % end red
 
 \begin{lstlisting}[]%language=plantuml
 @startuml
@@ -645,8 +685,7 @@ stop
 @enduml
 \end{lstlisting}
 
-<draft>
-
+\textcolor{orange}{
 \begin{itemize}
     \item start function used for initialization of the robot controller with the robot as the supervisor and the devices required for the task
     \item loop and autoloop functions containing the actions to be performed by the robot
@@ -655,4 +694,4 @@ stop
       \item autoloop function contains actions that are performed autonomously by the robot. This includes the object detection routine followed by the movement of the robot itself to move the objects from one place to another.
     \end{itemize}
 \end{itemize}
-</draft>
+} %end orange

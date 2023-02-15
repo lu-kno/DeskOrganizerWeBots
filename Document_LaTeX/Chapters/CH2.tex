@@ -105,7 +105,7 @@ This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the compl
 $$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
 % <!-- 
-% <red> The following is not complete, needs to be reworked and checked </red>
+% \textcolor{red}{ The following is not complete, needs to be reworked and checked } % end red
 
 % This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
 
@@ -172,7 +172,7 @@ The analytical methods are based on the use of trigonometric formulas, which can
 
 The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and are non-deterministic procedures, meaning there can be more than one solution for a given point. Likewise, the time required to find a solution is also non-deterministic, which poses a problem when critical computations need to be performed in real time.
 
-<red>Insert image showing forward and inverse kinematics from Folien</red>
+\textcolor{red}{Insert image showing forward and inverse kinematics from Folien} % end red
 
 
 \subsubsection{Gripper Actuation}
@@ -183,7 +183,7 @@ A different approach that aims to improve the contact area of the gripper, is po
 
 The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
 
-<red>insert figure of gripper open, closed claw and closed flat</red>
+\textcolor{red}{insert figure of gripper open, closed claw and closed flat} % end red
 
 
 \subsubsection{Movement coordination}
@@ -209,23 +209,27 @@ repeat while (Keep Watching?) is (yes)
 @enduml
 \end{lstlisting}
 
-<draft>
+\textcolor{orange}{
 . moves to pick up the object and places  
 Being able to detect the objects position and orientation, and moving 
 With the information regarding the objects' position and orientation in the simulation, the following step is to control the robots movement to produce the desired behavior. The robot controller is implemented in Python and uses the Webots API to control the robot. The robot controller is responsible for the following tasks:
+}
 
+\textcolor{orange}{
 Initialization of the robot instance and the devices attached to it: 
 * camera
 * gripper
 * internal variables
 * Motor sensors
 * Motor actuators
+}
 
+\textcolor{orange}{
 Coordination of the robot's movement.
 Coornidation of the different steps required for the organization process.
 * Reding the camera's image and forwarding the data to the object detection module.
 * Reading the object detection module's output and forwarding the data to the coordinate transformation module.
 * Reading the coordinate transformation module's output and forwarding the data to the robotic arm control module.
 * Perform the movement as required for the detected objects positions
-  
-</draft>
+} %end orange
+
