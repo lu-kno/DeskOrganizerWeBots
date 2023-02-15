@@ -66,6 +66,16 @@ Movement directions make sense when "standing" in front of the robot
   - [ ] implement functionality START_WITH_RANDOMIZED_TABLE
   - [ ] implement functionality ENDLESS_TABLE_RANDOMIZATION
 
+
+
+Lu:
+
+- [ ] add code snippets
+- [ ] add figures
+- [ ] proof read
+- [ ] remove comments to self
+- [ ] add individual points missing from the sections
+
 ## used to avoid tracking of some world files
 
 `git update-index --assume-unchanged worlds/.DeskOrganizer.wbproj `

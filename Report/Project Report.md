@@ -103,38 +103,38 @@ Solution theory, implementations and documentation of the developed system are p
 <div style="page-break-after: always"></div>
 
 # Table of Content
-- [Robot Desk Organizer](#robot-desk-organizer)
-- [Abstract](#abstract)
-- [Table of Content](#table-of-content)
-- [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
-  - [Introduction](#introduction)
-  - [Project introduction](#project-introduction)
-  - [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
-    - [Object detection](#object-detection)
-    - [Coordinates transformation](#coordinates-transformation)
-      - [Transformation Matrix](#transformation-matrix)
-    - [Robot controller](#robot-controller)
-      - [Robot Kinematics](#robot-kinematics)
-      - [Gripper Actuation](#gripper-actuation)
-      - [Movement coordination](#movement-coordination)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
-  - [Implementation](#implementation)
-    - [Object detection](#object-detection-1)
-      - [First approach](#first-approach)
-      - [Second approach / Solution](#second-approach--solution)
-      - [Training data](#training-data)
-      - [Training](#training)
-      - [Result](#result)
-    - [Coordinate transformation](#coordinate-transformation)
-    - [Robot arm](#robot-arm)
-      - [Robot Movement](#robot-movement)
-      - [Gripper](#gripper)
-      - [Movement Routine](#movement-routine)
-    - [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
-  - [Results](#results)
-  - [Outlook / Conclusion](#outlook--conclusion)
-- [Sources](#sources)
-  - [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
+1. [Robot Desk Organizer](#robot-desk-organizer)
+2. [Abstract](#abstract)
+3. [Table of Content](#table-of-content)
+4. [Report: Autonomous workplace organizer](#report-autonomous-workplace-organizer)
+   1. [Introduction](#introduction)
+   2. [Project introduction](#project-introduction)
+   3. [Solution Theory (given problems and proposed solutions)](#solution-theory-given-problems-and-proposed-solutions)
+      1. [Object detection](#object-detection)
+      2. [Coordinates transformation](#coordinates-transformation)
+         1. [Transformation Matrix](#transformation-matrix)
+      3. [Robot controller](#robot-controller)
+         1. [Robot Kinematics](#robot-kinematics)
+         2. [Gripper Actuation](#gripper-actuation)
+         3. [Movement coordination](#movement-coordination)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later)
+   4. [Implementation](#implementation)
+      1. [Object detection](#object-detection-1)
+         1. [First approach](#first-approach)
+         2. [Second approach / Solution](#second-approach--solution)
+         3. [Training data](#training-data)
+         4. [Training](#training)
+         5. [Result](#result)
+      2. [Coordinate transformation](#coordinate-transformation)
+      3. [Robot arm](#robot-arm)
+         1. [Robot Movement](#robot-movement)
+         2. [Gripper](#gripper)
+         3. [Movement Routine](#movement-routine)
+      4. [Notes for this chapter (to be deleted later)](#notes-for-this-chapter-to-be-deleted-later-1)
+   5. [Results](#results)
+   6. [Outlook / Conclusion](#outlook--conclusion)
+5. [Sources](#sources)
+   1. [References for Markdown (to be deleted later)](#references-for-markdown-to-be-deleted-later)
 
 <div style="page-break-after: always"></div>
 
@@ -1025,13 +1025,18 @@ Ultimately, it can be concluded that the objectives and requirements of the proj
 
 In this project a robot controller for a robot arm that can be used to organize a workspace was successfully developed. The milestones achieved in the development process included the successful implementation of computer vision techniques, the creation of a framework to automate the process of creating training data and robot arm as well as gripper movement routines.
 
-The framework created to automate the process of training data generation is transferable to other projects in webots and possibly real world applications, depending on the quality of the object animation, including the number of polygons and textures used. Further projects could incorporate this approach and utilize a more realistic object animation to train a model for a real world use case. 
+The framework created to automate the process of training data generation is transferable to other projects in webots and possibly real world applications, depending on the quality of the object models, including their polygon density and texture resolution. Further projects could incorporate this approach and utilize a more realistic object animation to train a model for a real world use case. 
+
+The robot controller as implemented in this project has the potential of being used in real world applications due to its simplicity and deterministic nature, increased safety due to the predictability of its movements and the ability of the inverse kinematics implementation to allow for a deterministic computation time in time critical scenarios.
 
 Despite the project successfully achieving its objectives, there is still room for improvement.
 The framework implemented to automate the process of training data generation should include more configurations to setup the environment. This includes the ability utilize different objects of the same class as well as the ability to use multiple objects of the same class in the same scene.
 Improving the training data, including using multiple models per type, and improving the training process to prevent overfitting are key areas for future development.
 
-In conclusion, our project has contributed to the field of robotics by demonstrating the feasibility of using a robot controller for a robot arm in real-world applications. While our project focused on the specific use case of tidying up a cluttered workspace, the potential applications of this technology are vast, and we look forward to seeing how this technology can be further developed and applied in the future.
+One aspect of the robot's movement implementation that could be considered a significant limitation in some applications is the inability to grab and position objects from different orientations. If for example the robot arm was to be used to pick up objects from a shelf, it would be necessary to be able to grab objects from the front. While this adaptation could be easily made, having to consider objects in a shelf and a table might prove to be more challenging. 
+Another aspect that could be improved is the movement of the gripper's fingers, which has its fingertips moving in a bow shape when being opened or closed. This leads to them not being able to grasp thin flat objects from the surface, like a ruler or a knife for example. This could be improved by making use of the second joint of the fingers in order to compensate for the displacement of the fingertips in the `z` axis.
+
+<!-- In conclusion, our project has contributed to the field of robotics by demonstrating the feasibility of using a robot controller for a robot arm in real-world applications. While our project focused on the specific use case of tidying up a cluttered workspace, the potential applications of this technology are vast, and we look forward to seeing how this technology can be further developed and applied in the future.
 
 In conclusion, the project has been successfully completed and the objectives and requirements have been fulfilled. 
 
@@ -1055,7 +1060,7 @@ In conclusion, the project has been successfully completed and the objectives an
   - improve data
     - only one model usedm per type
   - improve training
-    - maybe overfitted
+    - maybe overfitted -->
 
 
 <div style="page-break-after: always"></div>
