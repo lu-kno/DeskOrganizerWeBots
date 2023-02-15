@@ -1,3 +1,4 @@
+% !TEX root = ../main.tex
 
 \chapter{Solution Theory} % Main chapter title
 \label{theory} % \ref{theory}
@@ -21,7 +22,8 @@ Once the objects are detected, the next step is to determine their coordinates i
 \end{itemize}
 Once knowing the coordinates of the detected object in the image, 
 the next step is to transform the objects position vector from the image's coordinate system to the world's coordinate system. This type of transformation is best achieved with the use of a transformation matrix.
-<!-- the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used. -->
+
+% <!-- the next step is to determine the coordinates of the object in the simulation environment so that its position relative to the robot arm can be used. -->
 
 \subsubsection{Transformation Matrix}
 
@@ -102,30 +104,29 @@ This is then multiplied with the scaling matrix $\mathbf{S}$ to obtain the compl
 
 $$\mathbf{T} =  \mathbf{S} \bullet  \mathbf{T_{0}}$$
 
+% <!-- 
+% \textcolor{red}{ The following is not complete, needs to be reworked and checked } % end red
 
-<!-- 
-<red> The following is not complete, needs to be reworked and checked </red>
+% This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
 
-This is done by dividing the dimensions of the table in the simulation by the dimensions of the table in the image. Knowing this, it is possible to generate a transformation matrix
+% The first step is to determine the dimensions of the table in order to calculate the scale factor between the image and the simulation. Knowing the scale factor, it is necessary to determine the position and orientation of the table, in order to complete the transformation matrix that needs to be use to calculate the coordinates of the object in the simulation.
 
-The first step is to determine the dimensions of the table in order to calculate the scale factor between the image and the simulation. Knowing the scale factor, it is necessary to determine the position and orientation of the table, in order to complete the transformation matrix that needs to be use to calculate the coordinates of the object in the simulation.
-
-A transformation matrix is a 4x4 matrix that is used to transform a vector from one coordinate system to another. The transformation matrix is calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The rotation matrix is used to rotate the vector around the origin of the coordinate system. The scale matrix is used to scale the vector to the desired size.
-
+% A transformation matrix is a 4x4 matrix that is used to transform a vector from one coordinate system to another. The transformation matrix is calculated by multiplying the translation matrix, the rotation matrix, and the scale matrix. The translation matrix is used to translate the vector from the origin of the coordinate system to the desired position. The rotation matrix is used to rotate the vector around the origin of the coordinate system. The scale matrix is used to scale the vector to the desired size.
 
 
-In order to tranform the coordinates from the unit `pixels` to the unit `meters`, the scale matrix is calculated as follows:
 
-$$
-\begin{bmatrix}
- width & 0 & 0 & 0 \\
- 0 & height & 0 & 0 \\
- 0 & 0 & depth & 0 \\
- 0 & 0 & 0 & 1 \\
-\end{bmatrix}
-$$
+% In order to tranform the coordinates from the unit \(pixels\) to the unit \(meters\), the scale matrix is calculated as follows:
 
-where `width`, `height`, and `depth` are the dimensions of the table in the simulation. -->
+% $$
+% \begin{bmatrix}
+%  width & 0 & 0 & 0 \\
+%  0 & height & 0 & 0 \\
+%  0 & 0 & depth & 0 \\
+%  0 & 0 & 0 & 1 \\
+% \end{bmatrix}
+% $$
+
+% where \(width\), \(height\), and \(depth\) are the dimensions of the table in the simulation. -->
 
 \subsection{Robot controller}
 
@@ -141,21 +142,20 @@ The main tasks of the robot controller are the following:
     \item coordinating the actions of the different modules
 \end{itemize}
 
-<!-- 
-It manages and accesses the robot's motors and sensors, and by using the supervisor class from the webots API, it can also have access to the other devices and elements in the simulation. This class allows it to modify the simulation environment and the nodes that are present in the scene, It also provides the capability of accessing and modifying the properties of other elements in the simulation, as well as controlling how the simulation is run.
+% <!-- 
+% It manages and accesses the robot's motors and sensors, and by using the supervisor class from the webots API, it can also have access to the other devices and elements in the simulation. This class allows it to modify the simulation environment and the nodes that are present in the scene, It also provides the capability of accessing and modifying the properties of other elements in the simulation, as well as controlling how the simulation is run.
 
- that controlls the robotic arm and accesses the different modules and devices in the simulation. The webots environment provides a supervisor class which provides the capability of accessing and modifyng the properties of other elements in the simulation, as well as controlling how the simulation is run. -->
+%  that controlls the robotic arm and accesses the different modules and devices in the simulation. The webots environment provides a supervisor class which provides the capability of accessing and modifyng the properties of other elements in the simulation, as well as controlling how the simulation is run. -->
 
 
+% <!-- is responsible for the different actions that take place in the simulation. It manages and accesses the robot's motors and sensors of the actions and the access to the other devices in the simulation. It 
 
-<!-- is responsible for the different actions that take place in the simulation. It manages and accesses the robot's motors and sensors of the actions and the access to the other devices in the simulation. It 
+% Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
 
-Additionally, a robot-controller needs to be developed to control the robotic arm and the gripper.
-
-\begin{itemize}
-    \item TODO: first / theoretical approach to solve problem(s)
-\end{itemize}  
-These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location. -->
+% \begin{itemize}
+%     \item TODO: first / theoretical approach to solve problem(s)
+% \end{itemize}  
+% These components will then be integrated into a single routine to detect objects, maneuver the robotic arm to the objects, and relocate the objects to a specified location. -->
 
 \subsubsection{Robot Kinematics}
 
@@ -172,7 +172,7 @@ The analytical methods are based on the use of trigonometric formulas, which can
 
 The numerical methods are based on the use of iterative algorithms, which can be used to calculate the required position values for the motors. However, while these methods are not limited to a specific number of degrees of freedom, they can be computationally expensive and are non-deterministic procedures, meaning there can be more than one solution for a given point. Likewise, the time required to find a solution is also non-deterministic, which poses a problem when critical computations need to be performed in real time.
 
-<red>Insert image showing forward and inverse kinematics from Folien</red>
+\textcolor{red}{Insert image showing forward and inverse kinematics from Folien} % end red
 
 
 \subsubsection{Gripper Actuation}
@@ -183,7 +183,7 @@ A different approach that aims to improve the contact area of the gripper, is po
 
 The following figure shows the gripper in the open and closed position using the a claw and a pinch grip respectively.
 
-<red>insert figure of gripper open, closed claw and closed flat</red>
+\textcolor{red}{insert figure of gripper open, closed claw and closed flat} % end red
 
 
 \subsubsection{Movement coordination}
@@ -209,23 +209,27 @@ repeat while (Keep Watching?) is (yes)
 @enduml
 \end{lstlisting}
 
-<draft>
+\textcolor{orange}{
 . moves to pick up the object and places  
 Being able to detect the objects position and orientation, and moving 
 With the information regarding the objects' position and orientation in the simulation, the following step is to control the robots movement to produce the desired behavior. The robot controller is implemented in Python and uses the Webots API to control the robot. The robot controller is responsible for the following tasks:
+}
 
+\textcolor{orange}{
 Initialization of the robot instance and the devices attached to it: 
 * camera
 * gripper
 * internal variables
 * Motor sensors
 * Motor actuators
+}
 
+\textcolor{orange}{
 Coordination of the robot's movement.
 Coornidation of the different steps required for the organization process.
 * Reding the camera's image and forwarding the data to the object detection module.
 * Reading the object detection module's output and forwarding the data to the coordinate transformation module.
 * Reading the coordinate transformation module's output and forwarding the data to the robotic arm control module.
 * Perform the movement as required for the detected objects positions
-  
-</draft>
+} %end orange
+
