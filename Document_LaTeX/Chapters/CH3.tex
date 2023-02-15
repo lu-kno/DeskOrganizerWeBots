@@ -203,9 +203,9 @@ def startTraining():
     trainer.setTrainConfig(object_names_array=categories, batch_size=32, num_experiments=100, train_from_pretrained_model=model_path)
     trainer.trainModel()
 \end{lstlisting}
-The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the trainModel method. The DetectionModelTrainer class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
+The function sets up the data directory, model path, and configuration for the training process. It also creates the class files for the categories to be detected and initiates the training process using the "trainModel" method. The "DetectionModelTrainer" class from the ImageAI library is used to set up and train the model, with parameters such as batch size, number of training experiments, and object categories specified. 
 
-The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 4 hours to complete.
+The batch size was set to 32, while the number of training iterations through the dataset was set to 100. The training process was performed on a desktop computer using a NVIDIA GeForce RTX 4080 graphics card, an AMD Ryzen 7 5800X3D processor and 32 GB of ram. The training process took approximately 8 hours to complete.
 
 
 \subsection{Result }
@@ -220,7 +220,7 @@ The results of the evaluation revealed that the model achieved a recall value of
 
 The recall value of 0.748433 indicates that the model correctly detected 74.84\% of all positive instances present in the test dataset. Precision measures the proportion of detected instances that were correctly identified as positive. The precision value of 0.683522 suggests that 68.35\% of the instances detected by the model were positive. The mAP (Mean Average Precision) metric is a measure of accuracy in object detection tasks. The mAP@0.5 value of 0.736085 indicates that, on average, the model achieved a precision of 73.60\% in detecting objects in the test dataset, with a threshold of 0.5 for Intersection over Union (IoU) between the ground-truth and predicted bounding boxes. The Intersection over Union is a metric used to evaluate the similarity between two bounding boxes and measures the ratio of the area of intersection between the two boxes to the area of their union. Similarly, the mAP@0.5-0.95 value of 0.340358 suggests an average precision of 34.03\% in detecting objects using a range of IoU thresholds from 0.5 to 0.95. 
 
-The effect is that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
+The low mAP@0.5-0.95 score indiciates that the model is more likely to detect multiple bounding boxes for the same object with a high probability. \Vref{fig:trained_model_results} shows the results of the object detection process using the custom model and demonstrates the problem. 
 
 \begin{figure}[!h]
     \centering
@@ -229,7 +229,7 @@ The effect is that the model is more likely to detect multiple bounding boxes fo
     \label{fig:trained_model_results}
 \end{figure}
 
-Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause of this issue could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
+Multiple bounding boxes with high probabilities were created respectively for each object, leading to distorted results, which is a common problem in object detection tasks. One possible reason for this issue could be overfitting, where the model has been trained for an extended period and has memorized the training data. Another possible cause could be an insufficient training dataset, which lacks diversity in its data, as it only provides a limited number of image configurations, despite the dataset's scope being sufficient.
 
 The problem can be addressed by using non-maximum suppression (NMS) to find the best fitting box based on a given threshold. The NMS algorithm is implemented in the ImageAI library and can be used by setting the \(nms\_threshold\) parameter in the corresponding function. The NMS threshold is used to determine when two bounding boxes should be considered duplicates and only one should be kept. If the overlap between two bounding boxes, measured by the IoU, is greater than or equal to the NMS threshold, then  the bounding boxes with the lower confidence score will be eliminated alternatively both bounding boxes will be kept, as they are considered to be separate detections. By setting the NMS threshold to a certain value, the algorithm can eliminate duplicates and produce a cleaner, more accurate output. 
 
@@ -244,7 +244,7 @@ The results of the object detection process using The NMS algorithm with a thres
 
 The test results indicate that the model has a satisfactory level of performance for the intended application, as it was capable to correctly determine the position and class of each object on the table in multiple test cases. 
 
-To use the model during simulation a class was implemented to handle the object detection process, which contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
+To use the model during simulation a class was implemented to handle the object detection process. The class contains a method to detect objects in a given image, returning a list of detections and their respective bounding boxes as well as the corresponding orientation.
 
 \section{Orientation of the object}
 
@@ -294,7 +294,9 @@ def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None
             return orientation
 \end{lstlisting}
 
-The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. The mask was combined using four individual masks that select from each direction the pixels that are not contained within the objects area. The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
+The first step is to crop an image of the object using the bounding box coordinates provided by the object detection class. The image is then converted to the HSV color space and edges are detected using the Canny algorithm from the OpenCV library. The next step is to remove the object's inner edges by applying a mask to the image. This mask is created by selecting all the pixels that do not have any edge pixels between itself and at least one of the image's borders.
+
+The edges are then smoothed using a Gaussian blur and contours are detected using the Canny algorithm a second time. Finally, the main orientation of the object is computed using the function "getOrientationPCA", presented in the following code segment.
 
 \begin{lstlisting}[language=python]
 def getOrientationPCA(self, edges):

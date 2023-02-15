@@ -78,7 +78,6 @@ Movement directions make sense when "standing" in front of the robot
   - [x] readme with instructions on how to run the code and how to use the interface (including the keyboard shortcuts) 
     - [x] include webots version and python version used
     - [x] Mention video directory in repo to present results
-  
     - [ ] test install instructions on a fresh machine
   
   - [ ] find solution for model download (maybe use git lfs) 
