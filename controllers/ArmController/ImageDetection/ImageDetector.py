@@ -26,22 +26,43 @@ class ImageScanner(logger):
     Class for scanning images for objects and returning their position and orientation. Which extends from the Logger class.
     """
     def __init__(self, master, model: Any|Literal['webots'] = 'webots', logging: str = 'D', logName: str = 'ImageScanner', **kwargs) -> None:
+        """
+        Initializes an instance of the ImageScanner class.
+        Parameters:
+            master (RobotArm): reference to the robot arm.
+            model (str):  the model of the image scanner. Default value is 'webots'.
+            logging (str):  the logging level. Default value is 'D'.
+            logName (str):  the name of the log file. Default value is 'ImageScanner'.
+            **kwargs (Any):  additional keyword arguments.
+            
+        """
         super().__init__(logging=logging, logName=logName, **kwargs)
         if model=='webots':
             self.scanImage = self.webotsScan
         else:
             self.scanImage = self.imageAIScan
-        
         self.master=master
         self.camera=master.camera
         self.customModel= CustomModel(logging=logging)
         
     def imageAIScan(self) -> Iterable[dict]:
+        """
+        Runs image recognition, using the custom model, on the current image and returns a list of recognized objects.
+                
+        Parameters:
+            None
+            
+        Returns:
+            objects (Iterable[dict]): A list of dictionaries representing objects in the environment.
+            Each dictionary contains the following key-value pairs:
+            - 'name': name of the recognized object
+            - 'position': position of the object in the image, as a list of two floats in the range [0, 1], representing the x and y coordinates respectively.
+            - 'boxPoints': position of the object in the image, as a list of four integers [x1, y1, x2, y2]
+            - 'orientation': orientation of the object in degrees, relative to the x-axis of the image.
+        """
         snapshot_path = os.path.join(OUTPUT_DIR, 'snapshot.jpg')
-        
         self.camera.saveImage(snapshot_path,100)
         img = cv2.imread(snapshot_path).astype('uint8')
-        
         self.logV(f"img.shape: {img.shape}")
         self.logV(f"img.dtype: {img.dtype}")
         self.logVV(f"img.unique: {np.unique(img)}")
@@ -82,15 +103,24 @@ class ImageScanner(logger):
                            
         
     def webotsScan(self) -> Iterable[dict]:
-        
+        """
+        Performs a scan of the environment using the webots object regocnition.
+
+        Returns:
+        objects (Iterable[dict]): A list of dictionaries representing objects in the environment.
+        Each contains the following key-value pairs:
+        - id: The object ID
+        - name: The object model name
+        - position: The normalized (x,y) position of the object on the image, where (0,0) is the top-left corner and (1,1) is the bottom-right corner
+        - boxPoints: The corner points of the bounding box that encloses the object, in the format [[x1,y1], [x2,y2]]
+        - orientation: The orientation of the object in degrees, calculated using the `getAngle` method
+        """
         self.camera.saveImage('snapshot.jpg', 100)
         img = cv2.imread('snapshot.jpg')
-        # img = np.array(list(self.camera.getImageArray()),dtype='uint8')[:,:,:3]
         if not np.any(img):
             return []
 
         objectsRes = self.camera.getRecognitionObjects()
-        # print(img)
         objects=[]
         for o in objectsRes:
             size=np.array(list(o.getSizeOnImage()))
@@ -108,10 +138,6 @@ class ImageScanner(logger):
             self.logD(f"pos  = {pos}")
             self.logD(f"objImage.shape = {objImage.shape}")
             self.logD(f"np.max(objImage) = {np.max(objImage)}")
-            # self.logD(f"np.max(img) = {np.max(img)}")
-            # self.logD(f"np.shape(img) = {np.shape(img)}")
-            
-            # objImage = img[]
             oValues = dict(  id=o.getId(), 
                             name=o.getModel(), 
                             position=(pos/img.shape[:2]).tolist(), 
@@ -119,8 +145,7 @@ class ImageScanner(logger):
                             orientation=self.getAngle(objImage),
                             )
             objects.append(oValues)
-        
-        # print(json.dumps(objects,indent=4))
+
         with open(os.path.join(OUTPUT_DIR,'recognitionObject.yaml'),'w+') as f:
             f.write(yaml.dump(objects))
         self.logV(yaml.dump(objects))
@@ -128,6 +153,21 @@ class ImageScanner(logger):
         return objects
         
     def getAngle(self, objectImage, name: str|None = None, savefig: bool|None = None) -> float:
+        """
+        Calculates the orientation angle of an object in an image.
+
+        Parameters:
+            objectImage (ndarray): The input image containing the object.
+            name (str): (optional) The name to be used as a prefix for saved images. Defaults to None.
+            savefig (bool): (optional) If True, save images showing the different steps of the process. Defaults to None.
+
+        Returns:
+            float: The orientation angle of the object in degrees.
+
+        Raises:
+            cv2.error: If an error occurs during the image processing.
+        """
+        
         try:
             # Convert the image to the HSV color space
             hsv_image = cv2.cvtColor(objectImage, cv2.COLOR_BGR2HSV)
@@ -175,8 +215,6 @@ class ImageScanner(logger):
             cleanEdges = cv2.Canny(blur.astype('uint8'),50,150)
             
             orientation, contourNangle = self.getOrientationPCA(cleanEdges,objectImage)
-            
-            
             if savefig:
                 if not name:
                     name=str(random.randrange(999))
@@ -207,7 +245,17 @@ class ImageScanner(logger):
             return 0
 
     def getOrientationPCA(self, edges, img) -> tuple:
-        '''returns orientation from the contour of an object'''
+        """
+        Returns the main orientation from the contours of an object,
+
+        Parameters:
+            img (ndarray): The original input image containing the object.
+            edges (ndarray): Image of the identified edges.
+   
+        Returns:
+            float: The orientation angle of the object in radians.
+
+        """
         pts = np.transpose(np.where(edges>1),[1,0]).astype(np.float64)
 
         # Perform PCA analysis
@@ -218,17 +266,22 @@ class ImageScanner(logger):
         cntr = (int(mean[0,0]), int(mean[0,1]))
         p1 = (cntr[0] + 0.02 * eigenvectors[0,0] * eigenvalues[0,0], cntr[1] + 0.02 * eigenvectors[0,1] * eigenvalues[0,0])
         p2 = (cntr[0] - 0.02 * eigenvectors[1,0] * eigenvalues[1,0], cntr[1] - 0.02 * eigenvectors[1,1] * eigenvalues[1,0])
-        # img = drawAxis(img, cntr, p1, (255, 255, 0), 1)
-        # img = drawAxis(img, cntr, p2, (0, 0, 255), 5)
-        # img[edges>1]= [225,0,225]
         
         return angle, img
 
 class CustomModel(logger):
-    """ Class to create training data as well as train and test the custin nidek """
+    """
+    Class to use the custom trained model for object detection. Extends from the Logger class. 
+    """
     def __init__(self, logging: str = 'D', logName: str = 'ImageAImodel'):
+        """
+        Initializes an instance of the CustomModel class.
+        Parameters:
+            logging (str):  the logging level. Default value is 'D'.
+            logName (str):  the name of the log file. Default value is 'ImageAImodel'.
+            
+        """
         super().__init__(logging=logging, logName=logName)
-        
         self.execution_path = os.path.dirname(__file__)
         self.detector = CustomObjectDetection()
         self.detector.setModelTypeAsYOLOv3()
@@ -239,7 +292,19 @@ class CustomModel(logger):
         self.detector.loadModel()
 
     def getObjectsFromImage(self, image) -> list[dict[str,Any]]:
-        
+        """
+        Performs object detection on an image, using the custom trained model. 
+
+        Parameters:
+            image (ndarray): The input image containing the objects to be detected.
+   
+        Returns:
+            detections (Iterable[dict]): A list of dictionaries representing detected objects in image.
+            Each dictionary contains the following key-value pairs:
+            - 'name': name of the recognized object
+            - 'position': position of the object in the image, as a list of two floats in the range [0, 1], representing the x and y coordinates respectively.
+            - 'boxPoints': position of the object in the image, as a list of four integers [x1, y1, x2, y2]
+        """
         detections = self.detector.detectObjectsFromImage(input_image=image, 
                                                     output_image_path=os.path.join(self.execution_path ,'output','snapshot-detected.jpg'),
                                                     nms_treshold = 0.05,
