@@ -25,7 +25,7 @@ class ImageScanner(logger):
     """
     Class for scanning images for objects and returning their position and orientation. Which extends from the Logger class.
     """
-    def __init__(self, master, model: Any|Literal['webots'] = 'webots', logging: str = 'D', logName: str = 'ImageScanner', **kwargs) -> None:
+    def __init__(self, master, model: Any = 'webots', logging: str = 'D', logName: str = 'ImageScanner', **kwargs) -> None:
         """
         Initializes an instance of the ImageScanner class.
         Parameters:

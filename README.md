@@ -2,7 +2,7 @@
 
 1. [Download](https://cyberbotics.com/doc/guide/installation-procedure) Webots following the steps provided in the link. Make sure to install the version that matches your operating system.
    
-2. [Download](https://www.python.org/downloads/) Python version 3.7 or higher. Make sure to add Python to your PATH.
+2. [Download](https://www.python.org/downloads/) Python version 3.10.8 or higher. Make sure to add Python to your PATH.
 
 3. Install dependencies:
    
@@ -17,17 +17,24 @@
   ```
   
 5. Start Webots and open the world file `worlds/DeskOrganizer.wbt` from the project folder. As soon as webots is started, the simulation starts automatically. The robot arm will need a few seconds to initialize and will then start moving. The Simulation can be controlled using the start, stop and reset button at the top of the screen.
-
 # Instructions to use the interface
- on autoloop mode, you can press the key 'k' to randomize the position of the object on the table.
+ On autoloop mode, you can press the key 'k' to randomize the position of the object on the table.
 
- on manual mode you can use the following keys to control the robot:
+ On manual mode you can use the following keys to control the robot:
  WASD to move the sphere around in X-Y-Z directions
  Q and E to open and close the gripper
  1 and 3 to pick up an object or place it down
 
+  Auto and Manual mode can be toggled by setting the `AUTO_LOOP` flag in ArmController.py to True or False respectively.
+# Additional information: 
+- The "vidoes" directory contains various videos showcasing the robot in action.
+  
+- The custom trained model is at: project-root\controllers\ArmController\Modelle\yolov3_DataSet_last.pt
+  
+- The origin model used for transfer learning is available [here]((https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/))
 
-Info: The "vidoes" directory contains various videos showcasing the robot in action.
+Info: The "videos" directory contains various videos showcasing the robot in action.
+
 # DeskOrganizerWeBots
 
 ## Movement
@@ -89,11 +96,16 @@ Movement directions make sense when "standing" in front of the robot
     - [x] Mention video directory in repo to present results
     - [ ] test install instructions on a fresh machine
   
-  - [ ] find solution for model download (maybe use git lfs) 
-      - [ ] remove object detection model from git ignore and push it to repo
+  - [x] find solution for model download (maybe use git lfs) 
+      - [x] remove object detection model from git ignore and push it to repo
   
-  - [ ] make sure that the git repo is publicly accessible
+  - [x] make sure that the git repo is publicly accessible
   
+  - [ ] merge project to master branch
+
+  - [x] fix First page
+    - [x] matrikelnumbers
+    - [x] logo of th koeln instead of kepten and 
   - [x] fix First page
     - [x] matrikelnumbers
     - [x] logo of th koeln instead of kepten and 
