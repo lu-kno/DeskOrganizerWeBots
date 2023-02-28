@@ -42,7 +42,7 @@ the wrist of the robot now follows the target while positioning the hand/gripper
 - The origin model used for transfer learning is available [here]((https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/))
 
 
-
+If your source files does not contain the files `DataSet_yolov3_detection_config.json` and `yolov3_DataSet_last.pt` in the directory `DeskOrganizerWeBots/controllers/ArmController/Modelle/`, then you need to download them separately, either from the github repository or from provided `Modelle.zip` file containing them and put them in the directory.
 
 # Public Repository
 
