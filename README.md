@@ -48,4 +48,4 @@ If your source files does not contain the files `DataSet_yolov3_detection_config
 
 https://github.com/lu-kno/DeskOrganizerWeBots
 
-[Final Report](https://github.com/lu-kno/DeskOrganizerWeBots/blob/master/Final%20Project%20Report.pdf)
+[Final Report](Final%20Project%20Report.pdf)
